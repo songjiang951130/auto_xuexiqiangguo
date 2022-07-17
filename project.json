@@ -1,0 +1,8 @@
+{
+    "name": "学习强国daydayup",
+    "main": "xxqg.js",
+    "ignore": ["build"],
+    "packageName": "Auto.js",
+    "versionName": "1.0.0",
+    "versionCode": 1
+  }

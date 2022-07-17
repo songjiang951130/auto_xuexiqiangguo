@@ -28,8 +28,8 @@ var two_player_battle = "yes";
 /**
  * 请在双引号里填写百度AK和SK，如何获取请看README
  *  */
-var AK = "";
-var SK = "";
+var AK = "AmC0GodmjYqq5o1yBreeG09L";
+var SK = "WWNukireGvAZGEehtQAmZdfS8tqTyp3z";
 
 /* **********************请填写如上信息********************** */
 
