@@ -971,11 +971,11 @@ if (!finish_list[3]) {
         back_track();
     }
     toast('每日答题手动答避免服务器作弊检查');
-    // entry_model(7);
-    // // 等待题目加载
-    // text('查看提示').waitFor();
-    // do_periodic_answer(5);
-    // my_click_clickable('返回');
+    entry_model(7);
+    // 等待题目加载
+    text('查看提示').waitFor();
+    do_periodic_answer(5);
+    my_click_clickable('返回');
 }
 
 /*
@@ -1121,11 +1121,14 @@ if (!finish_list[5]) {
             // 每题的过渡
             sleep(random_time(delay_time * 2));
             // 如果答错，第一次通过分享复活
-            if (text('分享就能复活').exists()) {
+            if (text("立即复活").exists()) {
                 num -= 2;
-                click('分享就能复活');
-                sleep(random_time(delay_time / 2));
-                back();
+                click("立即复活");
+                sleep(random_time(delay_time * 3));
+                if (text("访问异常").exists()) {
+                    handling_access_exceptions();
+                    sleep(random_time(delay_time * 7));
+                }
                 // 等待题目加载
                 sleep(random_time(delay_time * 3));
             }
