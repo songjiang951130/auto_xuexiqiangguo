@@ -45,34 +45,21 @@ var SK = "WWNukireGvAZGEehtQAmZdfS8tqTyp3z";
  *  */
 var pushplus_token = ["99ab8953122344c9bfefdbbe591612fd", "183cda2f82d346fa858e8d7233f027f1"];
 
+var lock_number = "303178";
+
 /* **********************请填写如上信息********************** */
- 
+
 /*判断屏幕锁定，解锁屏幕（数字密码）*/
- 
-if (!device.isScreenOn()) {//息屏状态将屏幕唤醒
- 
+if (!device.isScreenOn() && lock_number) {//息屏状态将屏幕唤醒
     device.wakeUp();//唤醒设备
- 
     sleep(1000); // 等待屏幕亮起
- 
-    //miui锁屏滑动不能唤出密码输入 通过下拉通知栏点击时间进入密码解锁
- 
     swipe(500, 30, 500, 1000, 300);
- 
     sleep(400);
- 
-    //点击时间
- 
-    click(100, 120);
- 
     //输入锁屏密码
-    desc(3).findOne().click();
-    desc(0).findOne().click();
-    desc(3).findOne().click();
-    desc(1).findOne().click();
-    desc(7).findOne().click();
-    desc(8).findOne().click();
- 
+    for (var l in lock_number) {
+        desc(lock_number[l]).findOne().click();
+        sleep(200);
+    }
 }
 
 auto.waitFor()
