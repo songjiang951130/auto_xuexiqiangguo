@@ -25,7 +25,7 @@ var all_special_answer_completed = "yes";
  * 是否完成订阅模块
  * 请填入"yes"或"no"(默认为"yes")
  *  */
-var whether_complete_subscription = "yes";
+var whether_complete_subscription = "no";
 
 /**
  * 是否完成发表言论模块
@@ -46,6 +46,34 @@ var SK = "WWNukireGvAZGEehtQAmZdfS8tqTyp3z";
 var pushplus_token = ["99ab8953122344c9bfefdbbe591612fd", "183cda2f82d346fa858e8d7233f027f1"];
 
 /* **********************请填写如上信息********************** */
+ 
+/*判断屏幕锁定，解锁屏幕（数字密码）*/
+ 
+if (!device.isScreenOn()) {//息屏状态将屏幕唤醒
+ 
+    device.wakeUp();//唤醒设备
+ 
+    sleep(1000); // 等待屏幕亮起
+ 
+    //miui锁屏滑动不能唤出密码输入 通过下拉通知栏点击时间进入密码解锁
+ 
+    swipe(500, 30, 500, 1000, 300);
+ 
+    sleep(400);
+ 
+    //点击时间
+ 
+    click(100, 120);
+ 
+    //输入锁屏密码
+    desc(3).findOne().click();
+    desc(0).findOne().click();
+    desc(3).findOne().click();
+    desc(1).findOne().click();
+    desc(7).findOne().click();
+    desc(8).findOne().click();
+ 
+}
 
 auto.waitFor()
 
@@ -296,6 +324,8 @@ function get_finish_list() {
                 weekly_answer_scored = parseInt(model.child(2).text().match(/\d+/));
             } else if (i == 8) {
                 special_answer_scored = parseInt(model.child(2).text().match(/\d+/));
+                //跳过专项答题
+                special_answer_scored = 8;
             } else if (i == 10) {
                 four_players_scored = parseInt(model.child(2).text().match(/\d+/));
             } else if (i == 11) {
@@ -404,7 +434,7 @@ while ((count < 6 - completed_read_count) && !finish_list[0]) {
         }
 
         // 观看时长
-        sleep(random_time(63000));
+        sleep(random_time(65000));
 
         back();
         count++;
