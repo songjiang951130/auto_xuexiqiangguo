@@ -1,8 +1,3 @@
-var lock_number = "303178";
+var v = device.getMusicVolume();
 
-
-if (lock_number) {
-    for (var l in lock_number) {
-        console.log(lock_number[l])
-    }
-}
+console.log("volume:" + v);

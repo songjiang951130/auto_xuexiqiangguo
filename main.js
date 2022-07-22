@@ -367,9 +367,10 @@ var back_track_flag = 0;
 /*
 **********我要选读文章与分享与广播学习*********
 */
-
+var currentVolume = device.getMusicVolume();
 // 打开电台广播
 if (!finish_list[2] && !finish_list[0]) {
+    device.setMusicVolume(0);
     sleep(random_time(delay_time));
     my_click_clickable('电台');
     sleep(random_time(delay_time));
@@ -1458,6 +1459,8 @@ if (pushplus_token) {
     // 推送消息
     push_weixin_message(account, score);
 }
+
+device.setMusicVolume(currentVolume);
 
 device.cancelKeepingAwake();
 
