@@ -1464,6 +1464,4 @@ device.setMusicVolume(currentVolume);
 
 device.cancelKeepingAwake();
 
-//震动一秒
-device.vibrate(1000);
 toast('脚本运行完成');
