@@ -985,10 +985,7 @@ var restart_flag = 0;
 
 if (!finish_list[3]) {
     sleep(random_time(delay_time));
-    if (!className('android.view.View').depth(21).text('学习积分').exists()) {
-        back_track();
-    }
-    toast('每日答题手动答避免服务器作弊检查');
+    if (!className('android.view.View').depth(21).text('学习积分').exists()) back_track();
     entry_model(7);
     // 等待题目加载
     text('查看提示').waitFor();
@@ -1037,22 +1034,33 @@ if (!finish_list[12] && weekly_answer_scored < 4 && all_weekly_answers_completed
 }
 
 /*
-**********专项答题*********
-*/
+ **********专项答题*********
+ */
+
 // 保存本地变量，如果已经做完之前的所有题目则跳过
-if (!storage.contains('all_special_answer_completed_storage')) {
-    storage.put('all_special_answer_completed_storage', "no");
+if (!storage.contains("all_special_answer_completed_storage")) {
+    storage.put("all_special_answer_completed_storage", "no");
 }
-// if (all_special_answer_completed == "no") {
-//     all_special_answer_completed = storage.get('all_special_answer_completed_storage');
-// }
+
+// 保存本地变量，改变存储上次搜索未完成的题目所需时间，用于加速搜索
+if (!storage.contains("quick_search_special_answer_time_storage")) {
+    storage.put("quick_search_special_answer_time_storage", 0);
+}
+
+// 当该账号已完成专项答题，但配置没有转为yes时，也自动跳过
+if (all_special_answer_completed == "no") {
+    all_special_answer_completed = storage.get("all_special_answer_completed_storage");
+}
 
 if (!finish_list[4] && special_answer_scored < 8) {
+    log("专项答题");
     sleep(random_time(delay_time));
-    if (!className('android.view.View').depth(21).text('学习积分').exists()) back_track();
+
+    if (!className("android.view.View").depth(21).text("学习积分").exists()) back_track();
     entry_model(8);
     // 等待列表加载
-    className('android.view.View').clickable(true).depth(23).waitFor();
+    log("等待:" + "android.view.View");
+    className("android.view.View").clickable(true).depth(23).waitFor();
     // 打开第一个出现未完成作答的题目
     // 第一个未完成作答的索引
     var special_i = 0;
@@ -1060,38 +1068,67 @@ if (!finish_list[4] && special_answer_scored < 8) {
     var special_flag = false;
     // 是否答题的标志
     var is_answer_special_flag = false;
+    // 均速搜索次数（需要根据此更新加速搜索次数）
+    var comm_search_special_answer_time = 0
+    // 加速搜索次数
+    var quick_search_special_answer_time = storage.get("quick_search_special_answer_time_storage");
 
     // 如果之前的答题全部完成则不向下搜索
-    if (all_special_answer_completed == 'yes') {
+    if (all_special_answer_completed == "yes") {
         special_flag = true;
     }
     while (!special_flag) {
-        if (text('开始答题').exists()) {
+        if (text("开始答题").exists()) {
             special_flag = true;
             break;
         }
-        while (text('继续答题').findOnce(special_i)) {
-            if (text('继续答题').findOnce(special_i).parent().childCount() < 3) {
+        while (text("继续答题").findOnce(special_i)) {
+            if (text("继续答题").findOnce(special_i).parent().childCount() < 3) {
                 special_flag = true;
                 break;
             } else {
                 special_i++;
             }
         }
-        if (!special_flag) swipe(500, 1700, 500, 500, random_time(delay_time / 2));
-        if (text('您已经看到了我的底线').exists()) storage.put('all_special_answers_completed_storage', "yes");
+        // 根据上次搜索时间 加速搜索
+        while (quick_search_special_answer_time > 0) {
+            swipe(device.width / 2, (device.height * 13) / 15, device.width / 2, (device.height * 2) / 15, 100);
+            quick_search_special_answer_time--;
+        }
+        if (!special_flag) {
+            refresh(true);
+            comm_search_special_answer_time++;
+        }
+        // 如果搜索到底部
+        if (text("您已经看到了我的底线").exists()) {
+            storage.put("all_special_answers_completed_storage", "yes");
+            break;
+        }
     }
     sleep(random_time(delay_time * 2));
+    // 更新加速搜索次数
+    if (storage.get("quick_search_special_answer_time_storage") == 0) {
+        // 如果是第一次更新
+        storage.put("quick_search_special_answer_time_storage", comm_search_special_answer_time);
+    } else {
+        var tmp = storage.get("quick_search_special_answer_time_storage");
+        storage.put("quick_search_special_answer_time_storage", tmp + comm_search_special_answer_time);
+    }
+
+
     if (text("开始答题").exists() || text("您已经看到了我的底线").exists()) {
+        log("点击:" + "开始答题");
         text("开始答题").findOne().click();
         is_answer_special_flag = true;
         // 总题数
         className("android.view.View").depth(24).waitFor();
         sleep(random_time(delay_time));
+        // 为兼容新版本新题只有5题，老版有10题
         var num_string = className("android.view.View").depth(24).findOnce(1).text();
         var total_question_num = parseInt(num_string.slice(num_string.indexOf('/') + 1));
         do_periodic_answer(total_question_num);
     } else if (text("继续答题").exists()) {
+        log("点击:" + "继续答题");
         text("继续答题").findOnce(special_i).click();
         // 等待题目加载
         sleep(random_time(delay_time));
@@ -1106,18 +1143,24 @@ if (!finish_list[4] && special_answer_scored < 8) {
         do_periodic_answer(total_question_num - completed_question_num + 1);
     } else {
         sleep(random_time(delay_time));
-        className('android.view.View').clickable(true).depth(23).waitFor();
-        className('android.view.View').clickable(true).depth(23).findOne().click();
+        log("等待:" + "android.view.View");
+        className("android.view.View").clickable(true).depth(23).waitFor();
+        log("点击:" + "android.view.View");
+        className("android.view.View").clickable(true).depth(23).findOne().click();
     }
 
     if (is_answer_special_flag) {
         // 点击退出
         sleep(random_time(delay_time));
-        className('android.view.View').clickable(true).depth(20).waitFor();
-        className('android.view.View').clickable(true).depth(20).findOne().click();
+        log("等待:" + "android.view.View");
+        className("android.view.View").clickable(true).depth(20).waitFor();
+        log("点击:" + "android.view.View");
+        className("android.view.View").clickable(true).depth(20).findOne().click();
         sleep(random_time(delay_time));
-        className('android.view.View').clickable(true).depth(23).waitFor();
-        className('android.view.View').clickable(true).depth(23).findOne().click();
+        log("等待:" + "android.view.View");
+        className("android.view.View").clickable(true).depth(23).waitFor();
+        log("点击:" + "android.view.View");
+        className("android.view.View").clickable(true).depth(23).findOne().click();
     }
 }
 
@@ -1194,7 +1237,7 @@ if (!finish_list[5]) {
 
 function do_contest() {
 
-    while (!text('开始').exists()) handling_access_exceptions();
+    while (!text('开始').exists());
     while (!text('继续挑战').exists()) {
         // 等待下一题题目加载
         className("android.view.View").depth(28).waitFor();
@@ -1244,14 +1287,10 @@ if (!finish_list[6] && four_players_scored < 3) {
     for (var i = 0; i < 2; i++) {
         sleep(random_time(delay_time));
         my_click_clickable("开始比赛");
-        handling_access_exceptions();
         do_contest();
-        handling_access_exceptions();
         if (i == 0) {
             sleep(random_time(delay_time * 2));
-            handling_access_exceptions();
             my_click_clickable("继续挑战");
-            handling_access_exceptions();
             sleep(random_time(delay_time));
         }
     }
@@ -1274,7 +1313,6 @@ if (!finish_list[7] && two_players_scored < 1) {
     entry_model(11);
 
     // 点击随机匹配
-    handling_access_exceptions();
     log("等待:" + "随机匹配");
     text("随机匹配").waitFor();
     sleep(random_time(delay_time * 2));
@@ -1285,18 +1323,13 @@ if (!finish_list[7] && two_players_scored < 1) {
         log("点击:" + "");
         className("android.view.View").text("").findOne().click();
     }
-    handling_access_exceptions();
     do_contest();
-    handling_access_exceptions();
     sleep(random_time(delay_time));
     back();
     sleep(random_time(delay_time));
     back();
     my_click_clickable("退出");
 }
-
-// 取消访问异常处理循环
-if (id_handling_access_exceptions) clearInterval(id_handling_access_exceptions);
 
 /*
 **********订阅*********
