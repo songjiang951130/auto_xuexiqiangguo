@@ -1454,7 +1454,7 @@ if (!finish_list[8] && whether_complete_subscription == "yes") {
 
 if (!finish_list[9] && whether_complete_speech == "yes") {
 
-    var speechs = ["好好学习，天天向上", "大国领袖，高瞻远瞩", "请党放心，强国有我", "坚持信念，砥砺奋进", "团结一致，共建美好", "为人民谋幸福"];
+    var speechs = ["好好学习，天天向上" + random_time(1), "大国领袖，高瞻远瞩" + random_time(1), "请党放心，强国有我" + random_time(1), "坚持信念，砥砺奋进" + random_time(1), "团结一致，共建美好" + random_time(1), "为人民谋幸福" + random_time(1)];
 
     sleep(random_time(delay_time));
     if (!text('欢迎发表你的观点').exists()) {
