@@ -51,8 +51,10 @@ var lock_number = "303178";
 
 /*判断屏幕锁定，解锁屏幕（数字密码）*/
 if (!device.isScreenOn() && lock_number) {//息屏状态将屏幕唤醒
-    device.wakeUp();//唤醒设备
-    sleep(1000); // 等待屏幕亮起
+    device.wakeUp();
+    // 等待屏幕亮起
+    sleep(1000); 
+    //向上滑动、展示输入密码页
     swipe(500, 30, 500, 1000, 300);
     sleep(400);
     //输入锁屏密码
@@ -948,10 +950,10 @@ function handling_access_exceptions() {
         var right_border = className('android.view.View').depth(9).clickable(false).findOnce(0).bounds().right;
         while (text("访问异常").exists() || text("刷新").exists()) {
             // 位置取随机值
-            var randomX = random(pos.left, pos.right);
-            var randomY = random(pos.top, pos.bottom);
-            swipe(randomX, randomY, randomX + right_border, randomY, random(200, 400));
-            press(randomX + right_border, randomY, 1000);
+            var ex = (pos.left + pos.right) / 2;
+            var ey = (pos.top + pos.bottom) / 2;
+            swipe(ex, ey, ex + right_border, ey, random(500, 800));
+            press(ex + right_border, ey, 1000);
             sleep(500);
             // 需要开启新线程获取控件
             threads.start(function () {

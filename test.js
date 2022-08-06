@@ -1,3 +1,5 @@
-var v = device.getMusicVolume();
+// 获取今日得分
 
-console.log("volume:" + v);
+var total = textStartsWith("成长总积分").findOne().parent().child(3).text();
+// var b = c.child(0).findOne().text();
+console.log("cc:", c)
