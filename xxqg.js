@@ -405,9 +405,6 @@ while ((count < 6 - completed_read_count) && !finish_list[0]) {
     }
 
     for (var i = 0; i < article.length; i++) {
-
-        sleep(random_time(500));
-
         try {
             click(article[i].bounds().centerX(),
                 article[i].bounds().centerY());
@@ -584,7 +581,6 @@ function do_contest_answer(depth_click_option, question, options_text) {
 
     // 如果本地题库没搜到，则搜网络题库
     if (answer == null) {
-
         var result;
         // 发送http请求获取答案 网站搜题速度 r1 > r2
         try {
@@ -606,15 +602,16 @@ function do_contest_answer(depth_click_option, question, options_text) {
         if (result) {
             // 答案文本
             var result = result[0].slice(5, result[0].indexOf('<'));
-            log('答案: ' + result);
             select_option(result, depth_click_option, options_text);
+            log('答案 baidu: ' + result);
         } else {
             // 没找到答案，点击第一个
             className('android.widget.RadioButton').depth(depth_click_option).clickable(true).findOne().click();
         }
     } else {
-        log('答案: ' + answer);
         select_option(answer, depth_click_option, options_text);
+        log('答案 题库: ' + answer);
+
     }
 }
 /*
