@@ -6,3 +6,7 @@ function getTotalScore() {
 }
 
 
+className('android.view.ViewGroup').depth(15).findOnce(2).child(2).click();
+
+
+log("end")

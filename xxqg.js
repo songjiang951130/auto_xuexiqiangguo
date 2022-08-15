@@ -53,7 +53,7 @@ var lock_number = "303178";
 if (!device.isScreenOn() && lock_number) {//息屏状态将屏幕唤醒
     device.wakeUp();
     // 等待屏幕亮起
-    sleep(1000); 
+    sleep(1000);
     //向上滑动、展示输入密码页
     swipe(500, 30, 500, 1000, 300);
     sleep(400);
@@ -228,6 +228,9 @@ function refresh(orientation) {
  * @param {string} score 分数
  */
 function push_weixin_message(account, score) {
+    if (score < 40) {
+        return;
+    }
     for (var t in pushplus_token) {
         http.postJson(
             'http://www.pushplus.plus/send',
@@ -389,10 +392,14 @@ if (!finish_list[2] && !finish_list[0]) {
 
 // 阅读文章次数
 var count = 0;
-
 while ((count < 6 - completed_read_count) && !finish_list[0]) {
+    log("开始阅读：completed_read_count:{} count:{}", completed_read_count, count)
+    // if (!id('comm_head_title').exists() || !className('android.widget.TextView').depth(27).text('切换地区').exists()) {
+    //     back_track();
+    // }
+    //去思想页面
+    // className('android.view.ViewGroup').depth(15).findOnce(2).child(2).click();
 
-    if (!id('comm_head_title').exists() || !className('android.widget.TextView').depth(27).text('切换地区').exists()) back_track();
     sleep(random_time(delay_time));
 
     refresh(false);
@@ -406,27 +413,27 @@ while ((count < 6 - completed_read_count) && !finish_list[0]) {
 
     for (var i = 0; i < article.length; i++) {
         try {
-            click(article[i].bounds().centerX(),
-                article[i].bounds().centerY());
-        } catch (error) {
-            continue;
-        }
+            click(article[i].bounds().centerX(), article[i].bounds().centerY());
+            // 跳过专栏与音乐
+            if (className("ImageView").depth(10).clickable(true).findOnce(1) == null ||
+                textContains("专题").findOne(1000) != null) {
+                log("专题回退");
+                back();
+                continue;
+            }
 
-        sleep(random_time(delay_time));
-        // 跳过专栏与音乐
-        if (className("ImageView").depth(10).clickable(true).findOnce(1) == null ||
-            textContains("专题").findOne(1000) != null) {
+            // 观看时长
+            sleep(random_time(65000));
+
+            log("阅读完成 article length", article.length, " i:", i)
+
             back();
+            count++;
+        } catch (error) {
+            log("article x:", article[i].bounds().centerX(), " y:", article[i].bounds().centerY())
             continue;
         }
-
-        // 观看时长
-        sleep(random_time(65000));
-
-        back();
-        count++;
     }
-    sleep(random_time(500));
 }
 
 /*
