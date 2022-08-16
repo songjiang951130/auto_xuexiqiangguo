@@ -5,8 +5,14 @@ function getTotalScore() {
     console.log("cc:", c)
 }
 
+function findArticle() {
+    var article = id('general_card_title_id').findOne();
+    log(article)
+    article.click();
+    log("article:", article.click())
+}
 
-className('android.view.ViewGroup').depth(15).findOnce(2).child(2).click();
+findArticle();
 
 
 log("end")

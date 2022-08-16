@@ -207,7 +207,10 @@ function my_click_clickable(target) {
     }
 }
 
-// 模拟随机时间
+/** 
+ * time 毫秒
+ * 模拟随机时间
+ */
 function random_time(time) {
     return time + random(100, 1000);
 }
@@ -394,19 +397,21 @@ if (!finish_list[2] && !finish_list[0]) {
 var count = 0;
 while ((count < 6 - completed_read_count) && !finish_list[0]) {
     log("开始阅读：completed_read_count:{} count:{}", completed_read_count, count)
-    // if (!id('comm_head_title').exists() || !className('android.widget.TextView').depth(27).text('切换地区').exists()) {
-    //     back_track();
-    // }
+    if (!id('comm_head_title').exists() || !className('android.widget.TextView').depth(27).text('切换地区').exists()) {
+        back_track();
+    }
     //去思想页面
     // className('android.view.ViewGroup').depth(15).findOnce(2).child(2).click();
 
     sleep(random_time(delay_time));
+
 
     refresh(false);
 
     var article = id('general_card_image_id').find();
 
     if (article.length == 0) {
+        log("未找到文章，进行刷新");
         refresh(false);
         continue;
     }
@@ -415,15 +420,17 @@ while ((count < 6 - completed_read_count) && !finish_list[0]) {
         try {
             click(article[i].bounds().centerX(), article[i].bounds().centerY());
             // 跳过专栏与音乐
-            if (className("ImageView").depth(10).clickable(true).findOnce(1) == null ||
-                textContains("专题").findOne(1000) != null) {
-                log("专题回退");
+            if (textContains("专题").findOne(1000) != null) {
+                log("专题回退 start");
+                log("result: ", className("ImageView").depth(10).clickable(true).findOnce(1) == null, " r2:", textContains("专题").findOne(1000) != null)
+                sleep(random_time(60000));
+                log("专题回退 end");
                 back();
                 continue;
             }
 
             // 观看时长
-            sleep(random_time(65000));
+            sleep(random_time(63000));
 
             log("阅读完成 article length", article.length, " i:", i)
 
@@ -431,7 +438,6 @@ while ((count < 6 - completed_read_count) && !finish_list[0]) {
             count++;
         } catch (error) {
             log("article x:", article[i].bounds().centerX(), " y:", article[i].bounds().centerY())
-            continue;
         }
     }
 }
