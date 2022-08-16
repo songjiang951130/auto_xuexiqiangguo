@@ -395,50 +395,55 @@ if (!finish_list[2] && !finish_list[0]) {
 
 // 阅读文章次数
 var count = 0;
+// completed_read_count = 0;
+// finish_list[0] = false;
+var single_total_read = 63000
 while ((count < 6 - completed_read_count) && !finish_list[0]) {
-    log("开始阅读：completed_read_count:{} count:{}", completed_read_count, count)
-    if (!id('comm_head_title').exists() || !className('android.widget.TextView').depth(27).text('切换地区').exists()) {
-        back_track();
+    if (count == 0) {
+        //点击菜单栏思想
+        className('android.view.ViewGroup').depth(15).findOnce(2).child(2).click();
+        sleep(random_time(delay_time));
     }
-    //去思想页面
-    // className('android.view.ViewGroup').depth(15).findOnce(2).child(2).click();
-
-    sleep(random_time(delay_time));
-
-
-    refresh(false);
-
-    var article = id('general_card_image_id').find();
+    log("开始阅读：completed_read_count:{} count:{}", completed_read_count, count)
+    var article = id("general_card_title_id").className("android.widget.TextView").find();
+    log("找文章列表 length:", article.length)
 
     if (article.length == 0) {
         log("未找到文章，进行刷新");
-        refresh(false);
+        refresh(true);
+        sleep(random_time(delay_time));
         continue;
     }
 
     for (var i = 0; i < article.length; i++) {
-        try {
-            click(article[i].bounds().centerX(), article[i].bounds().centerY());
-            // 跳过专栏与音乐
-            if (textContains("专题").findOne(1000) != null) {
-                log("专题回退 start");
-                log("result: ", className("ImageView").depth(10).clickable(true).findOnce(1) == null, " r2:", textContains("专题").findOne(1000) != null)
-                sleep(random_time(60000));
-                log("专题回退 end");
-                back();
-                continue;
-            }
-
-            // 观看时长
-            sleep(random_time(63000));
-
-            log("阅读完成 article length", article.length, " i:", i)
-
-            back();
-            count++;
-        } catch (error) {
-            log("article x:", article[i].bounds().centerX(), " y:", article[i].bounds().centerY())
+        if (article[i].text().includes("朗读") || article[i].text().includes("朗诵") || article[i].text().includes("专题")) {
+            continue;
         }
+        //有问题的坐标
+        if (article[i].bounds().centerX() < 0 || article[i].bounds().centerY() < 0) {
+            continue;
+        }
+        //问题出在这里，点击虽然生效，实际并未生效，怀疑是坐标问题
+        // var cr = click(article[i].bounds().centerX(), article[i].bounds().centerY());
+        article[i].text().click()
+        log("click result:", cr);
+        sleep(random_time(delay_time));
+
+        var use_time = 0;
+        while (!text('提醒').exists()) {
+            log("滑动阅读：", use_time)
+            //向下滑动
+            swipe(500, 1700, 500, 700, 2000);
+            use_time += 2000;
+            if (use_time > 10000) {
+                break;
+            }
+        }
+        log("本次滑动时间：", use_time)
+        sleep(single_total_read - use_time);
+        log("阅读完成 article length", article.length, " i:", i)
+        back();
+        count++;
     }
 }
 
