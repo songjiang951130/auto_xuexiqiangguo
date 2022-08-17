@@ -398,52 +398,69 @@ var count = 0;
 // completed_read_count = 0;
 // finish_list[0] = false;
 var single_total_read = 63000
+var titleSet = new Set();
 while ((count < 6 - completed_read_count) && !finish_list[0]) {
     if (count == 0) {
-        //点击菜单栏思想
-        className('android.view.ViewGroup').depth(15).findOnce(2).child(2).click();
+        //点击菜单栏[要闻]
+        className('android.view.ViewGroup').depth(15).findOnce(2).child(1).click();
         sleep(random_time(delay_time));
     }
     log("开始阅读：completed_read_count:{} count:{}", completed_read_count, count)
-    var article = id("general_card_title_id").className("android.widget.TextView").find();
-    log("找文章列表 length:", article.length)
+    swipe(800, 2000, 800, 600, 2000);
+    sleep(random_time(delay_time));
+    var articles = id("general_card_title_id").className("android.widget.TextView").find();
+    log("找文章列表 length:", articles.length)
 
-    if (article.length == 0) {
+    if (articles.length == 0) {
         log("未找到文章，进行刷新");
-        refresh(true);
+        swipe(800, 2000, 800, 600, 2000);
         sleep(random_time(delay_time));
         continue;
     }
 
-    for (var i = 0; i < article.length; i++) {
-        if (article[i].text().includes("朗读") || article[i].text().includes("朗诵") || article[i].text().includes("专题")) {
+    for (var i = 0; i < articles.length; i++) {
+        log("title: ", articles[i].text())
+        //跳过已阅读内容
+        if (titleSet.has(articles[i].text())) {
+            log("跳过已阅读");
             continue;
         }
-        //有问题的坐标
-        if (article[i].bounds().centerX() < 0 || article[i].bounds().centerY() < 0) {
+        if (articles[i].text().includes("朗读") || articles[i].text().includes("朗诵") || articles[i].text().includes("专题")) {
             continue;
         }
-        //问题出在这里，点击虽然生效，实际并未生效，怀疑是坐标问题
-        // var cr = click(article[i].bounds().centerX(), article[i].bounds().centerY());
-        article[i].text().click()
-        log("click result:", cr);
+
+        if (articles[i].parent() == null || articles[i].parent().parent() == null) {
+            //多次滑动的时候
+            log("未找到父类");
+            continue;
+        }
+        var cr = articles[i].parent().parent().click();
+        if (!cr) {
+            log("点击失败");
+            continue;
+        }
         sleep(random_time(delay_time));
 
         var use_time = 0;
         while (!text('提醒').exists()) {
             log("滑动阅读：", use_time)
             //向下滑动
-            swipe(500, 1700, 500, 700, 2000);
-            use_time += 2000;
-            if (use_time > 10000) {
+            swipe(500, 1700, 500, 700, 3000);
+            use_time += 3000;
+            if (use_time > 20000) {
                 break;
             }
         }
         log("本次滑动时间：", use_time)
-        sleep(single_total_read - use_time);
-        log("阅读完成 article length", article.length, " i:", i)
+        sleep(Math.abs(single_total_read - use_time));
+        log("阅读完成 article length", articles.length, " i:", i, "title:", articles[i].text());
+        titleSet.add(articles[i].text());
         back();
         count++;
+        //比如在100个，循环完了这个值会大于（6 - completed_read_count）
+        if (count >= 6 - completed_read_count) {
+            break;
+        }
     }
 }
 

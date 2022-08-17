@@ -40,10 +40,20 @@ function read(article) {
 // findArticle();
 // swipe(500, 1700, 500, 300, 1000);
 // findArticle();
-var articles = id("general_card_title_id").className("android.widget.TextView").find();
 
-log(articles[0]);
-log("x:", articles[0].bounds().centerX(), " y:", articles[0].bounds().centerY())
-log("left:", articles[0].bounds().left, " top:",articles[0].bounds().top," right:",articles[0].bounds().right," bottom: ",articles[0].bounds().bottom)
-click(articles[0].bounds().left, articles[0].bounds().top)
-log("end")
+
+// var articles = id("general_card_title_id").className("android.widget.TextView").find();
+// var article = articles[0];
+// log(article.text());
+// click(article.text())
+
+
+// log(article.parent() == null)
+// log(article.parent().parent().click());
+// log("x:", article.bounds().centerX(), " y:", article.bounds().centerY())
+// log("left:", article.bounds().left, " top:", article.bounds().top, " right:", article.bounds().right, " bottom: ", article.bounds().bottom)
+// var cr = click(article.bounds().left + 5, article.bounds().top + 3)
+// log("end" + cr)
+
+
+swipe(800, 2000, 800, 600, 2000);
