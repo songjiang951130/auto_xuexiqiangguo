@@ -46,6 +46,7 @@ var SK = "WWNukireGvAZGEehtQAmZdfS8tqTyp3z";
 var pushplus_token = ["99ab8953122344c9bfefdbbe591612fd", "183cda2f82d346fa858e8d7233f027f1"];
 
 var lock_number = "303178";
+var start = new Date();
 
 /* **********************请填写如上信息********************** */
 
@@ -312,15 +313,13 @@ function get_finish_list() {
         try {
             var model = className('android.view.View').depth(22).findOnce(i);
             if (i == 4) {
-                completed_read_count = parseInt(model.child(2).text().match(/\d+/)) / 2;
+                completed_read_count = parseInt(model.child(2).text().match(/\d+/));
             } else if (i == 5) {
                 completed_watch_count = parseInt(model.child(2).text().match(/\d+/));
             } else if (i == 16) {
                 weekly_answer_scored = parseInt(model.child(2).text().match(/\d+/));
             } else if (i == 8) {
                 special_answer_scored = parseInt(model.child(2).text().match(/\d+/));
-                //跳过专项答题
-                special_answer_scored = 8;
             } else if (i == 10) {
                 four_players_scored = parseInt(model.child(2).text().match(/\d+/));
             } else if (i == 11) {
@@ -393,13 +392,13 @@ if (!finish_list[2] && !finish_list[0]) {
     click(home_bottom.centerX(), home_bottom.centerY());
 }
 
-// 阅读文章次数
-var count = 0;
 // completed_read_count = 0;
 // finish_list[0] = false;
-var single_total_read = 63000
+// 阅读文章次数
+var count = 0;
+var single_total_read = 33000
 var titleSet = new Set();
-while ((count < 6 - completed_read_count) && !finish_list[0]) {
+while ((count < 12 - completed_read_count) && !finish_list[0]) {
     if (count == 0) {
         //点击菜单栏[要闻]
         className('android.view.ViewGroup').depth(15).findOnce(2).child(1).click();
@@ -419,10 +418,7 @@ while ((count < 6 - completed_read_count) && !finish_list[0]) {
     }
 
     for (var i = 0; i < articles.length; i++) {
-        log("title: ", articles[i].text())
-        //跳过已阅读内容
         if (titleSet.has(articles[i].text())) {
-            log("跳过已阅读");
             continue;
         }
         if (articles[i].text().includes("朗读") || articles[i].text().includes("朗诵") || articles[i].text().includes("专题")) {
@@ -430,8 +426,6 @@ while ((count < 6 - completed_read_count) && !finish_list[0]) {
         }
 
         if (articles[i].parent() == null || articles[i].parent().parent() == null) {
-            //多次滑动的时候
-            log("未找到父类");
             continue;
         }
         var cr = articles[i].parent().parent().click();
@@ -440,10 +434,10 @@ while ((count < 6 - completed_read_count) && !finish_list[0]) {
             continue;
         }
         sleep(random_time(delay_time));
+        log("title: ", articles[i].text())
 
         var use_time = 0;
         while (!text('提醒').exists()) {
-            log("滑动阅读：", use_time)
             //向下滑动
             swipe(500, 1700, 500, 700, 3000);
             use_time += 3000;
@@ -457,10 +451,6 @@ while ((count < 6 - completed_read_count) && !finish_list[0]) {
         titleSet.add(articles[i].text());
         back();
         count++;
-        //比如在100个，循环完了这个值会大于（6 - completed_read_count）
-        if (count >= 6 - completed_read_count) {
-            break;
-        }
     }
 }
 
@@ -1534,4 +1524,4 @@ device.setMusicVolume(currentVolume);
 
 device.cancelKeepingAwake();
 
-toast('脚本运行完成');
+toast('脚本运行完成，时间：' + (new Date() - start) / 1000 / 60 + "分钟");
