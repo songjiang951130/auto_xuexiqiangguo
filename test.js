@@ -7,7 +7,9 @@ function getTotalScore() {
 
 
 function findArticle() {
-    var articles = id("general_card_title_id").className("android.widget.TextView").find();
+    var articles = id("general_card_title_id").className("android.widget.TextView").depth(25).find();
+    console.log("length : ", articles.length);
+    return articles;
 
 }
 
@@ -32,28 +34,13 @@ function read(article) {
     back();
 }
 
-// var single_total_read = 13000;
-// findArticle();
-// swipe(500, 1700, 500, 300, 1000);
-// findArticle();
-// swipe(500, 1700, 500, 300, 1000);
-// findArticle();
-// swipe(500, 1700, 500, 300, 1000);
-// findArticle();
+// var articles = findArticle();
+
+// console.log("length : ", articles.length);
+
+var result = ">答案：D、碘</span></p>".match(/答案：.*</)
+log("body:" + result);
+var result = result[0].slice(5, result[0].indexOf('<'));
+log("result: " + result);
 
 
-// var articles = id("general_card_title_id").className("android.widget.TextView").find();
-// var article = articles[0];
-// log(article.text());
-// click(article.text())
-
-
-// log(article.parent() == null)
-// log(article.parent().parent().click());
-// log("x:", article.bounds().centerX(), " y:", article.bounds().centerY())
-// log("left:", article.bounds().left, " top:", article.bounds().top, " right:", article.bounds().right, " bottom: ", article.bounds().bottom)
-// var cr = click(article.bounds().left + 5, article.bounds().top + 3)
-// log("end" + cr)
-
-
-swipe(800, 2000, 800, 600, 2000);

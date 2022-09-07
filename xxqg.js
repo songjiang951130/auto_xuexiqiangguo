@@ -73,7 +73,7 @@ device.keepScreenDim();
 // 本地存储数据
 var storage = storages.create('data');
 // 更新题库为answer_question_map1
-storage.remove('answer_question_map');
+storage.remove('answer_question_map1');
 
 delay_time = Number(delay_time) * 1000;
 
@@ -396,14 +396,14 @@ if (!finish_list[2] && !finish_list[0]) {
 // finish_list[0] = false;
 // 阅读文章次数
 var count = 0;
-var single_total_read = 33000
+var single_total_read = 35000
 var titleSet = new Set();
 while ((count < 12 - completed_read_count) && !finish_list[0]) {
-    if (count == 0) {
-        //点击菜单栏[要闻]
-        className('android.view.ViewGroup').depth(15).findOnce(2).child(1).click();
-        sleep(random_time(delay_time));
-    }
+    // if (count == 0) {
+    //     //点击菜单栏[要闻]
+    //     className('android.view.ViewGroup').depth(15).findOnce(2).child(1).click();
+    //     sleep(random_time(delay_time));
+    // }
     log("开始阅读：completed_read_count:{} count:{}", completed_read_count, count)
     swipe(800, 2000, 800, 600, 2000);
     sleep(random_time(delay_time));
@@ -437,7 +437,7 @@ while ((count < 12 - completed_read_count) && !finish_list[0]) {
         log("title: ", articles[i].text())
 
         var use_time = 0;
-        while (!text('提醒').exists()) {
+        while (!text('点赞').exists()) {
             //向下滑动
             swipe(500, 1700, 500, 700, 3000);
             use_time += 3000;
@@ -612,21 +612,28 @@ function do_contest_answer(depth_click_option, question, options_text) {
             // 此网站只支持十个字符的搜索
             var r1 = http.get('http://www.syiban.com/search/index/init.html?modelid=1&q=' + encodeURI(question.slice(0, 10)));
             result = r1.body.string().match(/答案：.*</);
+            log("r1:" + result);
+            if (result == null) {
+                log("url:" + 'http://www.syiban.com/search/index/init.html?modelid=1&q=' + encodeURI(question.slice(0, 10)))
+                toast('答案查询失败');
+            }
         } catch (error) {
         }
-        // 如果第一个网站没获取到正确答案，则利用第二个网站
-        if (!(result && result[0].charCodeAt(3) > 64 && result[0].charCodeAt(3) < 69)) {
-            try {
-                // 此网站只支持六个字符的搜索
-                var r2 = http.get('https://www.souwen123.com/search/select.php?age=' + encodeURI(question.slice(0, 6)));
-                result = r2.body.string().match(/答案：.*</);
-            } catch (error) {
-            }
-        }
+        // // 如果第一个网站没获取到正确答案，则利用第二个网站
+        // if (!(result && result[0].charCodeAt(3) > 64 && result[0].charCodeAt(3) < 69)) {
+        //     try {
+        //         // 此网站只支持六个字符的搜索
+        //         var r2 = http.get('https://www.souwen123.com/search/select.php?age=' + encodeURI(question.slice(0, 6)));
+        //         result = r2.body.string().match(/答案：.*</);
+        //         log("r2:" + result);
+        //     } catch (error) {
+        //     }
+        // }
 
         if (result) {
             // 答案文本
             var result = result[0].slice(5, result[0].indexOf('<'));
+            result = result.replace(/、/, "")
             select_option(result, depth_click_option, options_text);
             log('答案 baidu: ' + result);
         } else {
@@ -1288,8 +1295,9 @@ function do_contest() {
 
         log("题目: " + question);
         log("选项: " + options_text);
-        if (question) do_contest_answer(32, question, options_text);
-        else {
+        if (question) {
+            do_contest_answer(32, question, options_text);
+        } else {
             className('android.widget.RadioButton').depth(32).waitFor();
             className('android.widget.RadioButton').depth(32).findOne().click();
         }
@@ -1481,7 +1489,14 @@ if (!finish_list[8] && whether_complete_subscription == "yes") {
 
 if (!finish_list[9] && whether_complete_speech == "yes") {
 
-    var speechs = ["好好学习，天天向上" + random_time(1), "大国领袖，高瞻远瞩" + random_time(1), "请党放心，强国有我" + random_time(1), "坚持信念，砥砺奋进" + random_time(1), "团结一致，共建美好" + random_time(1), "为人民谋幸福" + random_time(1)];
+    var speechs = [
+        "好好学习，天天向上" + random_time(1),
+        "大国领袖，高瞻远瞩" + random_time(1),
+        "请党放心，强国有我" + random_time(1),
+        "坚持信念，砥砺奋进" + random_time(1),
+        "团结一致，共建美好" + random_time(1),
+        "为人民谋幸福" + random_time(1)
+    ];
 
     sleep(random_time(delay_time));
     if (!text('欢迎发表你的观点').exists()) {

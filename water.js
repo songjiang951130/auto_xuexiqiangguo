@@ -1,8 +1,6 @@
 var user_name = "韶华成书"
 var water_count = 66
 var times = 1
-// var user_name = "韶华成书"
-// var count = 66
 app.startActivity({
     action: 'VIEW',
     data: 'alipays://platformapi/startapp?appId=60000002',
