@@ -45,6 +45,8 @@ var SK = "WWNukireGvAZGEehtQAmZdfS8tqTyp3z";
  *  */
 var pushplus_token = ["99ab8953122344c9bfefdbbe591612fd", "183cda2f82d346fa858e8d7233f027f1"];
 
+var task_parent = 24;
+
 var lock_number = "303178";
 var start = new Date();
 
@@ -307,27 +309,23 @@ var four_players_scored;
 var two_players_scored;
 
 function get_finish_list() {
+    var child_index = 3;
     var finish_list = [];
     for (var i = 4; i < 17; i++) {
         // 由于模拟器有model无法读取因此用try catch
-        try {
-            var model = className('android.view.View').depth(22).findOnce(i);
-            if (i == 4) {
-                completed_read_count = parseInt(model.child(2).text().match(/\d+/));
-            } else if (i == 5) {
-                completed_watch_count = parseInt(model.child(2).text().match(/\d+/));
-            } else if (i == 16) {
-                weekly_answer_scored = parseInt(model.child(2).text().match(/\d+/));
-            } else if (i == 8) {
-                special_answer_scored = parseInt(model.child(2).text().match(/\d+/));
-            } else if (i == 10) {
-                four_players_scored = parseInt(model.child(2).text().match(/\d+/));
-            } else if (i == 11) {
-                two_players_scored = parseInt(model.child(2).text().match(/\d+/));
-            }
-            finish_list.push(model.child(3).text() == '已完成');
-        } catch (error) {
-            finish_list.push(false);
+        var model = className('android.view.View').depth(24).findOnce(i);
+        if (i == 4) {
+            completed_read_count = parseInt(model.child(child_index).child(0).text().match(/\d+/));
+        } else if (i == 5) {
+            completed_watch_count = parseInt(model.child(child_index).child(0).text().match(/\d+/));
+        } else if (i == 16) {
+            weekly_answer_scored = parseInt(model.child(child_index).child(0).text().match(/\d+/));
+        } else if (i == 8) {
+            special_answer_scored = parseInt(model.child(child_index).child(0).text().match(/\d+/));
+        } else if (i == 10) {
+            four_players_scored = parseInt(model.child(child_index).child(0).text().match(/\d+/));
+        } else if (i == 11) {
+            two_players_scored = parseInt(model.child(child_index).child(0).text().match(/\d+/));
         }
     }
     return finish_list;
@@ -341,7 +339,7 @@ back_track();
 var finish_list = get_finish_list();
 
 // 返回首页
-className('android.view.View').clickable(true).depth(21).findOne().click();
+back();
 id('my_back').waitFor();
 sleep(random_time(delay_time / 2));
 id('my_back').findOne().click();
@@ -398,6 +396,7 @@ if (!finish_list[2] && !finish_list[0]) {
 var count = 0;
 var single_total_read = 35000
 var titleSet = new Set();
+log("已阅读次数:" + completed_read_count)
 while ((count < 12 - completed_read_count) && !finish_list[0]) {
     // if (count == 0) {
     //     //点击菜单栏[要闻]
@@ -749,8 +748,8 @@ function is_select_all_choice() {
  * @param {int} number 7对应为每日答题模块，以此类推
  */
 function entry_model(number) {
-    var model = className('android.view.View').depth(22).findOnce(number);
-    while (!model.child(3).click());
+    var model = className('android.view.View').depth(task_parent).findOnce(number);
+    model.child(3).click();
 }
 
 /**

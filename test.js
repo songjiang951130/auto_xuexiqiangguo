@@ -44,3 +44,36 @@ var result = result[0].slice(5, result[0].indexOf('<'));
 log("result: " + result);
 
 
+function get_finish_list() {
+    var child_index = 3;
+    var finish_list = [];
+    log("读取任务完成信息")
+    for (var i = 4; i < 17; i++) {
+        // 由于模拟器有model无法读取因此用try catch
+        try {
+            var model = className('android.view.View').depth(24).findOnce(i);
+            if (i == 4) {
+                completed_read_count = parseInt(model.child(child_index).child(0).text().match(/\d+/));
+            } else if (i == 5) {
+                completed_watch_count = parseInt(model.child(child_index).child(0).text().match(/\d+/));
+            } else if (i == 16) {
+                weekly_answer_scored = parseInt(model.child(child_index).child(0).text().match(/\d+/));
+            } else if (i == 8) {
+                special_answer_scored = parseInt(model.child(child_index).child(0).text().match(/\d+/));
+            } else if (i == 10) {
+                four_players_scored = parseInt(model.child(child_index).child(0).text().match(/\d+/));
+            } else if (i == 11) {
+                two_players_scored = parseInt(model.child(child_index).child(0).text().match(/\d+/));
+            }
+            finish_list.push(model.child(3).text() == '已完成');
+        } catch (error) {
+            log("读取任务完成信息失败" + i)
+            log(error)
+            finish_list.push(false);
+        }
+    }
+    log("已完成情况：" + finish_list)
+    return finish_list;
+}
+
+get_finish_list();
