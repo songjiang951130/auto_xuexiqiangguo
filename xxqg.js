@@ -69,8 +69,8 @@ if (!device.isScreenOn() && lock_number) {//息屏状态将屏幕唤醒
 
 auto.waitFor()
 
-// 将设备保持常亮
-device.keepScreenDim();
+// 将设备保持常亮 30分钟，应该能跑完脚本
+device.keepScreenOn(30 * 60 * 1000);
 
 // 本地存储数据
 var storage = storages.create('data');
@@ -406,23 +406,23 @@ if (!finish_list[2]) {
 // finish_list[0] = false;
 // 阅读文章次数
 var count = 0;
-var single_total_read = 35000
+var single_total_read = 63000
 var titleSet = new Set();
 while (count < 12 - completed_read_count) {
-    // if (count == 0) {
-    //     //点击菜单栏[要闻]
-    //     className('android.view.ViewGroup').depth(15).findOnce(2).child(1).click();
-    //     sleep(random_time(delay_time));
-    // }
+    if (count == 0) {
+        //点击菜单栏[要闻]
+        className('android.view.ViewGroup').depth(15).findOnce(2).child(1).click();
+        sleep(random_time(delay_time));
+    }
     log("开始阅读：completed_read_count:{} count:{}", completed_read_count, count)
-    swipe(800, 2000, 800, 600, 2000);
+    swipe(800, 2000, 800, 600, 1000);
     sleep(random_time(delay_time));
     var articles = id("general_card_title_id").className("android.widget.TextView").find();
     log("找文章列表 length:", articles.length)
 
     if (articles.length == 0) {
-        log("未找到文章，进行刷新");
-        swipe(800, 2000, 800, 600, 2000);
+        toast("未找到文章，进行刷新");
+        swipe(800, 2000, 800, 600, 1000);
         sleep(random_time(delay_time));
         continue;
     }
@@ -455,7 +455,6 @@ while (count < 12 - completed_read_count) {
                 break;
             }
         }
-        log("本次滑动时间：", use_time)
         sleep(Math.abs(single_total_read - use_time));
         log("阅读完成 article length", articles.length, " i:", i, "title:", articles[i].text());
         titleSet.add(articles[i].text());
@@ -482,6 +481,7 @@ if (!finish_list[2] && !finish_list[0]) {
         textStartsWith("正在收听").findOne().parent().child(1).child(0).click();
     }
     sleep(random_time(delay_time));
+    device.setMusicVolume(currentVolume);
 }
 
 back_track_flag = 1;
@@ -1528,8 +1528,6 @@ if (pushplus_token) {
     // 推送消息
     push_weixin_message(account, score);
 }
-
-device.setMusicVolume(currentVolume);
 
 device.cancelKeepingAwake();
 
