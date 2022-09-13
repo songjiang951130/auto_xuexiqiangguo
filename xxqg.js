@@ -317,31 +317,33 @@ function get_finish_list() {
     for (var i = 4; i < 17; i++) {
         // 由于模拟器有model无法读取因此用try catch
         try {
-            var model = className('android.view.View').depth(24).findOnce(i);
+            var model = className('android.view.View').depth(11).findOnce(i);
             if (i == 4) {
-                completed_read_count = parseInt(model.child(child_index).child(0).text().match(/\d+/));
+                completed_read_count = parseInt(model.child(child_index).child(0).text());
             } else if (i == 5) {
-                completed_watch_count = parseInt(model.child(child_index).child(0).text().match(/\d+/));
+                completed_watch_count = parseInt(model.child(child_index).child(0).text());
             } else if (i == 16) {
-                weekly_answer_scored = parseInt(model.child(child_index).child(0).text().match(/\d+/));
+                weekly_answer_scored = parseInt(model.child(child_index).child(0).text());
             } else if (i == 8) {
-                special_answer_scored = parseInt(model.child(child_index).child(0).text().match(/\d+/));
+                special_answer_scored = parseInt(model.child(child_index).child(0).text());
             } else if (i == 10) {
-                four_players_scored = parseInt(model.child(child_index).child(0).text().match(/\d+/));
+                four_players_scored = parseInt(model.child(child_index).child(0).text());
             } else if (i == 11) {
-                two_players_scored = parseInt(model.child(child_index).child(0).text().match(/\d+/));
+                two_players_scored = parseInt(model.child(child_index).child(0).text());
             }
 
             finish_list.push(model.child(4).text() == '已完成');
         } catch (error) {
             log("读取任务完成信息失败" + i)
             log(error)
+            exit()
             finish_list.push(false);
         }
     }
     log("已完成情况:" + finish_list)
     return finish_list;
 }
+
 /*
 *********************准备部分********************
 */
@@ -351,22 +353,16 @@ back_track();
 var finish_list = get_finish_list();
 
 // 返回首页
-back();
-id('my_back').waitFor();
-sleep(random_time(delay_time / 2));
-id('my_back').findOne().click();
-
-// 去province模块
-sleep(random_time(delay_time));
-className('android.view.ViewGroup').depth(15).waitFor();
-sleep(random_time(delay_time));
-className('android.view.ViewGroup').depth(15).findOnce(2).child(3).click();
-
 /*
 **********本地频道*********
 */
 if (!finish_list[10]) {
+    log("本地")
+    text("去看看").findOne(1).click();
+    log("本地2")
+    // className('android.widget.LinearLayout').clickable(true).depth(2).waitFor();
     className('android.widget.LinearLayout').clickable(true).depth(26).waitFor();
+    log("本地3")
     sleep(random_time(delay_time));
     className('android.widget.LinearLayout').clickable(true).depth(26).drawingOrder(1).findOne().click();
     sleep(random_time(delay_time));
@@ -387,20 +383,25 @@ var back_track_flag = 0;
 var currentVolume = device.getMusicVolume();
 // 打开电台广播
 if (!finish_list[2]) {
+    log("打开电台广播")
     device.setMusicVolume(0);
+    //点击去看看
+    click('去学习');
     sleep(random_time(delay_time));
     my_click_clickable('电台');
     sleep(random_time(delay_time));
     my_click_clickable('听广播');
     sleep(random_time(delay_time));
-    id("lay_state_icon").waitFor();
-    var lay_state_icon_pos = id("lay_state_icon").findOne().bounds();
-    click(lay_state_icon_pos.centerX(), lay_state_icon_pos.centerY());
-
-    sleep(random_time(delay_time));
-    var home_bottom = id('home_bottom_tab_icon_large').findOne().bounds();
-    click(home_bottom.centerX(), home_bottom.centerY());
+    var icon_id = "v_paused";
+    if (id(icon_id)) {
+        var lay_state_icon_pos = id(icon_id).findOne().bounds();
+        click(lay_state_icon_pos.centerX(), lay_state_icon_pos.centerY());
+        sleep(random_time(delay_time));
+        var home_bottom = id('home_bottom_tab_button_work').findOne().bounds();
+        click(home_bottom.centerX(), home_bottom.centerY());
+    }
 }
+log("打开电台广播end");
 
 // completed_read_count = 0;
 // finish_list[0] = false;
@@ -408,10 +409,11 @@ if (!finish_list[2]) {
 var count = 0;
 var single_total_read = 63000
 var titleSet = new Set();
-while (count < 12 - completed_read_count) {
+while (count < 6 - completed_read_count / 2) {
     if (count == 0) {
-        //点击菜单栏[要闻]
-        className('android.view.ViewGroup').depth(15).findOnce(2).child(1).click();
+        //点击菜单栏[要闻]，第二个 i = 1
+        click("要闻");
+        // className('android.widge.LinearLayout').depth(2).findOnce(1).click();
         sleep(random_time(delay_time));
     }
     log("开始阅读：completed_read_count:{} count:{}", completed_read_count, count)
@@ -469,6 +471,7 @@ while (count < 12 - completed_read_count) {
 
 // 关闭电台广播
 if (!finish_list[2] && !finish_list[0]) {
+    device.setMusicVolume(0);
     sleep(random_time(delay_time));
     my_click_clickable('电台');
     sleep(random_time(delay_time));
@@ -499,6 +502,7 @@ if (!finish_list[1] || !finish_list[2]) {
     my_click_clickable("竖")
     // 等待视频加载
     sleep(random_time(delay_time * 3));
+    device.setMusicVolume(0);
     // 点击第一个视频
     className('android.widget.FrameLayout').clickable(true).depth(24).findOne().click();
 
@@ -531,7 +535,7 @@ if (!finish_list[1] || !finish_list[2]) {
         }
         completed_watch_count++;
     }
-
+    device.setMusicVolume(currentVolume);
     back();
 }
 
