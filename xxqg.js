@@ -518,39 +518,34 @@ if (!finish_list[1] || !finish_list[2]) {
     my_click_clickable('百灵');
     sleep(random_time(delay_time / 2));
     my_click_clickable('竖');
-    // 刷新视频列表
-    sleep(random_time(delay_time / 2));
-    my_click_clickable("竖")
     // 等待视频加载
     sleep(random_time(delay_time * 3));
     device.setMusicVolume(0);
-    log("视听学习 第一个视频")
     // 点击第一个视频
-    className('android.widget.FrameLayout').clickable(true).depth(5).findOne().click();
+    var firstVideo = className('android.widget.FrameLayout').clickable(true).depth(5).findOne();
+    var bound = firstVideo.bounds()
+    click(bound.centerX(), bound.centerY());
+    toast("点击第一个视频")
 
     sleep(random_time(delay_time));
     if (text('继续播放').exists()) click('继续播放');
     if (text('刷新重试').exists()) click('刷新重试');
-
+    log("completed_watch_count:" + completed_watch_count)
     while (completed_watch_count < 6) {
         sleep(random_time(delay_time / 2));
-        log("视听学习 第一个视频 waitFor")
-        className('android.widget.LinearLayout').clickable(true).depth(16).waitFor();
-        log("视听学习 第一个视频 waitFor end")
         // 当前视频的时间长度
-        try {
-            var current_video_time = className('android.widget.TextView').clickable(false).depth(16).findOne().text().match(/\/.*/).toString().slice(1);
-            // 如果视频超过一分钟就跳过
-            if (Number(current_video_time.slice(0, 3)) >= 1) {
-                refresh(true);
-                sleep(random_time(delay_time));
-                continue;
-            }
-            sleep(Number(current_video_time.slice(4)) * 1000 + 500);
-        } catch (error) {
-            // 如果被"即将播放"将读取不到视频的时间长度，此时就sleep 3秒
-            sleep(3000);
+        var video_time_text = className('android.widget.TextView').clickable(false).depth(6).findOne().text();
+        log("短视频时长:" + video_time_text)
+        var current_video_time = video_time_text.match(/\/.*/).toString().slice(1);
+        log("短视频时长:" + current_video_time)
+        // 如果视频超过一分钟就跳过
+        if (Number(current_video_time.slice(0, 3)) >= 1) {
+            refresh(true);
+            sleep(random_time(delay_time));
+            continue;
         }
+        sleep(Number(current_video_time.slice(4)) * 1000 + 500);
+
         completed_watch_count++;
     }
     device.setMusicVolume(currentVolume);
@@ -558,21 +553,10 @@ if (!finish_list[1] || !finish_list[2]) {
 }
 log("视听学习 end");
 
-// 过渡
-log("过渡 start")
-my_click_clickable('我的');
-sleep(random_time(delay_time / 2));
-my_click_clickable('学习积分');
-sleep(random_time(delay_time / 2));
-back_track();
-
 /*
 *********************竞赛部分********************
 */
-log("竞赛部分 start")
-// 把音乐打开
-media.resumeMusic();
-back_track_flag = 2;
+log("竞赛部分 start");
 
 /** 
  * 选出选项
@@ -960,6 +944,10 @@ function do_periodic_answer(number) {
                 var baidu_res = baidu_ocr_api(img);
                 answer = baidu_res[0];
                 var options_text = baidu_res[1];
+                if(!answer){
+                    log("未找到答案")
+                    exit();
+                }
                 log("answer:" + answer + " options_text:" + options_text);
 
                 text('提示').waitFor();
