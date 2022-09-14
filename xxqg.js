@@ -257,6 +257,7 @@ function push_weixin_message(account, score) {
  * back_track_flag = 2时，表示竞赛、答题部分和准备部分
  */
 function back_track() {
+    var home_bottom_tab = "home_bottom_tab_button_work"
     app.launchApp('学习强国');
     sleep(random_time(delay_time * 3));
     var while_count = 0;
@@ -265,17 +266,20 @@ function back_track() {
         back();
         sleep(random_time(delay_time));
     }
+    // log("switch")
     switch (back_track_flag) {
         case 0:
             // 去中心模块
-            id('home_bottom_tab_icon_large').waitFor();
+            // log("switch waitFor")
+            id(home_bottom_tab).waitFor();
+            // log("switch waitFor end ")
             sleep(random_time(delay_time));
-            var home_bottom = id('home_bottom_tab_icon_large').findOne().bounds();
+            var home_bottom = id(home_bottom_tab).findOne().bounds();
             click(home_bottom.centerX(), home_bottom.centerY());
             // 去province模块
-            className('adnroid.view.ViewGroup').depth(15).waitFor();
             sleep(random_time(delay_time));
-            className('android.view.ViewGroup').depth(15).findOnce(2).child(3).click();
+            className('android.widget.LinearLayout').depth(2).findOnce(4).click();
+            toast("点击本地模块")
             break;
         case 1:
             break;
@@ -411,18 +415,21 @@ log("打开电台广播end");
 // 阅读文章次数
 var count = 0;
 var single_total_read = 63000
-var titleSet = new Set();
+log("选读文章 start")
 while (count < 6 - completed_read_count / 2) {
     if (count == 0) {
+        back_track_flag = 0;
+        log("back_track start")
+        back_track();
+        log("back_track end")
         //点击菜单栏[要闻]，第二个 i = 1
-        click("要闻");
-        // className('android.widge.LinearLayout').depth(2).findOnce(1).click();
+        click("亮点");
         sleep(random_time(delay_time));
     }
     log("开始阅读：completed_read_count:{} count:{}", completed_read_count, count)
     swipe(800, 2000, 800, 600, 1000);
     sleep(random_time(delay_time));
-    var articles = id("general_card_title_id").className("android.widget.TextView").find();
+    var articles = className('android.widget.FrameLayout').clickable(true).depth(4).drawingOrder(2).find();
     log("找文章列表 length:", articles.length)
 
     if (articles.length == 0) {
@@ -433,24 +440,15 @@ while (count < 6 - completed_read_count / 2) {
     }
 
     for (var i = 0; i < articles.length; i++) {
-        if (titleSet.has(articles[i].text())) {
-            continue;
-        }
         if (articles[i].text().includes("朗读") || articles[i].text().includes("朗诵") || articles[i].text().includes("专题")) {
             continue;
         }
-
-        if (articles[i].parent() == null || articles[i].parent().parent() == null) {
-            continue;
-        }
-        var cr = articles[i].parent().parent().click();
+        var cr = articles[i].click();
         if (!cr) {
             log("点击失败");
             continue;
         }
         sleep(random_time(delay_time));
-        log("title: ", articles[i].text())
-
         var use_time = 0;
         while (!text('点赞').exists()) {
             //向下滑动
@@ -462,12 +460,11 @@ while (count < 6 - completed_read_count / 2) {
         }
         sleep(Math.abs(single_total_read - use_time));
         log("阅读完成 article length", articles.length, " i:", i, "title:", articles[i].text());
-        titleSet.add(articles[i].text());
         back();
         count++;
     }
 }
-log("选读文章end");
+log("选读文章 end");
 
 /*
 *********************视听部分********************
@@ -547,14 +544,17 @@ if (!finish_list[1] || !finish_list[2]) {
 log("视听学习 end");
 
 // 过渡
+log("过渡 start")
 my_click_clickable('我的');
 sleep(random_time(delay_time / 2));
 my_click_clickable('学习积分');
 sleep(random_time(delay_time / 2));
+back_track();
 
 /*
 *********************竞赛部分********************
 */
+log("竞赛部分 start")
 // 把音乐打开
 media.resumeMusic();
 back_track_flag = 2;
@@ -803,6 +803,7 @@ function restart() {
 /*
 ********************调用百度API实现ocr********************
 */
+log("get_baidu_token")
 
 /**
  * 获取用户token
@@ -1028,6 +1029,7 @@ function handling_access_exceptions() {
     return thread_handling_access_exceptions;
 }
 
+log("每日答题 eeee")
 /* 
 处理访问异常，滑动验证
 */
