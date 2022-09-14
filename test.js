@@ -12,5 +12,9 @@
 // }
 // log("每日答题 end");
 
-var articles = className('android.widget.FrameLayout').clickable(true).depth(4).drawingOrder(2).find();
-log(articles);
+// var articles = className('android.widget.FrameLayout').clickable(true).depth(4).drawingOrder(2).find();
+// log(articles);
+var model = className('android.widget.TextView').depth(3).findOne().bounds();
+click(model.centerX(), model.centerY());
+
+log("cs:" + model.text())

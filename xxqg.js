@@ -278,7 +278,8 @@ function back_track() {
             click(home_bottom.centerX(), home_bottom.centerY());
             // 去province模块
             sleep(random_time(delay_time));
-            className('android.widget.LinearLayout').depth(2).findOnce(4).click();
+            // className('android.widget.LinearLayout').depth(2).findOnce(4).click();
+            click("重庆")
             toast("点击本地模块")
             break;
         case 1:
@@ -398,9 +399,12 @@ if (!finish_list[2]) {
     my_click_clickable('电台');
     sleep(random_time(delay_time));
     my_click_clickable('听广播');
+    log("点击听广播")
     sleep(random_time(delay_time));
     var icon_id = "v_paused";
-    if (id(icon_id)) {
+    var ccc = id(icon_id);
+    log(ccc)
+    if (!id(icon_id)) {
         var lay_state_icon_pos = id(icon_id).findOne().bounds();
         click(lay_state_icon_pos.centerX(), lay_state_icon_pos.centerY());
         sleep(random_time(delay_time));
@@ -414,36 +418,47 @@ log("打开电台广播end");
 // finish_list[0] = false;
 // 阅读文章次数
 var count = 0;
-var single_total_read = 63000
+var single_total_read = 33000
+var titleSet = new Set();
 log("选读文章 start")
-while (count < 6 - completed_read_count / 2) {
+while (count < 12 - completed_read_count) {
     if (count == 0) {
         back_track_flag = 0;
-        log("back_track start")
+        // log("back_track start")
         back_track();
-        log("back_track end")
+        // log("back_track end")
         //点击菜单栏[要闻]，第二个 i = 1
-        click("亮点");
+        click("要闻");
         sleep(random_time(delay_time));
     }
     log("开始阅读：completed_read_count:{} count:{}", completed_read_count, count)
-    swipe(800, 2000, 800, 600, 1000);
+    swipe(800, 2000, 800, 600, 2000);
     sleep(random_time(delay_time));
-    var articles = className('android.widget.FrameLayout').clickable(true).depth(4).drawingOrder(2).find();
+    var articles = id("general_card_title_id").className("android.widget.TextView").find();
     log("找文章列表 length:", articles.length)
 
     if (articles.length == 0) {
         toast("未找到文章，进行刷新");
-        swipe(800, 2000, 800, 600, 1000);
+        refresh(true);
         sleep(random_time(delay_time));
         continue;
     }
 
     for (var i = 0; i < articles.length; i++) {
-        if (articles[i].text().includes("朗读") || articles[i].text().includes("朗诵") || articles[i].text().includes("专题")) {
+        if (titleSet.has(articles[i].text())) {
+            log("已阅读+" + articles[i].text());
             continue;
         }
-        var cr = articles[i].click();
+        if (articles[i].text().includes("朗读") || articles[i].text().includes("朗诵") || articles[i].text().includes("专题")) {
+            log("跳过+" + articles[i].text());
+            continue;
+        }
+
+        if (articles[i].parent() == null) {
+            log("父类异常+" + articles[i].text());
+            continue;
+        }
+        var cr = articles[i].parent().click();
         if (!cr) {
             log("点击失败");
             continue;
@@ -453,6 +468,7 @@ while (count < 6 - completed_read_count / 2) {
         while (!text('点赞').exists()) {
             //向下滑动
             swipe(500, 1700, 500, 700, 3000);
+            log("阅读中");
             use_time += 3000;
             if (use_time > 20000) {
                 break;
@@ -460,8 +476,10 @@ while (count < 6 - completed_read_count / 2) {
         }
         sleep(Math.abs(single_total_read - use_time));
         log("阅读完成 article length", articles.length, " i:", i, "title:", articles[i].text());
+        titleSet.add(articles[i].text());
         back();
         count++;
+        swipe(500, 1700, 500, 700, 1000);
     }
 }
 log("选读文章 end");
@@ -506,14 +524,9 @@ if (!finish_list[1] || !finish_list[2]) {
     // 等待视频加载
     sleep(random_time(delay_time * 3));
     device.setMusicVolume(0);
+    log("视听学习 第一个视频")
     // 点击第一个视频
-    className('android.widget.FrameLayout').clickable(true).depth(24).findOne().click();
-
-    // 为了兼容强国版本为v2.32.0
-    sleep(random_time(delay_time));
-    if (!id('iv_back').exists()) {
-        className('android.widget.FrameLayout').clickable(true).depth(24).findOnce(7).click();
-    }
+    className('android.widget.FrameLayout').clickable(true).depth(5).findOne().click();
 
     sleep(random_time(delay_time));
     if (text('继续播放').exists()) click('继续播放');
@@ -521,7 +534,9 @@ if (!finish_list[1] || !finish_list[2]) {
 
     while (completed_watch_count < 6) {
         sleep(random_time(delay_time / 2));
+        log("视听学习 第一个视频 waitFor")
         className('android.widget.LinearLayout').clickable(true).depth(16).waitFor();
+        log("视听学习 第一个视频 waitFor end")
         // 当前视频的时间长度
         try {
             var current_video_time = className('android.widget.TextView').clickable(false).depth(16).findOne().text().match(/\/.*/).toString().slice(1);
