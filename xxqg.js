@@ -45,7 +45,7 @@ var SK = "WWNukireGvAZGEehtQAmZdfS8tqTyp3z";
  *  */
 var pushplus_token = ["99ab8953122344c9bfefdbbe591612fd", "183cda2f82d346fa858e8d7233f027f1"];
 
-var task_parent = 24;
+var task_parent = 11;
 
 var lock_number = "303178";
 var start = new Date();
@@ -237,16 +237,16 @@ function push_weixin_message(account, score) {
     if (score < 40) {
         return;
     }
-    for (var t in pushplus_token) {
-        http.postJson(
-            'http://www.pushplus.plus/send',
-            {
-                token: pushplus_token[t],
-                title: '[' + account + ']今日获得' + score + '积分',
-                content: '学习强国 账号名' + account + '今日已经获得' + score + '分'
-            }
-        );
-    }
+    // for (var t in pushplus_token) {
+    //     http.postJson(
+    //         'http://www.pushplus.plus/send',
+    //         {
+    //             token: pushplus_token[t],
+    //             title: '[' + account + ']今日获得' + score + '积分',
+    //             content: '学习强国 账号名' + account + '今日已经获得' + score + '分'
+    //         }
+    //     );
+    // }
 }
 
 /**
@@ -326,6 +326,7 @@ function get_finish_list() {
                 weekly_answer_scored = parseInt(model.child(child_index).child(0).text());
             } else if (i == 8) {
                 special_answer_scored = parseInt(model.child(child_index).child(0).text());
+                special_answer_scored = 8;
             } else if (i == 10) {
                 four_players_scored = parseInt(model.child(child_index).child(0).text());
             } else if (i == 11) {
@@ -357,14 +358,16 @@ var finish_list = get_finish_list();
 **********本地频道*********
 */
 if (!finish_list[10]) {
-    log("本地")
-    text("去看看").findOne(1).click();
-    log("本地2")
-    // className('android.widget.LinearLayout').clickable(true).depth(2).waitFor();
-    className('android.widget.LinearLayout').clickable(true).depth(26).waitFor();
+    //14是本地
+    var model = className('android.view.View').depth(11).findOnce(14).child(4);
+    var txt = model.text();
+    model.click();
+    sleep(random_time(delay_time));
+    toast("等待本地菜单")
+    className('android.widget.LinearLayout').clickable(true).depth(6).waitFor();
     log("本地3")
     sleep(random_time(delay_time));
-    className('android.widget.LinearLayout').clickable(true).depth(26).drawingOrder(1).findOne().click();
+    className('android.widget.LinearLayout').clickable(true).depth(6).drawingOrder(1).findOne().click();
     sleep(random_time(delay_time));
     back();
 }
@@ -464,6 +467,7 @@ while (count < 6 - completed_read_count / 2) {
         count++;
     }
 }
+log("选读文章end");
 
 /*
 *********************视听部分********************
@@ -486,12 +490,14 @@ if (!finish_list[2] && !finish_list[0]) {
     sleep(random_time(delay_time));
     device.setMusicVolume(currentVolume);
 }
+log("关闭电台广播 end");
 
 back_track_flag = 1;
 
 /*
 **********视听学习、听学习时长*********
 */
+log("视听学习 start");
 if (!finish_list[1] || !finish_list[2]) {
     if (!id('comm_head_title').exists()) back_track();
     my_click_clickable('百灵');
@@ -538,6 +544,7 @@ if (!finish_list[1] || !finish_list[2]) {
     device.setMusicVolume(currentVolume);
     back();
 }
+log("视听学习 end");
 
 // 过渡
 my_click_clickable('我的');
@@ -746,7 +753,7 @@ function multiple_choice(answer) {
 // 多选题是否全选
 function is_select_all_choice() {
     // options数组：下标为i基数时对应着ABCD，下标为偶数时对应着选项i-1(ABCD)的数值
-    var options = className('android.view.View').depth(26).find();
+    var options = className('android.view.View').depth(13).find();
     // question是题目(专项答题是第4个，其他是第2个)
     var question = (className('android.view.View').depth(23).findOnce(1).text().length > 2) ?
         className('android.view.View').depth(23).findOnce(1).text() :
@@ -837,6 +844,7 @@ function baidu_ocr_api(img) {
     try {
         var words_list = res.words_result;
     } catch (error) {
+        log("error" + error);
     }
     if (words_list) {
         // question是否读取完成的标志位
@@ -933,7 +941,10 @@ function do_periodic_answer(number) {
                 // 打开查看提示的时间
                 sleep(random_time(delay_time));
                 var img = images.inRange(captureScreen(), '#800000', '#FF0000');
-                answer = baidu_ocr_api(img)[0];
+                var baidu_res = baidu_ocr_api(img);
+                answer = baidu_res[0];
+                var options_text = baidu_res[1];
+                log("answer:" + answer + " options_text:" + options_text);
 
                 text('提示').waitFor();
                 back();
@@ -1027,6 +1038,7 @@ var thread_handling_access_exceptions = handling_access_exceptions();
 */
 var restart_flag = 0;
 
+log("每日答题 start")
 if (!finish_list[3]) {
     sleep(random_time(delay_time));
     if (!className('android.view.View').depth(22).text('学习积分').exists()) back_track();
@@ -1036,6 +1048,7 @@ if (!finish_list[3]) {
     do_periodic_answer(5);
     my_click_clickable('返回');
 }
+log("每日答题 end")
 
 /*
 **********每周答题*********
