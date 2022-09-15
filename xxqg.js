@@ -45,7 +45,8 @@ var SK = "WWNukireGvAZGEehtQAmZdfS8tqTyp3z";
  *  */
 var pushplus_token = ["99ab8953122344c9bfefdbbe591612fd", "183cda2f82d346fa858e8d7233f027f1"];
 
-var task_parent = 11;
+var task_parent = 24;
+var task_status = 25;
 
 var lock_number = "303178";
 var start = new Date();
@@ -237,16 +238,16 @@ function push_weixin_message(account, score) {
     if (score < 40) {
         return;
     }
-    // for (var t in pushplus_token) {
-    //     http.postJson(
-    //         'http://www.pushplus.plus/send',
-    //         {
-    //             token: pushplus_token[t],
-    //             title: '[' + account + ']今日获得' + score + '积分',
-    //             content: '学习强国 账号名' + account + '今日已经获得' + score + '分'
-    //         }
-    //     );
-    // }
+    for (var t in pushplus_token) {
+        http.postJson(
+            'http://www.pushplus.plus/send',
+            {
+                token: pushplus_token[t],
+                title: '[' + account + ']今日获得' + score + '积分',
+                content: '学习强国 账号名' + account + '今日已经获得' + score + '分'
+            }
+        );
+    }
 }
 
 /**
@@ -322,7 +323,7 @@ function get_finish_list() {
     for (var i = 4; i < 17; i++) {
         // 由于模拟器有model无法读取因此用try catch
         try {
-            var model = className('android.view.View').depth(11).findOnce(i);
+            var model = className('android.view.View').depth(24).findOnce(i);
             if (i == 4) {
                 completed_read_count = parseInt(model.child(child_index).child(0).text());
             } else if (i == 5) {
@@ -364,7 +365,7 @@ var finish_list = get_finish_list();
 */
 if (!finish_list[10]) {
     //14是本地
-    var model = className('android.view.View').depth(11).findOnce(14).child(4);
+    var model = className('android.view.View').depth(task_parent).findOnce(14).child(4);
     var txt = model.text();
     model.click();
     sleep(random_time(delay_time));
@@ -424,17 +425,14 @@ log("选读文章 start")
 while (count < 12 - completed_read_count) {
     if (count == 0) {
         back_track_flag = 0;
-        // log("back_track start")
         back_track();
-        // log("back_track end")
-        //点击菜单栏[要闻]，第二个 i = 1
         click("要闻");
         sleep(random_time(delay_time));
     }
     log("开始阅读：completed_read_count:{} count:{}", completed_read_count, count)
     swipe(800, 2000, 800, 600, 2000);
     sleep(random_time(delay_time));
-    var articles = id("general_card_title_id").className("android.widget.TextView").find();
+    var articles = id("general_card_title_id").className("android.widget.TextView").depth(25).find();
     log("找文章列表 length:", articles.length)
 
     if (articles.length == 0) {
@@ -461,6 +459,7 @@ while (count < 12 - completed_read_count) {
         var cr = articles[i].parent().click();
         if (!cr) {
             log("点击失败");
+            log(articles[i].text())
             continue;
         }
         sleep(random_time(delay_time));
@@ -515,14 +514,16 @@ back_track_flag = 1;
 log("视听学习 start");
 if (!finish_list[1] || !finish_list[2]) {
     if (!id('comm_head_title').exists()) back_track();
+    log("百灵")
     my_click_clickable('百灵');
     sleep(random_time(delay_time / 2));
+    log("竖")
     my_click_clickable('竖');
     // 等待视频加载
     sleep(random_time(delay_time * 3));
     device.setMusicVolume(0);
     // 点击第一个视频
-    var firstVideo = className('android.widget.FrameLayout').clickable(true).depth(5).findOne();
+    var firstVideo = className('android.widget.FrameLayout').clickable(true).depth(24).findOne();
     var bound = firstVideo.bounds()
     click(bound.centerX(), bound.centerY());
     toast("点击第一个视频")
@@ -534,7 +535,7 @@ if (!finish_list[1] || !finish_list[2]) {
     while (completed_watch_count < 6) {
         sleep(random_time(delay_time / 2));
         // 当前视频的时间长度
-        var video_time_text = className('android.widget.TextView').clickable(false).depth(6).findOne().text();
+        var video_time_text = className('android.widget.TextView').clickable(false).depth(16).findOne().text();
         log("短视频时长:" + video_time_text)
         var current_video_time = video_time_text.match(/\/.*/).toString().slice(1);
         log("短视频时长:" + current_video_time)
@@ -618,6 +619,7 @@ function do_contest_answer(depth_click_option, question, options_text) {
         question = sorted_options_text.join('|');
     }
     // 从哈希表中取出答案
+    log("找到答案-哈希表")
     var answer = map_get(question);
 
     // 如果本地题库没搜到，则搜网络题库
@@ -647,12 +649,14 @@ function do_contest_answer(depth_click_option, question, options_text) {
         // }
 
         if (result) {
+            log("找到答案-文本匹配")
             // 答案文本
             var result = result[0].slice(5, result[0].indexOf('<'));
             result = result.replace(/、/, "")
             select_option(result, depth_click_option, options_text);
             log('答案 baidu: ' + result);
         } else {
+            log("找到答案-第一个")
             // 没找到答案，点击第一个
             className('android.widget.RadioButton').depth(depth_click_option).clickable(true).findOne().click();
         }
@@ -941,10 +945,12 @@ function do_periodic_answer(number) {
                 // 打开查看提示的时间
                 sleep(random_time(delay_time));
                 var img = images.inRange(captureScreen(), '#800000', '#FF0000');
+                images.save(img, "./my_img.jpg");
+                exit();
                 var baidu_res = baidu_ocr_api(img);
                 answer = baidu_res[0];
                 var options_text = baidu_res[1];
-                if(!answer){
+                if (!answer) {
                     log("未找到答案")
                     exit();
                 }
@@ -1032,7 +1038,7 @@ function handling_access_exceptions() {
     return thread_handling_access_exceptions;
 }
 
-log("每日答题 eeee")
+// log("每日答题 eeee")
 /* 
 处理访问异常，滑动验证
 */
@@ -1296,15 +1302,23 @@ function do_contest() {
         // 等待下一题题目加载
         className("android.view.View").depth(28).waitFor();
         var pos = className("android.view.View").depth(28).findOne().bounds();
-        if (className("android.view.View").text("        ").exists())
+        var posTimes = 0;
+        if (className("android.view.View").text("        ").exists()) {
             pos = className("android.view.View").text("        ").findOne().bounds();
-        do {
-            var point = findColor(captureScreen(), '#1B1F25', {
-                region: [pos.left, pos.top, pos.width(), pos.height()],
-                threshold: 10,
-            });
-        } while (!point);
+        }
+        // do {
+        //     var point = findColor(captureScreen(), '#1B1F25', {
+        //         region: [pos.left, pos.top, pos.width(), pos.height()],
+        //         threshold: 10,
+        //     });
+        //     log("point 循环");
+        //     posTimes++;
+        //     if (posTimes >= 20) {
+        //         break;
+        //     }
+        // } while (!point);
         // 等待选项加载
+        log("题目加载 登答题按钮出现");
         className('android.widget.RadioButton').depth(32).clickable(true).waitFor();
         var img = images.inRange(captureScreen(), '#000000', '#444444');
         img = images.clip(img, pos.left, pos.top, pos.width(), device.height - pos.top);
@@ -1316,14 +1330,17 @@ function do_contest() {
         log("题目: " + question);
         log("选项: " + options_text);
         if (question) {
+            log("选项匹配");
             do_contest_answer(32, question, options_text);
         } else {
-            className('android.widget.RadioButton').depth(32).waitFor();
+            log("选项加载 题目查找失败，选首个");
             className('android.widget.RadioButton').depth(32).findOne().click();
         }
 
         // 等待新题目加载
-        while (!textMatches(/第\d题/).exists() && !text('继续挑战').exists() && !text('开始').exists());
+        while (!textMatches(/第\d题/).exists() && !text('继续挑战').exists() && !text('开始').exists()) {
+            log("等待中")
+        }
     }
 }
 
@@ -1335,7 +1352,10 @@ if (!finish_list[6] && four_players_scored < 3) {
     sleep(random_time(delay_time));
 
     if (!className("android.view.View").depth(22).text("学习积分").exists()) back_track();
-    entry_model(10);
+    swipe(500, 1700, 500, 500, random_time(delay_time / 2));
+    var model = textStartsWith("四人赛").findOne().parent().child(4);
+    log("四人赛:" + model.text())
+    model.click();
 
     for (var i = 0; i < 2; i++) {
         sleep(random_time(delay_time));
