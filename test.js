@@ -14,7 +14,7 @@
 
 // var articles = className('android.widget.FrameLayout').clickable(true).depth(4).drawingOrder(2).find();
 // log(articles);
-var model = className('android.widget.TextView').depth(3).findOne().bounds();
-click(model.centerX(), model.centerY());
-
-log("cs:" + model.text())
+var model = className('android.widget.TextView').depth(17).drawingOrder(1).findOnce(3);
+var c = model.click();
+log(c);
+log(model.text())
