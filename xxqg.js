@@ -822,7 +822,6 @@ var token = get_baidu_token();
  * @returns {list[string]} options_text 选项文字 
  */
 function baidu_ocr_api(img) {
-    // exit();
     var options_text = [];
     var question = "";
     var res = http.post(
@@ -840,6 +839,46 @@ function baidu_ocr_api(img) {
     } catch (error) {
         log("error" + error);
     }
+    if (words_list) {
+        // question是否读取完成的标志位
+        var question_flag = false;
+        for (var i in words_list) {
+            if (!question_flag) {
+                // 如果是选项则后面不需要加到question中
+                if (words_list[i].words[0] == "A") question_flag = true;
+                // 将题目读取到下划线处，如果读到下划线则不需要加到question中
+                // 利用location之差判断是否之中有下划线
+                /**
+                 * location:
+                 * 识别到的文字块的区域位置信息，列表形式，
+                 * location['left']表示定位位置的长方形左上顶点的水平坐标
+                 * location['top']表示定位位置的长方形左上顶点的垂直坐标
+                 */
+                if (words_list[0].words.indexOf('.') != -1 && i > 0 &&
+                    Math.abs(words_list[i].location['left'] -
+                        words_list[i - 1].location['left']) > 100) question_flag = true;
+                if (!question_flag) question += words_list[i].words;
+                // 如果question已经大于10了也不需要读取了
+                if (question > 10) question_flag = true;
+            }
+            // 这里不能用else，会漏读一次
+            if (question_flag) {
+                // 其他的就是选项了
+                if (words_list[i].words[1] == '.') options_text.push(words_list[i].words.slice(2));
+            }
+        }
+    }
+    // 处理question
+    question = question.replace(/\s*/g, "");
+    question = question.replace(/,/g, "，");
+    question = question.slice(question.indexOf('.') + 1);
+    question = question.slice(0, 10);
+    return [question, options_text];
+}
+
+function paddle_ocr_api(img) {
+    var question = "";
+    var words_list = paddle.ocrText(img, 4, true);
     if (words_list) {
         // question是否读取完成的标志位
         var question_flag = false;
@@ -1290,7 +1329,11 @@ function do_4_contest() {
         // 等待下一题题目加载
         className("android.view.View").depth(28).waitFor();
         log("题目加载 等答题按钮出现");
-        var questionPos = className("android.view.View").depth(28).findOne().bounds();
+        var pos = className("android.view.View").depth(28).findOne().bounds();
+        var rawImage = captureScreen();
+        var img = images.inRange(captureScreen(), '#000000', '#444444');
+        img = images.clip(img, pos.left, pos.top, pos.width(), device.height - pos.top);
+        var result = paddle_ocr_api(img);
 
         className('android.widget.RadioButton').depth(32).clickable(true).waitFor();
 
