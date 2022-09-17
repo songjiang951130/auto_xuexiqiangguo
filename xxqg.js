@@ -82,13 +82,13 @@ storage.remove(answer_question_map_name);
 delay_time = Number(delay_time) * 1000;
 
 //请求横屏截图权限
-threads.start(function() {
+threads.start(function () {
     try {
         var beginBtn;
         if (beginBtn = classNameContains("Button").textContains("开始").findOne(delay_time));
-        else(beginBtn = classNameContains("Button").textContains("允许").findOne(delay_time));
+        else (beginBtn = classNameContains("Button").textContains("允许").findOne(delay_time));
         beginBtn.click();
-    } catch (error) {}
+    } catch (error) { }
 });
 requestScreenCapture(false);
 sleep(delay_time);
@@ -191,7 +191,7 @@ var answer_question_map = storage.get(answer_question_map_name);
  * @param {UiObject / string} target 控件或者是控件文本
  */
 function my_click_non_clickable(target) {
-    if (typeof(target) == 'string') {
+    if (typeof (target) == 'string') {
         text(target).waitFor();
         var tmp = text(target).findOne().bounds();
     } else {
@@ -243,10 +243,10 @@ function push_weixin_message(account, score) {
     for (var t in pushplus_token) {
         http.postJson(
             'http://www.pushplus.plus/send', {
-                token: pushplus_token[t],
-                title: '[' + account + ']今日获得' + score + '积分',
-                content: '学习强国 账号名' + account + '今日已经获得' + score + '分'
-            }
+            token: pushplus_token[t],
+            title: '[' + account + ']今日获得' + score + '积分',
+            content: '学习强国 账号名' + account + '今日已经获得' + score + '分'
+        }
         );
     }
 }
@@ -371,9 +371,9 @@ if (!finish_list[10]) {
     model.click();
     sleep(random_time(delay_time));
     toast("等待本地菜单")
-        /**
-         * 重庆学习平台、重庆农家书屋等数据
-         */
+    /**
+     * 重庆学习平台、重庆农家书屋等数据
+     */
     className('android.widget.LinearLayout').clickable(true).depth(26).waitFor();
     log("本地菜单")
     sleep(random_time(delay_time));
@@ -541,10 +541,11 @@ if (!finish_list[1] || !finish_list[2]) {
         sleep(random_time(delay_time / 2));
         // 当前视频的时间长度
         var video_time_text = className('android.widget.TextView').clickable(false).depth(16).findOne().text();
-        log("短视频时长:" + video_time_text)
+        // log("短视频时长:" + video_time_text)
         var current_video_time = video_time_text.match(/\/.*/).toString().slice(1);
+        //"竖线后内容，有空格| 01:20"
         log("短视频时长:" + current_video_time)
-            // 如果视频超过一分钟就跳过
+        // 如果视频超过一分钟就跳过
         if (Number(current_video_time.slice(0, 3)) >= 1) {
             refresh(true);
             sleep(random_time(delay_time));
@@ -578,7 +579,7 @@ function select_option(answer, depth_click_option, options_text) {
         try {
             className('android.widget.RadioButton').depth(depth_click_option).clickable(true).findOnce(option_i).click();
             return;
-        } catch (error) {}
+        } catch (error) { }
     }
 
     // 如果运行到这，说明很有可能是选项ocr错误，导致答案无法匹配，因此用最大相似度匹配
@@ -597,12 +598,12 @@ function select_option(answer, depth_click_option, options_text) {
         try {
             className('android.widget.RadioButton').depth(depth_click_option).clickable(true).findOnce(max_similarity_index).click();
             return;
-        } catch (error) {}
+        } catch (error) { }
     } else {
         try {
             // 没找到答案，点击第一个
             className('android.widget.RadioButton').depth(depth_click_option).clickable(true).findOne().click();
-        } catch (error) {}
+        } catch (error) { }
     }
 }
 
@@ -637,18 +638,18 @@ function do_contest_answer(depth_click_option, question, options_text) {
                 log("url:" + 'http://www.syiban.com/search/index/init.html?modelid=1&q=' + encodeURI(question.slice(0, 10)))
                 toast('答案查询失败');
             }
-        } catch (error) {}
+        } catch (error) { }
 
         if (result) {
             log("找到答案-文本匹配")
-                // 答案文本
+            // 答案文本
             var result = result[0].slice(5, result[0].indexOf('<'));
             result = result.replace(/、/, "")
             select_option(result, depth_click_option, options_text);
             log('答案 site: ' + result);
         } else {
             log("找到答案-第一个")
-                // 没找到答案，点击第一个
+            // 没找到答案，点击第一个
             className('android.widget.RadioButton').depth(depth_click_option).clickable(true).findOne().click();
         }
     } else {
@@ -688,7 +689,7 @@ function video_answer_question(video_question) {
     video_question = video_question.slice(0, Math.max(5, punctuation_index));
     try {
         var video_result = http.get('https://www.365shenghuo.com/?s=' + encodeURI(video_question));
-    } catch (error) {}
+    } catch (error) { }
     var video_answer = video_result.body.string().match(/答案：.+</);
     if (video_answer) video_answer = video_answer[0].slice(3, video_answer[0].indexOf('<'));
     return video_answer;
@@ -703,7 +704,7 @@ function video_answer_question(video_question) {
  */
 function getSimilarity(str1, str2) {
     var sameNum = 0
-        //寻找相同字符
+    //寻找相同字符
     for (var i = 0; i < str1.length; i++) {
         for (var j = 0; j < str2.length; j++) {
             if (str1[i] === str2[j]) {
@@ -746,7 +747,7 @@ function multiple_choice(answer) {
 // 多选题是否全选
 function is_select_all_choice() {
     // options数组：下标为i基数时对应着ABCD，下标为偶数时对应着选项i-1(ABCD)的数值
-    var options = className('android.view.View').depth(13).find();
+    var options = className('android.view.View').depth(26).find();
     // question是题目(专项答题是第4个，其他是第2个)
     var question = (className('android.view.View').depth(23).findOnce(1).text().length > 2) ?
         className('android.view.View').depth(23).findOnce(1).text() :
@@ -804,10 +805,10 @@ log("get_baidu_token")
 function get_baidu_token() {
     var res = http.post(
         'https://aip.baidubce.com/oauth/2.0/token', {
-            grant_type: 'client_credentials',
-            client_id: AK,
-            client_secret: SK
-        }
+        grant_type: 'client_credentials',
+        client_id: AK,
+        client_secret: SK
+    }
     );
     return res.body.json()['access_token'];
 }
@@ -826,12 +827,12 @@ function baidu_ocr_api(img) {
     var question = "";
     var res = http.post(
         'https://aip.baidubce.com/rest/2.0/ocr/v1/general', {
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            access_token: token,
-            image: images.toBase64(img),
-        }
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        access_token: token,
+        image: images.toBase64(img),
+    }
     );
     var res = res.body.json();
     try {
@@ -991,7 +992,7 @@ function do_periodic_answer(number) {
  */
 function handling_access_exceptions() {
     // 在子线程执行的定时器，如果不用子线程，则无法获取弹出页面的控件
-    var thread_handling_access_exceptions = threads.start(function() {
+    var thread_handling_access_exceptions = threads.start(function () {
         while (true) {
             textContains("访问异常").waitFor();
             // 滑动按钮">>"位置
@@ -1084,7 +1085,7 @@ if (!finish_list[4] && special_answer_scored < 8) {
     var is_answer_special_flag = false;
     // 均速搜索次数（需要根据此更新加速搜索次数）
     var comm_search_special_answer_time = 0
-        // 加速搜索次数
+    // 加速搜索次数
     var quick_search_special_answer_time = storage.get("quick_search_special_answer_time_storage");
 
     // 如果之前的答题全部完成则不向下搜索
@@ -1279,18 +1280,18 @@ function do_contest() {
     }
 }
 
+/**
+ * 四人赛先加载题目再加载答案，而且是单选题，所以可以先题目识别，找到答案，答案一加载，就点击答案
+ */
 function do_4_contest() {
 
     while (!text('开始').exists());
     while (!text('继续挑战').exists()) {
         // 等待下一题题目加载
         className("android.view.View").depth(28).waitFor();
-        var pos = className("android.view.View").depth(28).findOne().bounds();
-        var posTimes = 0;
-        if (className("android.view.View").text("        ").exists()) {
-            pos = className("android.view.View").text("        ").findOne().bounds();
-        }
         log("题目加载 等答题按钮出现");
+        var questionPos = className("android.view.View").depth(28).findOne().bounds();
+
         className('android.widget.RadioButton').depth(32).clickable(true).waitFor();
 
         var question = result[0];
@@ -1409,7 +1410,7 @@ if (!finish_list[8] && whether_complete_subscription == "yes") {
                 do {
                     var subscribe_pos = findColor(captureScreen(), '#E42417', {
                         region: [subscribe_button_pos.left, subscribe_button_pos.top,
-                            subscribe_button_pos.width(), device.height - subscribe_button_pos.top
+                        subscribe_button_pos.width(), device.height - subscribe_button_pos.top
                         ],
                         threshold: 10,
                     });
@@ -1424,7 +1425,7 @@ if (!finish_list[8] && whether_complete_subscription == "yes") {
                 // 滑动前的已订阅控件的位置
                 var complete_subscribe_pos1 = findColor(captureScreen(), '#B2B3B7', {
                     region: [subscribe_button_pos.left, subscribe_button_pos.top,
-                        subscribe_button_pos.width(), device.height - subscribe_button_pos.top
+                    subscribe_button_pos.width(), device.height - subscribe_button_pos.top
                     ],
                     threshold: 10,
                 });
@@ -1433,7 +1434,7 @@ if (!finish_list[8] && whether_complete_subscription == "yes") {
                 // 滑动后的已订阅控件的位置
                 var complete_subscribe_pos2 = findColor(captureScreen(), '#B2B3B7', {
                     region: [subscribe_button_pos.left, subscribe_button_pos.top,
-                        subscribe_button_pos.width(), device.height - subscribe_button_pos.top
+                    subscribe_button_pos.width(), device.height - subscribe_button_pos.top
                     ],
                     threshold: 10,
                 });
@@ -1468,7 +1469,7 @@ if (!finish_list[8] && whether_complete_subscription == "yes") {
                     do {
                         var subscribe_pos = findColor(captureScreen(), '#E42417', {
                             region: [subscribe_button_pos.left, subscribe_button_pos.top,
-                                subscribe_button_pos.width(), device.height - subscribe_button_pos.top
+                            subscribe_button_pos.width(), device.height - subscribe_button_pos.top
                             ],
                             threshold: 10,
                         });
