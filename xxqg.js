@@ -192,8 +192,8 @@ var answer_question_map = storage.get(answer_question_map_name);
  */
 function my_click_non_clickable(target) {
     if (typeof(target) == 'string') {
-        questionText(target).waitFor();
-        var tmp = questionText(target).findOne().bounds();
+        text(target).waitFor();
+        var tmp = text(target).findOne().bounds();
     } else {
         var tmp = target.bounds();
     }
@@ -204,7 +204,7 @@ function my_click_non_clickable(target) {
 
 // 模拟点击可点击元素
 function my_click_clickable(target) {
-    questionText(target).waitFor();
+    text(target).waitFor();
     // 防止点到页面中其他有包含“我的”的控件，比如搜索栏
     if (target == '我的') {
         return id("comm_head_xuexi_mine").findOne().click();
@@ -291,7 +291,7 @@ function back_track() {
             sleep(random_time(delay_time));
             my_click_clickable('学习积分');
             sleep(random_time(delay_time));
-            questionText('登录').waitFor();
+            text('登录').waitFor();
             break;
     }
 }
@@ -464,7 +464,7 @@ if (!finish_list[4] && completed_read_count < 12) {
             sleep(random_time(delay_time));
             var use_time = 0;
             log("阅读中");
-            while (!questionText('点赞').exists()) {
+            while (!text('点赞').exists()) {
                 //向下滑动
                 swipe(500, 1700, 500, 700, 3000);
                 log("滑动中");
@@ -534,8 +534,8 @@ if (!finish_list[1] || !finish_list[2]) {
     toast("点击第一个视频")
 
     sleep(random_time(delay_time));
-    if (questionText('继续播放').exists()) click('继续播放');
-    if (questionText('刷新重试').exists()) click('刷新重试');
+    if (text('继续播放').exists()) click('继续播放');
+    if (text('刷新重试').exists()) click('刷新重试');
     log("completed_watch_count:" + completed_watch_count)
     while (completed_watch_count < 6) {
         sleep(random_time(delay_time / 2));
@@ -777,19 +777,19 @@ function restart() {
     my_click_clickable('退出');
     switch (restart_flag) {
         case 0:
-            questionText('登录').waitFor();
+            text('登录').waitFor();
             entry_model(7);
             break;
         case 1:
             // 设置标志位
             if_restart_flag = true;
             // 等待列表加载
-            questionText('本月').waitFor();
+            text('本月').waitFor();
             // 打开第一个出现未作答的题目
-            while (!questionText('未作答').exists()) {
+            while (!text('未作答').exists()) {
                 swipe(500, 1700, 500, 500, random_time(delay_time / 2));
             }
-            questionText('未作答').findOne().parent().click();
+            text('未作答').findOne().parent().click();
             break;
     }
 }
@@ -943,7 +943,7 @@ function do_periodic_answer(number) {
                     my_click_non_clickable(options[i].text());
                 }
 
-            } else if (className("android.widget.Image").exists() && questionText('填空题').exists()) {
+            } else if (className("android.widget.Image").exists() && text('填空题').exists()) {
                 // 如果存在视频题
                 var video_question = className("android.view.View").depth(24).findOnce(2).text();
                 answer = video_answer_question(video_question);
@@ -955,10 +955,10 @@ function do_periodic_answer(number) {
                     if (restart_flag == 1) {
                         fill_in_blank('cao');
                         sleep(random_time(delay_time * 2));
-                        if (questionText('下一题').exists()) click('下一题');
-                        if (questionText('确定').exists()) click('确定');
+                        if (text('下一题').exists()) click('下一题');
+                        if (text('确定').exists()) click('确定');
                         sleep(random_time(delay_time));
-                        if (questionText('完成').exists()) {
+                        if (text('完成').exists()) {
                             click('完成');
                             flag = true;
                             break;
@@ -985,7 +985,7 @@ function do_periodic_answer(number) {
                 }
                 log("answer:" + answer + " options_text:" + options_text);
 
-                questionText('提示').waitFor();
+                text('提示').waitFor();
                 back();
                 sleep(random_time(delay_time));
 
@@ -998,9 +998,9 @@ function do_periodic_answer(number) {
 
             sleep(random_time(delay_time * 2));
             // 对于专项答题没有确定
-            if (questionText('下一题').exists()) {
+            if (text('下一题').exists()) {
                 click('下一题');
-            } else if (questionText("完成").exists()) {
+            } else if (text("完成").exists()) {
                 // 如果专项答题完成点击完成
                 click("完成");
             } else {
@@ -1008,10 +1008,10 @@ function do_periodic_answer(number) {
                 click('确定');
                 sleep(random_time(delay_time)); // 等待提交的时间
                 // 如果错误（ocr识别有误）则重来
-                if (questionText('下一题').exists() || (questionText('完成').exists() && !special_flag)) {
+                if (text('下一题').exists() || (text('完成').exists() && !special_flag)) {
                     // 如果视频题错误，则每周答题就不需要重新答
                     if (restart_flag == 1 && className("android.widget.Image").exists()) {
-                        if (questionText('下一题').exists()) click('下一题');
+                        if (text('下一题').exists()) click('下一题');
                         else click('完成');
                     } else {
                         restart();
@@ -1038,8 +1038,8 @@ function handling_access_exceptions() {
             idContains("nc_1_n1t").waitFor();
             var bound = idContains("nc_1_n1t").findOne().bounds();
             // 滑动边框位置
-            questionText("向右滑动验证").waitFor();
-            var slider_bound = questionText("向右滑动验证").findOne().bounds();
+            text("向右滑动验证").waitFor();
+            var slider_bound = text("向右滑动验证").findOne().bounds();
             // 通过更复杂的手势验证（先右后左再右）
             var x_start = bound.centerX();
             var dx = x_start - slider_bound.left;
@@ -1083,7 +1083,7 @@ if (!finish_list[3]) {
     if (!className('android.view.View').depth(22).text('学习积分').exists()) back_track();
     entry_model(7);
     // 等待题目加载
-    questionText('查看提示').waitFor();
+    text('查看提示').waitFor();
     do_periodic_answer(5);
     my_click_clickable('返回');
 }
@@ -1132,12 +1132,12 @@ if (!finish_list[4] && special_answer_scored < 8) {
         special_flag = true;
     }
     while (!special_flag) {
-        if (questionText("开始答题").exists()) {
+        if (text("开始答题").exists()) {
             special_flag = true;
             break;
         }
-        while (questionText("继续答题").findOnce(special_i)) {
-            if (questionText("继续答题").findOnce(special_i).parent().childCount() < 3) {
+        while (text("继续答题").findOnce(special_i)) {
+            if (text("继续答题").findOnce(special_i).parent().childCount() < 3) {
                 special_flag = true;
                 break;
             } else {
@@ -1154,7 +1154,7 @@ if (!finish_list[4] && special_answer_scored < 8) {
             comm_search_special_answer_time++;
         }
         // 如果搜索到底部
-        if (questionText("您已经看到了我的底线").exists()) {
+        if (text("您已经看到了我的底线").exists()) {
             storage.put("all_special_answers_completed_storage", "yes");
             break;
         }
@@ -1170,9 +1170,9 @@ if (!finish_list[4] && special_answer_scored < 8) {
     }
 
 
-    if (questionText("开始答题").exists() || questionText("您已经看到了我的底线").exists()) {
+    if (text("开始答题").exists() || text("您已经看到了我的底线").exists()) {
         log("点击:" + "开始答题");
-        questionText("开始答题").findOne().click();
+        text("开始答题").findOne().click();
         is_answer_special_flag = true;
         // 总题数
         className("android.view.View").depth(24).waitFor();
@@ -1181,9 +1181,9 @@ if (!finish_list[4] && special_answer_scored < 8) {
         var num_string = className("android.view.View").depth(24).findOnce(1).text();
         var total_question_num = parseInt(num_string.slice(num_string.indexOf('/') + 1));
         do_periodic_answer(total_question_num);
-    } else if (questionText("继续答题").exists()) {
+    } else if (text("继续答题").exists()) {
         log("点击:" + "继续答题");
-        questionText("继续答题").findOnce(special_i).click();
+        text("继续答题").findOnce(special_i).click();
         // 等待题目加载
         sleep(random_time(delay_time));
         is_answer_special_flag = true;
@@ -1232,11 +1232,11 @@ if (!finish_list[5]) {
             // 每题的过渡
             sleep(random_time(delay_time * 2));
             // 如果答错，第一次通过分享复活
-            if (questionText("立即复活").exists()) {
+            if (text("立即复活").exists()) {
                 num -= 2;
                 click("立即复活");
                 sleep(random_time(delay_time * 3));
-                if (questionText("访问异常").exists()) {
+                if (text("访问异常").exists()) {
                     handling_access_exceptions();
                     sleep(random_time(delay_time * 7));
                 }
@@ -1244,7 +1244,7 @@ if (!finish_list[5]) {
                 sleep(random_time(delay_time * 3));
             }
             // 第二次重新开局
-            if (questionText('再来一局').exists()) {
+            if (text('再来一局').exists()) {
                 my_click_clickable('再来一局');
                 break;
             }
@@ -1268,14 +1268,14 @@ if (!finish_list[5]) {
             num++;
         }
         sleep(random_time(delay_time * 2));
-        if (num == 5 && !questionText('再来一局').exists() && !questionText('结束本局').exists()) flag = true;
+        if (num == 5 && !text('再来一局').exists() && !text('结束本局').exists()) flag = true;
     }
     // 随意点击直到退出
     do {
         sleep(random_time(delay_time * 2.5));
         className('android.widget.RadioButton').depth(28).findOne().click();
         sleep(random_time(delay_time * 2.5));
-    } while (!questionText('再来一局').exists() && !questionText('结束本局').exists());
+    } while (!text('再来一局').exists() && !text('结束本局').exists());
     click('结束本局');
     sleep(random_time(delay_time));
     back();
@@ -1288,8 +1288,8 @@ log("挑战答题end")
 
 function do_contest() {
 
-    while (!questionText('开始').exists());
-    while (!questionText('继续挑战').exists()) {
+    while (!text('开始').exists());
+    while (!text('继续挑战').exists()) {
         // 等待下一题题目加载
         className("android.view.View").depth(28).waitFor();
         var pos = className("android.view.View").depth(28).findOne().bounds();
@@ -1401,7 +1401,7 @@ if (!finish_list[7] && two_players_scored < 1) {
 
     // 点击随机匹配
     log("等待:" + "随机匹配");
-    questionText("随机匹配").waitFor();
+    text("随机匹配").waitFor();
     sleep(random_time(delay_time * 2));
     try {
         log("点击:" + "android.view.View");
@@ -1555,7 +1555,7 @@ if (!finish_list[9] && whether_complete_speech == "yes") {
     ];
 
     sleep(random_time(delay_time));
-    if (!questionText('欢迎发表你的观点').exists()) {
+    if (!text('欢迎发表你的观点').exists()) {
         if (!className('android.view.View').depth(22).text('学习积分').exists()) back_track();
         entry_model(13);
         // 随意找一篇文章
