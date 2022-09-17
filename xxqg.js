@@ -75,19 +75,20 @@ device.keepScreenOn(30 * 60 * 1000);
 
 // 本地存储数据
 var storage = storages.create('data');
-// 更新题库为answer_question_map1
-storage.remove('answer_question_map1');
+// 更新题库为
+var answer_question_map_name = "answer_question_map_name"
+storage.remove(answer_question_map_name);
 
 delay_time = Number(delay_time) * 1000;
 
 //请求横屏截图权限
-threads.start(function () {
+threads.start(function() {
     try {
         var beginBtn;
         if (beginBtn = classNameContains("Button").textContains("开始").findOne(delay_time));
-        else (beginBtn = classNameContains("Button").textContains("允许").findOne(delay_time));
+        else(beginBtn = classNameContains("Button").textContains("允许").findOne(delay_time));
         beginBtn.click();
-    } catch (error) { }
+    } catch (error) {}
 });
 requestScreenCapture(false);
 sleep(delay_time);
@@ -155,7 +156,7 @@ function map_get(key) {
 /**
  * 通过Http下载题库到本地，并进行处理，如果本地已经存在则无需下载
  */
-if (!storage.contains('answer_question_map1')) {
+if (!storage.contains(answer_question_map_name)) {
     // 使用 Github 文件加速服务：https://gh-proxy.com
     var answer_question_bank = http.get("https://gh-proxy.com/https://raw.githubusercontent.com/Mondayfirst/XXQG_TiKu/main/%E9%A2%98%E5%BA%93_%E6%8E%92%E5%BA%8F%E7%89%88.json");
     // 如果资源过期或无法访问则换成别的云盘
@@ -177,18 +178,20 @@ if (!storage.contains('answer_question_map1')) {
         map_set(question, answer);
     }
 
-    storage.put('answer_question_map1', answer_question_map);
+    storage.put(answer_question_map_name, answer_question_map);
+    log("题库 更新完成")
+} else {
+    log("题库 跳过更新");
 }
 
-var answer_question_map = storage.get('answer_question_map1');
-
+var answer_question_map = storage.get(answer_question_map_name);
 
 /**
  * 模拟点击不可以点击元素
  * @param {UiObject / string} target 控件或者是控件文本
  */
 function my_click_non_clickable(target) {
-    if (typeof (target) == 'string') {
+    if (typeof(target) == 'string') {
         text(target).waitFor();
         var tmp = text(target).findOne().bounds();
     } else {
@@ -240,10 +243,10 @@ function push_weixin_message(account, score) {
     for (var t in pushplus_token) {
         http.postJson(
             'http://www.pushplus.plus/send', {
-            token: pushplus_token[t],
-            title: '[' + account + ']今日获得' + score + '积分',
-            content: '学习强国 账号名' + account + '今日已经获得' + score + '分'
-        }
+                token: pushplus_token[t],
+                title: '[' + account + ']今日获得' + score + '积分',
+                content: '学习强国 账号名' + account + '今日已经获得' + score + '分'
+            }
         );
     }
 }
@@ -339,13 +342,12 @@ function get_finish_list() {
 
             finish_list.push(model.child(4).text() == '已完成');
         } catch (error) {
-            log("读取任务完成信息失败" + i)
-            log(error)
-            exit()
-            finish_list.push(false);
+            log("读取任务完成信息失败" + i);
+            log(error);
+            exit();
         }
     }
-    log("已完成情况:" + finish_list)
+    log("已完成情况:" + finish_list);
     return finish_list;
 }
 
@@ -369,9 +371,9 @@ if (!finish_list[10]) {
     model.click();
     sleep(random_time(delay_time));
     toast("等待本地菜单")
-    /**
-     * 重庆学习平台、重庆农家书屋等数据
-     */
+        /**
+         * 重庆学习平台、重庆农家书屋等数据
+         */
     className('android.widget.LinearLayout').clickable(true).depth(26).waitFor();
     log("本地菜单")
     sleep(random_time(delay_time));
@@ -417,25 +419,19 @@ if (!finish_list[2]) {
     }
 }
 log("打开电台广播end");
-
-// completed_read_count = 0;
-// finish_list[0] = false;
-
-
-
-if (!finish_list[4]) {
+if (!finish_list[4] && completed_read_count < 12) {
     log("选读文章 start")
     back_track_flag = 0;
     back_track();
     //【亮点】 可刷新
     // var light = className('android.widget.LinearLayout').depth(16).findOnce(3);
     // log("light text:" + light.text())
-    click("亮点");
+    click("要闻");
     sleep(random_time(delay_time));
 
     // 阅读文章次数
     var count = 0;
-    var single_total_read = 33000
+    var single_total_read = 35000
     var titleSet = new Set();
     while (count < 12 - completed_read_count) {
         log("开始阅读：completed_read_count:{} count:{}", completed_read_count, count)
@@ -482,6 +478,10 @@ if (!finish_list[4]) {
             titleSet.add(articles[i].text());
             back();
             count++;
+            //文章阅读到达数量跳出列表
+            while (count >= 12 - completed_read_count) {
+                break;
+            }
             swipe(500, 1700, 500, 700, 1000);
         }
     }
@@ -544,7 +544,7 @@ if (!finish_list[1] || !finish_list[2]) {
         log("短视频时长:" + video_time_text)
         var current_video_time = video_time_text.match(/\/.*/).toString().slice(1);
         log("短视频时长:" + current_video_time)
-        // 如果视频超过一分钟就跳过
+            // 如果视频超过一分钟就跳过
         if (Number(current_video_time.slice(0, 3)) >= 1) {
             refresh(true);
             sleep(random_time(delay_time));
@@ -578,7 +578,7 @@ function select_option(answer, depth_click_option, options_text) {
         try {
             className('android.widget.RadioButton').depth(depth_click_option).clickable(true).findOnce(option_i).click();
             return;
-        } catch (error) { }
+        } catch (error) {}
     }
 
     // 如果运行到这，说明很有可能是选项ocr错误，导致答案无法匹配，因此用最大相似度匹配
@@ -597,12 +597,12 @@ function select_option(answer, depth_click_option, options_text) {
         try {
             className('android.widget.RadioButton').depth(depth_click_option).clickable(true).findOnce(max_similarity_index).click();
             return;
-        } catch (error) { }
+        } catch (error) {}
     } else {
         try {
             // 没找到答案，点击第一个
             className('android.widget.RadioButton').depth(depth_click_option).clickable(true).findOne().click();
-        } catch (error) { }
+        } catch (error) {}
     }
 }
 
@@ -637,28 +637,18 @@ function do_contest_answer(depth_click_option, question, options_text) {
                 log("url:" + 'http://www.syiban.com/search/index/init.html?modelid=1&q=' + encodeURI(question.slice(0, 10)))
                 toast('答案查询失败');
             }
-        } catch (error) { }
-        // // 如果第一个网站没获取到正确答案，则利用第二个网站
-        // if (!(result && result[0].charCodeAt(3) > 64 && result[0].charCodeAt(3) < 69)) {
-        //     try {
-        //         // 此网站只支持六个字符的搜索
-        //         var r2 = http.get('https://www.souwen123.com/search/select.php?age=' + encodeURI(question.slice(0, 6)));
-        //         result = r2.body.string().match(/答案：.*</);
-        //         log("r2:" + result);
-        //     } catch (error) {
-        //     }
-        // }
+        } catch (error) {}
 
         if (result) {
             log("找到答案-文本匹配")
-            // 答案文本
+                // 答案文本
             var result = result[0].slice(5, result[0].indexOf('<'));
             result = result.replace(/、/, "")
             select_option(result, depth_click_option, options_text);
-            log('答案 baidu: ' + result);
+            log('答案 site: ' + result);
         } else {
             log("找到答案-第一个")
-            // 没找到答案，点击第一个
+                // 没找到答案，点击第一个
             className('android.widget.RadioButton').depth(depth_click_option).clickable(true).findOne().click();
         }
     } else {
@@ -698,7 +688,7 @@ function video_answer_question(video_question) {
     video_question = video_question.slice(0, Math.max(5, punctuation_index));
     try {
         var video_result = http.get('https://www.365shenghuo.com/?s=' + encodeURI(video_question));
-    } catch (error) { }
+    } catch (error) {}
     var video_answer = video_result.body.string().match(/答案：.+</);
     if (video_answer) video_answer = video_answer[0].slice(3, video_answer[0].indexOf('<'));
     return video_answer;
@@ -713,7 +703,7 @@ function video_answer_question(video_question) {
  */
 function getSimilarity(str1, str2) {
     var sameNum = 0
-    //寻找相同字符
+        //寻找相同字符
     for (var i = 0; i < str1.length; i++) {
         for (var j = 0; j < str2.length; j++) {
             if (str1[i] === str2[j]) {
@@ -814,10 +804,10 @@ log("get_baidu_token")
 function get_baidu_token() {
     var res = http.post(
         'https://aip.baidubce.com/oauth/2.0/token', {
-        grant_type: 'client_credentials',
-        client_id: AK,
-        client_secret: SK
-    }
+            grant_type: 'client_credentials',
+            client_id: AK,
+            client_secret: SK
+        }
     );
     return res.body.json()['access_token'];
 }
@@ -831,16 +821,17 @@ var token = get_baidu_token();
  * @returns {list[string]} options_text 选项文字 
  */
 function baidu_ocr_api(img) {
+    // exit();
     var options_text = [];
     var question = "";
     var res = http.post(
         'https://aip.baidubce.com/rest/2.0/ocr/v1/general', {
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        access_token: token,
-        image: images.toBase64(img),
-    }
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            access_token: token,
+            image: images.toBase64(img),
+        }
     );
     var res = res.body.json();
     try {
@@ -942,9 +933,9 @@ function do_periodic_answer(number) {
                 my_click_clickable('查看提示');
                 // 打开查看提示的时间
                 sleep(random_time(delay_time));
-                var img = images.inRange(captureScreen(), '#800000', '#FF0000');
-                images.save(img, "./my_img.jpg");
-                exit();
+                var sc = captureScreen();
+                // images.save(sc, "./num_" + num + ".jpg");
+                var img = images.inRange(sc, '#800000', '#FF0000');
                 var baidu_res = baidu_ocr_api(img);
                 answer = baidu_res[0];
                 var options_text = baidu_res[1];
@@ -1000,7 +991,7 @@ function do_periodic_answer(number) {
  */
 function handling_access_exceptions() {
     // 在子线程执行的定时器，如果不用子线程，则无法获取弹出页面的控件
-    var thread_handling_access_exceptions = threads.start(function () {
+    var thread_handling_access_exceptions = threads.start(function() {
         while (true) {
             textContains("访问异常").waitFor();
             // 滑动按钮">>"位置
@@ -1036,7 +1027,6 @@ function handling_access_exceptions() {
     return thread_handling_access_exceptions;
 }
 
-// log("每日答题 eeee")
 /* 
 处理访问异常，滑动验证
 */
@@ -1048,8 +1038,7 @@ var thread_handling_access_exceptions = handling_access_exceptions();
 var restart_flag = 0;
 
 log("每日答题 start")
-//!finish_list[3]
-if (false) {
+if (!finish_list[3]) {
     sleep(random_time(delay_time));
     if (!className('android.view.View').depth(22).text('学习积分').exists()) back_track();
     entry_model(7);
@@ -1095,7 +1084,7 @@ if (!finish_list[4] && special_answer_scored < 8) {
     var is_answer_special_flag = false;
     // 均速搜索次数（需要根据此更新加速搜索次数）
     var comm_search_special_answer_time = 0
-    // 加速搜索次数
+        // 加速搜索次数
     var quick_search_special_answer_time = storage.get("quick_search_special_answer_time_storage");
 
     // 如果之前的答题全部完成则不向下搜索
@@ -1186,7 +1175,9 @@ if (!finish_list[4] && special_answer_scored < 8) {
 /*
  **********挑战答题*********
  */
+log("挑战答题")
 if (!finish_list[5]) {
+    log("挑战答题start")
     sleep(random_time(delay_time));
     if (!className('android.view.View').depth(22).text('学习积分').exists()) back_track();
     entry_model(9);
@@ -1249,6 +1240,7 @@ if (!finish_list[5]) {
     sleep(random_time(delay_time));
     back();
 }
+log("挑战答题end")
 
 /*
  ********************四人赛、双人对战********************
@@ -1265,18 +1257,6 @@ function do_contest() {
         if (className("android.view.View").text("        ").exists()) {
             pos = className("android.view.View").text("        ").findOne().bounds();
         }
-        // do {
-        //     var point = findColor(captureScreen(), '#1B1F25', {
-        //         region: [pos.left, pos.top, pos.width(), pos.height()],
-        //         threshold: 10,
-        //     });
-        //     log("point 循环");
-        //     posTimes++;
-        //     if (posTimes >= 20) {
-        //         break;
-        //     }
-        // } while (!point);
-        // 等待选项加载
         log("题目加载 等答题按钮出现");
         className('android.widget.RadioButton').depth(32).clickable(true).waitFor();
         var rawImage = captureScreen();
@@ -1296,10 +1276,34 @@ function do_contest() {
             log("选项加载 题目查找失败，选首个");
             className('android.widget.RadioButton').depth(32).findOne().click();
         }
+    }
+}
 
-        // 等待新题目加载
-        while (!textMatches(/第\d题/).exists() && !text('继续挑战').exists() && !text('开始').exists()) {
-            // log("等待中")
+function do_4_contest() {
+
+    while (!text('开始').exists());
+    while (!text('继续挑战').exists()) {
+        // 等待下一题题目加载
+        className("android.view.View").depth(28).waitFor();
+        var pos = className("android.view.View").depth(28).findOne().bounds();
+        var posTimes = 0;
+        if (className("android.view.View").text("        ").exists()) {
+            pos = className("android.view.View").text("        ").findOne().bounds();
+        }
+        log("题目加载 等答题按钮出现");
+        className('android.widget.RadioButton').depth(32).clickable(true).waitFor();
+
+        var question = result[0];
+        var options_text = result[1];
+
+        log("题目: " + question);
+        log("选项: " + options_text);
+        if (question) {
+            log("选项匹配");
+            do_contest_answer(32, question, options_text);
+        } else {
+            log("选项加载 题目查找失败，选首个");
+            className('android.widget.RadioButton').depth(32).findOne().click();
         }
     }
 }
@@ -1309,23 +1313,27 @@ function do_contest() {
  */
 if (!finish_list[6] && four_players_scored < 3) {
     log("四人赛");
-    if (textStartsWith("今日积分奖励局").exists()) {
+    if (!className("android.view.View").depth(22).text("学习积分").exists()) back_track();
+    swipe(500, 1700, 500, 500, random_time(delay_time / 2));
+    var model = textStartsWith("四人赛").findOne().parent().child(4);
+    model.click();
+    sleep(random_time(delay_time));
+    var isPlay = textStartsWith("今日积分奖励局").exists();
+    isPlay = true;
+    if (isPlay) {
         sleep(random_time(delay_time));
-
-        if (!className("android.view.View").depth(22).text("学习积分").exists()) back_track();
-        swipe(500, 1700, 500, 500, random_time(delay_time / 2));
-        var model = textStartsWith("四人赛").findOne().parent().child(4);
-        log("四人赛:" + model.text())
-        model.click();
-
         for (var i = 0; i < 2; i++) {
             sleep(random_time(delay_time));
             my_click_clickable("开始比赛");
-            do_contest();
+            do_4_contest();
             if (i == 0) {
                 sleep(random_time(delay_time * 2));
                 my_click_clickable("继续挑战");
                 sleep(random_time(delay_time));
+            }
+            //非积分局退出
+            if (!textStartsWith("今日积分奖励局").exists()) {
+                break;
             }
         }
         sleep(random_time(delay_time));
@@ -1401,7 +1409,7 @@ if (!finish_list[8] && whether_complete_subscription == "yes") {
                 do {
                     var subscribe_pos = findColor(captureScreen(), '#E42417', {
                         region: [subscribe_button_pos.left, subscribe_button_pos.top,
-                        subscribe_button_pos.width(), device.height - subscribe_button_pos.top
+                            subscribe_button_pos.width(), device.height - subscribe_button_pos.top
                         ],
                         threshold: 10,
                     });
@@ -1416,7 +1424,7 @@ if (!finish_list[8] && whether_complete_subscription == "yes") {
                 // 滑动前的已订阅控件的位置
                 var complete_subscribe_pos1 = findColor(captureScreen(), '#B2B3B7', {
                     region: [subscribe_button_pos.left, subscribe_button_pos.top,
-                    subscribe_button_pos.width(), device.height - subscribe_button_pos.top
+                        subscribe_button_pos.width(), device.height - subscribe_button_pos.top
                     ],
                     threshold: 10,
                 });
@@ -1425,7 +1433,7 @@ if (!finish_list[8] && whether_complete_subscription == "yes") {
                 // 滑动后的已订阅控件的位置
                 var complete_subscribe_pos2 = findColor(captureScreen(), '#B2B3B7', {
                     region: [subscribe_button_pos.left, subscribe_button_pos.top,
-                    subscribe_button_pos.width(), device.height - subscribe_button_pos.top
+                        subscribe_button_pos.width(), device.height - subscribe_button_pos.top
                     ],
                     threshold: 10,
                 });
@@ -1460,7 +1468,7 @@ if (!finish_list[8] && whether_complete_subscription == "yes") {
                     do {
                         var subscribe_pos = findColor(captureScreen(), '#E42417', {
                             region: [subscribe_button_pos.left, subscribe_button_pos.top,
-                            subscribe_button_pos.width(), device.height - subscribe_button_pos.top
+                                subscribe_button_pos.width(), device.height - subscribe_button_pos.top
                             ],
                             threshold: 10,
                         });
@@ -1540,5 +1548,7 @@ if (pushplus_token) {
 }
 
 device.cancelKeepingAwake();
+
+log('脚本运行完成，时间：' + (new Date() - start) / 1000 / 60 + "分钟");
 
 toast('脚本运行完成，时间：' + (new Date() - start) / 1000 / 60 + "分钟");
