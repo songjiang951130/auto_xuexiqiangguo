@@ -78,5 +78,10 @@ var text2 = ['1.鲁迅，原名周樟寿，后改为周树',
     'D.',
     '《内碱》'
 ];
-var video_time_text = className('android.widget.TextView').clickable(false).depth(3).findOne().text();
-log("短视频时长:" + video_time_text);
+// var video_time_text = className('android.widget.TextView').clickable(false).depth(3).findOne().text();
+// log("短视频时长:" + video_time_text);
+var words_list = text1;
+var question = "";
+var options_text = [];
+var key1 = "找到答案-第一个";
+var key2 = "找到答案";
