@@ -45,8 +45,17 @@ var SK = "WWNukireGvAZGEehtQAmZdfS8tqTyp3z";
  *  */
 var pushplus_token = ["99ab8953122344c9bfefdbbe591612fd", "183cda2f82d346fa858e8d7233f027f1"];
 
-var task_parent = 24;
-var task_status = 25;
+var app_index = 1;
+var task_parent_list = [24, 11];
+var task_parent = task_parent_list[app_index];
+var task_status_list = [25, 12];
+var task_status = task_status_list[app_index];
+var tab_depth_list = [26, 2];
+var tab_depth = tab_depth_list[app_index];
+var icon_id_list = ["lay_state_icon", "v_paused"];
+var icon_id = icon_id_list[app_index];
+var article_depth_list = [25, 5];
+var article_depth = article_depth_list[app_index];
 
 var lock_number = "303178";
 var start = new Date();
@@ -76,8 +85,8 @@ device.keepScreenOn(30 * 60 * 1000);
 // 本地存储数据
 var storage = storages.create('data');
 // 更新题库为
-var answer_question_map_name = "answer_question_map_name"
-storage.remove(answer_question_map_name);
+var answer_question_map_name = "answer_question_map_name";
+// storage.remove(answer_question_map_name);
 
 delay_time = Number(delay_time) * 1000;
 
@@ -268,21 +277,21 @@ function back_track() {
         back();
         sleep(random_time(delay_time));
     }
-    // log("switch")
+    log("switch")
     switch (back_track_flag) {
         case 0:
             // 去中心模块
-            // log("switch waitFor")
+            toast("等待-中间按钮")
             id(home_bottom_tab).waitFor();
-            // log("switch waitFor end ")
+            log("switch waitFor end ")
             sleep(random_time(delay_time));
             var home_bottom = id(home_bottom_tab).findOne().bounds();
             click(home_bottom.centerX(), home_bottom.centerY());
             // 去province模块
             sleep(random_time(delay_time));
-            className('android.widget.LinearLayout').depth(16).findOnce(4).click();
-            // click("重庆")
-            toast("点击本地模块")
+            var localModel = className('android.widget.LinearLayout').depth(tab_depth).findOnce(4);
+            toast("点击本地模块" + localModel.text())
+            localModel.click();
             break;
         case 1:
             break;
@@ -324,7 +333,8 @@ function get_finish_list() {
     for (var i = 4; i < 17; i++) {
         // 由于模拟器有model无法读取因此用try catch
         try {
-            var model = className('android.view.View').depth(24).findOnce(i);
+            var model = className('android.view.View').depth(task_parent).findOnce(i);
+            log("task:" + (i - 4) + " " + model.child(0).text());
             if (i == 4) {
                 completed_read_count = parseInt(model.child(child_index).child(0).text());
             } else if (i == 5) {
@@ -357,6 +367,7 @@ function get_finish_list() {
 
 var back_track_flag = 2;
 back_track();
+sleep(random_time(delay_time));
 var finish_list = get_finish_list();
 
 // 返回首页
@@ -364,22 +375,24 @@ var finish_list = get_finish_list();
  **********本地频道*********
  */
 // finish_list[10] = false;
-if (!finish_list[10]) {
+if (!finish_list[11]) {
+    log("进入本地");
     //14是本地
     var model = className('android.view.View').depth(task_parent).findOnce(14).child(4);
     var txt = model.text();
     model.click();
     sleep(random_time(delay_time));
-    toast("等待本地菜单")
-        /**
-         * 重庆学习平台、重庆农家书屋等数据
-         */
-    className('android.widget.LinearLayout').clickable(true).depth(26).waitFor();
-    log("本地菜单")
+    toast("等待本地菜单");
+    /**
+     * 重庆学习平台、重庆农家书屋等数据
+     */
+    log("本地菜单 可能会卡死");
+    className('android.widget.LinearLayout').clickable(true).depth(tab_depth).waitFor();
+    log("本地菜单");
     sleep(random_time(delay_time));
-    className('android.widget.LinearLayout').clickable(true).depth(26).findOne().click();
+    className('android.widget.LinearLayout').clickable(true).depth(tab_depth).findOne().click();
     sleep(random_time(delay_time));
-    back();
+    // back();
 }
 
 /*
@@ -407,8 +420,8 @@ if (!finish_list[2]) {
     my_click_clickable('听广播');
     log("点击听广播")
     sleep(random_time(delay_time));
-    var icon_id = "lay_state_icon";
     var v = id(icon_id).findOne();
+    log("点击听广播2")
     if (id(icon_id).findOne() != null && !textStartsWith("正在收听").exists()) {
         log("播放按钮获取成功")
         var lay_state_icon_pos = v.bounds();
@@ -437,7 +450,7 @@ if (!finish_list[4] && completed_read_count < 12) {
         log("开始阅读：completed_read_count:{} count:{}", completed_read_count, count)
         swipe(800, 2000, 800, 600, 2000);
         sleep(random_time(delay_time));
-        var articles = id("general_card_title_id").className("android.widget.TextView").depth(25).find();
+        var articles = id("general_card_title_id").className("android.widget.TextView").depth(article_depth).find();
         log("找文章列表 length:", articles.length)
 
         if (articles.length == 0) {
@@ -450,20 +463,21 @@ if (!finish_list[4] && completed_read_count < 12) {
         for (var i = 0; i < articles.length; i++) {
             if (titleSet.has(articles[i].text())) {
                 log("已阅读+" + articles[i].text());
-                continue;
+                back();
             }
             if (articles[i].text().includes("朗读") || articles[i].text().includes("朗诵") || articles[i].text().includes("专题")) {
                 log("跳过+" + articles[i].text());
-                continue;
+                back();
             }
+            log("标题+:" + articles[i].text() + " index:" + i)
             var cr = my_click_clickable(articles[i].text())
             if (!cr) {
                 log("点击失败 " + articles[i].text());
-                continue;
+                break;
             }
-            sleep(random_time(delay_time));
             var use_time = 0;
             log("阅读中");
+            swipe(500, 1700, 500, 700, 1000);
             while (!text('点赞').exists()) {
                 //向下滑动
                 swipe(500, 1700, 500, 700, 3000);
@@ -503,7 +517,6 @@ if (!finish_list[2] && !finish_list[0]) {
     if (!textStartsWith("最近收听").exists() && !textStartsWith("推荐收听").exists()) {
         // 换成通过text寻找控件
         textStartsWith("正在收听").waitFor();
-        // className("android.widget.ImageView").clickable(true).id("v_playing").findOne().click();
         textStartsWith("正在收听").findOne().parent().child(1).child(0).click();
     }
     sleep(random_time(delay_time));
