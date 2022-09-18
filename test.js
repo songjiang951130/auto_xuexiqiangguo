@@ -85,3 +85,18 @@ var question = "";
 var options_text = [];
 var key1 = "找到答案-第一个";
 var key2 = "找到答案";
+
+
+function my_click_clickable(target) {
+    text(target).waitFor();
+    // 防止点到页面中其他有包含“我的”的控件，比如搜索栏
+    if (target == '我的') {
+        return id("comm_head_xuexi_mine").findOne().click();
+    } else {
+        return click(target);
+    }
+}
+id("general_card_title_id").findOne().parent().click();
+log("等待欢迎发表你的观点")
+    // text('欢迎发表你的观点').waitFor();
+    // click("欢迎发表你的观点");
