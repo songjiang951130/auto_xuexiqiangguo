@@ -78,49 +78,5 @@ var text2 = ['1.鲁迅，原名周樟寿，后改为周树',
     'D.',
     '《内碱》'
 ];
-
-var app_index = 0;
-var task_parent_list = [24, 11]
-var task_status_list = [25, 12]
-var task_parent = task_parent_list[app_index];
-var task_status = task_status_list[app_index];
-
-function get_finish_list() {
-    var child_index = 3;
-    var finish_list = [];
-    for (var i = 4; i < 17; i++) {
-        // 由于模拟器有model无法读取因此用try catch
-        try {
-            var model = className('android.view.View').depth(11).findOnce(i);
-            log("text:" + model.child(child_index).text())
-
-            if (i == 4) {
-                log(model.child(child_index).text())
-                completed_read_count = parseInt(model.child(child_index).child(0).text());
-            } else if (i == 5) {
-                completed_watch_count = parseInt(model.child(child_index).child(0).text());
-            } else if (i == 16) {
-                weekly_answer_scored = parseInt(model.child(child_index).child(0).text());
-            } else if (i == 8) {
-                special_answer_scored = parseInt(model.child(child_index).child(0).text());
-                special_answer_scored = 8;
-            } else if (i == 10) {
-                four_players_scored = parseInt(model.child(child_index).child(0).text());
-            } else if (i == 11) {
-                two_players_scored = parseInt(model.child(child_index).child(0).text());
-            }
-
-            finish_list.push(model.child(4).text() == '已完成');
-        } catch (error) {
-            log("读取任务完成信息失败" + i);
-            log(error);
-            exit();
-        }
-    }
-    log("已完成情况:" + finish_list);
-    return finish_list;
-}
-
-var f = get_finish_list();
-
-className('android.view.View').depth(task_parent).findOnce(14).child(4);
+var video_time_text = className('android.widget.TextView').clickable(false).depth(3).findOne().text();
+log("短视频时长:" + video_time_text);

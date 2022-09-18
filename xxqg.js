@@ -57,6 +57,12 @@ var icon_id = icon_id_list[app_index];
 var article_depth_list = [25, 5];
 var article_depth = article_depth_list[app_index];
 
+var video_list = [24, 5];
+var video_depth = article_depth_list[app_index];
+//短视频进度条
+var video_bar_list = [16, 3];
+var video_bar_depth = article_depth_list[app_index];
+
 var lock_number = "303178";
 var start = new Date();
 
@@ -283,14 +289,13 @@ function back_track() {
             // 去中心模块
             toast("等待-中间按钮")
             id(home_bottom_tab).waitFor();
-            log("switch waitFor end ")
             sleep(random_time(delay_time));
             var home_bottom = id(home_bottom_tab).findOne().bounds();
             click(home_bottom.centerX(), home_bottom.centerY());
             // 去province模块
             sleep(random_time(delay_time));
-            var localModel = className('android.widget.LinearLayout').depth(tab_depth).findOnce(4);
-            toast("点击本地模块" + localModel.text())
+            var localModel = className('android.widget.LinearLayout').depth(tab_depth).findOnce(15);
+            toast("点击本地模块")
             localModel.click();
             break;
         case 1:
@@ -300,7 +305,9 @@ function back_track() {
             sleep(random_time(delay_time));
             my_click_clickable('学习积分');
             sleep(random_time(delay_time));
+            log("登录")
             text('登录').waitFor();
+            log("登录 end")
             break;
     }
 }
@@ -386,9 +393,7 @@ if (!finish_list[11]) {
     /**
      * 重庆学习平台、重庆农家书屋等数据
      */
-    log("本地菜单 可能会卡死");
     className('android.widget.LinearLayout').clickable(true).depth(tab_depth).waitFor();
-    log("本地菜单");
     sleep(random_time(delay_time));
     className('android.widget.LinearLayout').clickable(true).depth(tab_depth).findOne().click();
     sleep(random_time(delay_time));
@@ -436,10 +441,6 @@ if (!finish_list[4] && completed_read_count < 12) {
     log("选读文章 start")
     back_track_flag = 0;
     back_track();
-    //【亮点】 可刷新
-    // var light = className('android.widget.LinearLayout').depth(16).findOnce(3);
-    // log("light text:" + light.text())
-    click("要闻");
     sleep(random_time(delay_time));
 
     // 阅读文章次数
@@ -463,11 +464,11 @@ if (!finish_list[4] && completed_read_count < 12) {
         for (var i = 0; i < articles.length; i++) {
             if (titleSet.has(articles[i].text())) {
                 log("已阅读+" + articles[i].text());
-                back();
+                continue;
             }
             if (articles[i].text().includes("朗读") || articles[i].text().includes("朗诵") || articles[i].text().includes("专题")) {
                 log("跳过+" + articles[i].text());
-                back();
+                continue;
             }
             log("标题+:" + articles[i].text() + " index:" + i)
             var cr = my_click_clickable(articles[i].text())
@@ -477,7 +478,7 @@ if (!finish_list[4] && completed_read_count < 12) {
             }
             var use_time = 0;
             log("阅读中");
-            swipe(500, 1700, 500, 700, 1000);
+            swipe(500, 1700, 500, 700, 500);
             while (!text('点赞').exists()) {
                 //向下滑动
                 swipe(500, 1700, 500, 700, 3000);
@@ -535,13 +536,16 @@ if (!finish_list[1] || !finish_list[2]) {
     log("百灵")
     my_click_clickable('百灵');
     sleep(random_time(delay_time / 2));
+    if (text("关闭").exists()) {
+        click("关闭");
+    }
     log("竖")
     my_click_clickable('竖');
     // 等待视频加载
     sleep(random_time(delay_time * 3));
     device.setMusicVolume(0);
     // 点击第一个视频
-    var firstVideo = className('android.widget.FrameLayout').clickable(true).depth(24).findOne();
+    var firstVideo = className('android.widget.FrameLayout').clickable(true).depth(video_depth).findOne();
     var bound = firstVideo.bounds()
     click(bound.centerX(), bound.centerY());
     toast("点击第一个视频")
@@ -553,7 +557,7 @@ if (!finish_list[1] || !finish_list[2]) {
     while (completed_watch_count < 6) {
         sleep(random_time(delay_time / 2));
         // 当前视频的时间长度
-        var video_time_text = className('android.widget.TextView').clickable(false).depth(16).findOne().text();
+        var video_time_text = className('android.widget.TextView').clickable(false).depth(video_bar_depth).findOne().text();
         // log("短视频时长:" + video_time_text)
         var current_video_time = video_time_text.match(/\/.*/).toString().slice(1);
         //"竖线后内容，有空格| 01:20"
@@ -1231,11 +1235,16 @@ if (!finish_list[4] && special_answer_scored < 8) {
 log("挑战答题")
 if (!finish_list[5]) {
     log("挑战答题start")
+    var q_index = 12;
+    var o_index = 13;
     sleep(random_time(delay_time));
     if (!className('android.view.View').depth(22).text('学习积分').exists()) back_track();
     entry_model(9);
     // 加载页面
-    className('android.view.View').clickable(true).depth(22).waitFor();
+    log("挑战答题 加载页面");
+    className('android.view.View').depth(12).waitFor();
+    log("挑战答题 加载完成");
+
     // flag为true时挑战成功拿到6分
     var flag = false;
     while (!flag) {
@@ -1261,17 +1270,18 @@ if (!finish_list[5]) {
                 my_click_clickable('再来一局');
                 break;
             }
+
             // 题目
-            className('android.view.View').depth(25).waitFor();
-            var question = className('android.view.View').depth(25).findOne().text();
+            className('android.view.View').depth(q_index).waitFor();
+            var question = className('android.view.View').depth(q_index).findOne().text();
             // 截取到下划线前
             question = question.slice(0, question.indexOf(' '));
             // 选项文字列表
             var options_text = [];
             // 等待选项加载
-            className('android.widget.RadioButton').depth(28).clickable(true).waitFor();
+            className('android.widget.RadioButton').depth(o_index).clickable(true).waitFor();
             // 获取所有选项控件，以RadioButton对象为基准，根据UI控件树相对位置寻找选项文字内容
-            var options = className('android.widget.RadioButton').depth(28).find();
+            var options = className('android.widget.RadioButton').depth(o_index).find();
             // 选项文本
             options.forEach((element, index) => {
                 //挑战答题中，选项文字位于RadioButton对象的兄弟对象中
@@ -1286,7 +1296,7 @@ if (!finish_list[5]) {
     // 随意点击直到退出
     do {
         sleep(random_time(delay_time * 2.5));
-        className('android.widget.RadioButton').depth(28).findOne().click();
+        className('android.widget.RadioButton').depth(o_index).findOne().click();
         sleep(random_time(delay_time * 2.5));
     } while (!text('再来一局').exists() && !text('结束本局').exists());
     click('结束本局');
