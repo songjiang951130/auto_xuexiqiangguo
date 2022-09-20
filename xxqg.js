@@ -1442,6 +1442,10 @@ if (!finish_list[6] && four_players_scored < 3) {
     if (isPlay) {
         sleep(random_time(delay_time));
         for (var i = 0; i < 2; i++) {
+            //非积分局退出
+            if (!textStartsWith("今日积分奖励局").exists()) {
+                break;
+            }
             sleep(random_time(delay_time));
             my_click_clickable("开始比赛");
             do_4_contest();
@@ -1449,10 +1453,6 @@ if (!finish_list[6] && four_players_scored < 3) {
                 sleep(random_time(delay_time * 2));
                 my_click_clickable("继续挑战");
                 sleep(random_time(delay_time));
-            }
-            //非积分局退出
-            if (!textStartsWith("今日积分奖励局").exists()) {
-                break;
             }
         }
         sleep(random_time(delay_time));
