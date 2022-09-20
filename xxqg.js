@@ -127,13 +127,13 @@ var answer_question_map_name = "answer_question_map_name";
 // storage.remove(answer_question_map_name);
 
 //请求横屏截图权限
-threads.start(function () {
+threads.start(function() {
     try {
         var beginBtn;
         if (beginBtn = classNameContains("Button").textContains("开始").findOne(delay_time));
-        else (beginBtn = classNameContains("Button").textContains("允许").findOne(delay_time));
+        else(beginBtn = classNameContains("Button").textContains("允许").findOne(delay_time));
         beginBtn.click();
-    } catch (error) { }
+    } catch (error) {}
 });
 requestScreenCapture(false);
 sleep(delay_time);
@@ -236,7 +236,7 @@ var answer_question_map = storage.get(answer_question_map_name);
  * @param {UiObject / string} target 控件或者是控件文本
  */
 function my_click_non_clickable(target) {
-    if (typeof (target) == 'string') {
+    if (typeof(target) == 'string') {
         text(target).waitFor();
         var tmp = text(target).findOne().bounds();
     } else {
@@ -285,15 +285,15 @@ function push_weixin_message(account, score) {
     if (score < 40) {
         return;
     }
-    for (var t in pushplus_token) {
-        http.postJson(
-            'http://www.pushplus.plus/send', {
-            token: pushplus_token[t],
-            title: '[' + account + ']今日获得' + score + '积分',
-            content: '学习强国 账号名' + account + '今日已经获得' + score + '分'
-        }
-        );
-    }
+    // for (var t in pushplus_token) {
+    //     http.postJson(
+    //         'http://www.pushplus.plus/send', {
+    //             token: pushplus_token[t],
+    //             title: '[' + account + ']今日获得' + score + '积分',
+    //             content: '学习强国 账号名' + account + '今日已经获得' + score + '分'
+    //         }
+    //     );
+    // }
 }
 
 /**
@@ -418,7 +418,11 @@ var finish_list = get_finish_list();
 if (!finish_list[10]) {
     log("进入本地");
     //14是本地
-    entry_model(14)
+    while (!text("本地频道").exists()) {
+        swipe(400, 200, 400, 800, 500);
+    }
+    text("本地频道").findOne().parent().child(4).click();
+
     log("等待本地菜单");
     /**
      * 重庆学习平台、重庆农家书屋等数据
@@ -496,7 +500,7 @@ if (!finish_list[4] && completed_read_count < 12) {
         }
 
         for (var i = 0; i < articles.length; i++) {
-            while (count >= need_count) {
+            if (count >= need_count) {
                 break;
             }
             if (titleSet.has(articles[i].text())) {
@@ -606,7 +610,7 @@ if (!finish_list[1]) {
         var current_video_time = video_time_text.match(/\/.*/).toString().slice(1);
         //"竖线后内容，有空格| 01:20"
         log("短视频时长:" + current_video_time)
-        // 如果视频超过一分钟就跳过
+            // 如果视频超过一分钟就跳过
         if (Number(current_video_time.slice(0, 3)) >= 1) {
             refresh(true);
             sleep(random_time(delay_time));
@@ -642,7 +646,7 @@ function select_option(answer, depth_click_option, options_text) {
         try {
             className('android.widget.RadioButton').depth(depth_click_option).clickable(true).findOnce(option_i).click();
             return;
-        } catch (error) { }
+        } catch (error) {}
     }
 
     // 如果运行到这，说明很有可能是选项ocr错误，导致答案无法匹配，因此用最大相似度匹配
@@ -661,12 +665,12 @@ function select_option(answer, depth_click_option, options_text) {
         try {
             className('android.widget.RadioButton').depth(depth_click_option).clickable(true).findOnce(max_similarity_index).click();
             return;
-        } catch (error) { }
+        } catch (error) {}
     } else {
         try {
             // 没找到答案，点击第一个
             className('android.widget.RadioButton').depth(depth_click_option).clickable(true).findOne().click();
-        } catch (error) { }
+        } catch (error) {}
     }
 }
 
@@ -687,7 +691,7 @@ function do_contest_answer(depth_click_option, question, options_text) {
     // 从哈希表中取出答案
     var answer = map_get(question);
     log("找到答案-哈希表 :" + answer)
-    // 如果本地题库没搜到，则搜网络题库
+        // 如果本地题库没搜到，则搜网络题库
     if (answer == null) {
 
         var result;
@@ -701,18 +705,18 @@ function do_contest_answer(depth_click_option, question, options_text) {
                 log("url:" + 'http://www.syiban.com/search/index/init.html?modelid=1&q=' + encodeURI(question.slice(0, 10)))
                 toast('答案查询失败');
             }
-        } catch (error) { }
+        } catch (error) {}
 
         if (result) {
             log("找到答案-文本匹配")
-            // 答案文本
+                // 答案文本
             var result = result[0].slice(5, result[0].indexOf('<'));
             result = result.replace(/、/, "");
             log('答案 site: ' + result);
             select_option(result, depth_click_option, options_text);
         } else {
             log("找到答案-第一个")
-            // 没找到答案，点击第一个
+                // 没找到答案，点击第一个
             className('android.widget.RadioButton').depth(depth_click_option).clickable(true).findOne().click();
         }
     } else {
@@ -752,7 +756,7 @@ function video_answer_question(video_question) {
     video_question = video_question.slice(0, Math.max(5, punctuation_index));
     try {
         var video_result = http.get('https://www.365shenghuo.com/?s=' + encodeURI(video_question));
-    } catch (error) { }
+    } catch (error) {}
     var video_answer = video_result.body.string().match(/答案：.+</);
     if (video_answer) video_answer = video_answer[0].slice(3, video_answer[0].indexOf('<'));
     return video_answer;
@@ -767,7 +771,7 @@ function video_answer_question(video_question) {
  */
 function getSimilarity(str1, str2) {
     var sameNum = 0
-    //寻找相同字符
+        //寻找相同字符
     for (var i = 0; i < str1.length; i++) {
         for (var j = 0; j < str2.length; j++) {
             if (str1[i] === str2[j]) {
@@ -828,6 +832,11 @@ function entry_model(number) {
     model.child(4).click();
 }
 
+function entry_text_model(model_text) {
+    var model = text(model_text).parent();
+    model.child(4).click();
+}
+
 /**
  * 如果错误则重新答题
  * 全局变量restart_flag说明:
@@ -869,10 +878,10 @@ log("get_baidu_token")
 function get_baidu_token() {
     var res = http.post(
         'https://aip.baidubce.com/oauth/2.0/token', {
-        grant_type: 'client_credentials',
-        client_id: AK,
-        client_secret: SK
-    }
+            grant_type: 'client_credentials',
+            client_id: AK,
+            client_secret: SK
+        }
     );
     return res.body.json()['access_token'];
 }
@@ -890,12 +899,12 @@ function baidu_ocr_api(img) {
     var question = "";
     var res = http.post(
         'https://aip.baidubce.com/rest/2.0/ocr/v1/general', {
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        access_token: token,
-        image: images.toBase64(img),
-    }
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            access_token: token,
+            image: images.toBase64(img),
+        }
     );
     var res = res.body.json();
     try {
@@ -1090,7 +1099,7 @@ function do_periodic_answer(number) {
  */
 function handling_access_exceptions() {
     // 在子线程执行的定时器，如果不用子线程，则无法获取弹出页面的控件
-    var thread_handling_access_exceptions = threads.start(function () {
+    var thread_handling_access_exceptions = threads.start(function() {
         while (true) {
             textContains("访问异常").waitFor();
             // 滑动按钮">>"位置
@@ -1183,7 +1192,7 @@ if (!finish_list[4] && special_answer_scored < 8) {
     var is_answer_special_flag = false;
     // 均速搜索次数（需要根据此更新加速搜索次数）
     var comm_search_special_answer_time = 0
-    // 加速搜索次数
+        // 加速搜索次数
     var quick_search_special_answer_time = storage.get("quick_search_special_answer_time_storage");
 
     // 如果之前的答题全部完成则不向下搜索
@@ -1504,33 +1513,33 @@ if (!finish_list[9] && whether_complete_speech == "yes") {
     ];
 
     sleep(random_time(delay_time));
-    if (!text('欢迎发表你的观点').exists()) {
-        if (!text('发表观点').exists()) {
-            back_track_flag = 2;
-            back_track();
-        }
-        entry_model(13);
-        // 随意找一篇文章
-        sleep(random_time(delay_time));
-        className("android.widget.TextView").text("文化").findOne().parent().click();
-        sleep(random_time(delay_time));
-        var artcle = null;
-        while (artcle == null) {
-            swipe(500, 600, 500, 300, 300);
-            artcle = id("general_card_title_id").findOnce();
-        }
-        my_click_non_clickable(artcle);
-        sleep(random_time(delay_time));
+    if (!text('发表观点').exists()) {
+        back_track_flag = 2;
+        back_track();
     }
+    entry_model(13);
+    // 随意找一篇文章
+    sleep(random_time(delay_time * 2));
+    className("android.widget.TextView").text("文化").findOne().parent().click();
+    sleep(random_time(delay_time));
+    var artcle = null;
+    while (artcle == null) {
+        swipe(500, 600, 500, 300, 600);
+        log("滑动查找文章");
+        artcle = id("general_card_title_id").findOnce();
+    }
+    log("点击文章:" + artcle.text());
+    artcle.parent().parent().click();
+    sleep(random_time(delay_time));
+
     log("等待欢迎发表你的观点");
     text('欢迎发表你的观点').waitFor();
     sleep(random_time(delay_time));
     click("欢迎发表你的观点");
-    log("等待欢迎发表你的观点 end")
+    log("等待欢迎发表你的观点 end");
     sleep(random_time(delay_time));
     setText(speechs[random(0, speechs.length - 1)]);
     sleep(random_time(delay_time));
-    // className("android.widget.TextView").text("发布").findOne().click();
     my_click_clickable('发布');
     sleep(random_time(delay_time * 2));
     my_click_clickable('删除');
