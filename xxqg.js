@@ -619,6 +619,7 @@ if (!finish_list[1]) {
 
         completed_watch_count++;
     }
+    sleep(1000);
     device.setMusicVolume(currentVolume);
     back();
 }
