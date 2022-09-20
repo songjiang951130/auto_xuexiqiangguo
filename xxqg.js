@@ -1,11 +1,11 @@
 /* **********************请填写如下信息********************** */
 
 /**
- * 跳转页面加载的时间(以秒s为单位)
- * 默认为1s(支持小数点形式)，根据手机性能与网络情况自行而定
+ * 跳转页面加载的时间(以毫秒为单位)
+ * 默认为500ms，根据手机性能与网络情况自行而定
  * 时间越长出bug的可能越小，但同时耗费的时间越长
  *  */
-var delay_time = 1;
+var delay_time = 500;
 
 /**
  * 之前的每周答题是否全部完成
@@ -125,8 +125,6 @@ var storage = storages.create('data');
 // 更新题库为
 var answer_question_map_name = "answer_question_map_name";
 // storage.remove(answer_question_map_name);
-
-delay_time = Number(delay_time) * 1000;
 
 //请求横屏截图权限
 threads.start(function () {
@@ -825,7 +823,6 @@ function is_select_all_choice() {
  * @param {int} number 7对应为每日答题模块，以此类推
  */
 function entry_model(number) {
-    log("app_index_version_map:" + app_index_version_map + " version:" + app_index_version);
     var task_parent = app_index_version_map["task_parent"][app_index_version];
     var model = className('android.view.View').depth(task_parent).findOnce(number);
     model.child(4).click();
@@ -1058,7 +1055,7 @@ function do_periodic_answer(number) {
                 }
             }
 
-            sleep(random_time(delay_time * 2));
+            sleep(400);
             // 对于专项答题没有确定
             if (text('下一题').exists()) {
                 click('下一题');
