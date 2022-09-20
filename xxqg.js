@@ -518,17 +518,20 @@ if (!finish_list[4] && completed_read_count < 12) {
                 continue;
             }
             log("标题+:" + articles[i].text() + " index:" + i)
-            var cr = click(articles[i].text())
-                //这里存在点击失败，但是进文章成功
+            var cr = click(articles[i].text());
+            //这里存在点击失败，但是进文章成功
             if (!cr && !text("地方发布平台内容").exists()) {
                 log("点击失败 " + articles[i].text());
                 continue;
             }
-            //可能点到图片
-            if (text("地方发布平台内容").exists() && id("pllayout").exists()) {
-                back();
-                continue;
-            }
+            // sleep(200);
+            // //可能点到图片
+            // if (id("pllayout").exists()) {
+            //     log("跳过图文" + i);
+            //     titleSet.add(articles[i].text());
+            //     back();
+            //     continue;
+            // }
 
             var use_time = 0;
             log("阅读中");
@@ -536,7 +539,7 @@ if (!finish_list[4] && completed_read_count < 12) {
             while (!text('点赞').exists()) {
                 //向下滑动
                 swipe(500, 1700, 500, 700, 3000);
-                log("滑动中");
+                log("滑动中" + use_time);
                 use_time += 3000;
                 if (use_time > 20000) {
                     break;

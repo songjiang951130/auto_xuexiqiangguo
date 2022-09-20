@@ -96,7 +96,6 @@ function my_click_clickable(target) {
         return click(target);
     }
 }
-id("general_card_title_id").findOne().parent().click();
-log("等待欢迎发表你的观点")
-    // text('欢迎发表你的观点').waitFor();
-    // click("欢迎发表你的观点");
+var res = id("pllayout").exists();
+log("res:" + res);
+back();
