@@ -285,15 +285,15 @@ function push_weixin_message(account, score) {
     if (score < 40) {
         return;
     }
-    // for (var t in pushplus_token) {
-    //     http.postJson(
-    //         'http://www.pushplus.plus/send', {
-    //             token: pushplus_token[t],
-    //             title: '[' + account + ']今日获得' + score + '积分',
-    //             content: '学习强国 账号名' + account + '今日已经获得' + score + '分'
-    //         }
-    //     );
-    // }
+    for (var t in pushplus_token) {
+        http.postJson(
+            'http://www.pushplus.plus/send', {
+                token: pushplus_token[t],
+                title: '[' + account + ']今日获得' + score + '积分',
+                content: '学习强国 账号名' + account + '今日已经获得' + score + '分'
+            }
+        );
+    }
 }
 
 /**
