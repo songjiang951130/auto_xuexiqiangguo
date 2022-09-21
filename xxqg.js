@@ -602,15 +602,22 @@ if (!finish_list[1]) {
     log("completed_watch_count:" + completed_watch_count)
     var video_bar_depth = app_index_version_map["video_bar_depth"][app_index_version];
     while (completed_watch_count < 6) {
-        log("completed_watch_count:" + completed_watch_count)
+        log("completed_watch_count:" + completed_watch_count);
         sleep(random_time(delay_time / 2));
         // 当前视频的时间长度
         var video_time_text = className('android.widget.TextView').clickable(false).depth(video_bar_depth).findOne().text();
-        log("短视频时长:" + video_time_text)
+        video_time_text = video_time_text.toString();
+        //&& text("刷新重试").findOnce() != null
+        if (video_time_text.search("当前网络未非WiFi网络") != -1) {
+            text("刷新重试").findOnce().click();
+            sleep(200);
+            video_time_text = className('android.widget.TextView').clickable(false).depth(video_bar_depth).findOne().text();
+        }
+        log("短视频时长:" + video_time_text);
         var current_video_time = video_time_text.match(/\/.*/).toString().slice(1);
         //"竖线后内容，有空格| 01:20"
-        log("短视频时长:" + current_video_time)
-            // 如果视频超过一分钟就跳过
+        log("短视频时长:" + current_video_time);
+        // 如果视频超过一分钟就跳过
         if (Number(current_video_time.slice(0, 3)) >= 1) {
             refresh(true);
             sleep(random_time(delay_time));
@@ -708,16 +715,19 @@ function do_contest_answer(depth_click_option, question, options_text) {
         } catch (error) {}
 
         if (result) {
-            log("找到答案-文本匹配")
-                // 答案文本
+            log("找到答案-文本匹配");
+            // 答案文本
             var result = result[0].slice(5, result[0].indexOf('<'));
             result = result.replace(/、/, "");
             log('答案 site: ' + result);
             select_option(result, depth_click_option, options_text);
         } else {
-            log("找到答案-第一个")
-                // 没找到答案，点击第一个
-            className('android.widget.RadioButton').depth(depth_click_option).clickable(true).findOne().click();
+            log("找到答案-第一个");
+            // 没找到答案，点击第一个
+            var b = className('android.widget.RadioButton').depth(depth_click_option).clickable(true).findOnce();
+            if (b != null) {
+                b.click();
+            }
         }
     } else {
         select_option(answer, depth_click_option, options_text);
