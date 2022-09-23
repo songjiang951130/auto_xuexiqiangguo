@@ -25,3 +25,7 @@ while(artcle == null){
 }
 my_click_non_clickable(artcle);
 log("end");
+
+9223372036854775807 long 最大
+373486521275711488
+9223372036854775807
