@@ -485,7 +485,7 @@ if (!finish_list[4] && completed_read_count < 12) {
     var single_total_read = 63000
     var titleSet = new Set();
     var article_depth = app_index_version_map["article_depth"][app_index_version];
-    var need_count = 12 - completed_read_count / 2;
+    var need_count = (12 - completed_read_count) / 2 + 1;
     while (count < need_count) {
         log("开始阅读：need_count:{} count:{}", need_count, count)
         swipe(800, 2000, 800, 600, 2000);
@@ -1043,9 +1043,9 @@ function do_periodic_answer(number) {
                 var sc = captureScreen();
                 var tipsModel = text("提示").findOne().parent().parent().child(1).child(0);
                 var tipsBounds = tipsModel.bounds();
-                var img = images.clip(sc, tipsBounds.left, tipsBounds.top, tipsBounds.right, tipsBounds.bottom);
+                // var img = images.clip(sc, tipsBounds.left, tipsBounds.top, tipsBounds.right, tipsBounds.bottom);
                 // images.save(sc, "./num_" + num + ".jpg");
-                img = images.inRange(img, '#800000', '#FF0000');
+                img = images.inRange(sc, '#800000', '#FF0000');
                 var baidu_res = paddle_ocr_api(img);
                 answer = baidu_res[0];
                 var options_text = baidu_res[1];
