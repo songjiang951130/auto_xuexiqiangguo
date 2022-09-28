@@ -595,15 +595,15 @@ if (!finish_list[1]) {
     while (completed_watch_count < 6) {
         log("completed_watch_count:" + completed_watch_count);
         sleep(random_time(delay_time / 2));
-        // 当前视频的时间长度
-        var video_time_text = className('android.widget.TextView').clickable(false).depth(video_bar_depth).findOne().text();
-        video_time_text = video_time_text.toString();
-        //&& text("刷新重试").findOnce() != null
         if (video_time_text.search("当前网络未非WiFi网络") != -1) {
             text("刷新重试").findOnce().click();
             sleep(200);
             video_time_text = className('android.widget.TextView').clickable(false).depth(video_bar_depth).findOne().text();
         }
+        // 当前视频的时间长度
+        var video_time_text = className('android.widget.TextView').clickable(false).depth(video_bar_depth).findOne().text();
+        video_time_text = video_time_text.toString();
+        //&& text("刷新重试").findOnce() != null
         // log("短视频时长:" + video_time_text);
         var current_video_time = video_time_text.match(/\/.*/).toString().slice(1);
         //"竖线后内容，有空格| 01:20"
