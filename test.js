@@ -41,5 +41,12 @@ function multiple_choice(answer) {
         log("最大相似度匹配 end");
     }
 }
-
-id("v_playing").findOne().click();
+log("s");
+var firstVideo = text("").findOne(300);
+if (firstVideo == null) {
+    firstVideo = className('android.widget.FrameLayout').clickable(true).depth(5).findOne();
+}
+var bound = firstVideo.bounds();
+click(bound.centerX(), bound.centerY());
+toast("点击第一个视频");
+log("e");

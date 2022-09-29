@@ -37,17 +37,6 @@ var whether_complete_subscription = "no";
 var whether_complete_speech = "yes";
 
 /**
- * 百度飞浆cpu配置，主流旗舰都是8核了
- */
-var cpu_num = 8;
-
-/**
- * 请在双引号里填写百度AK和SK，如何获取请看README
- *  */
-var AK = "AmC0GodmjYqq5o1yBreeG09L";
-var SK = "WWNukireGvAZGEehtQAmZdfS8tqTyp3z";
-
-/**
  * 选填，是否要使用微信消息推送功能
  * 如是 请填写pushplus的token，如何获取请见说明
  *  */
@@ -87,10 +76,10 @@ var app_index_version_map = {
         28, 15
     ],
     "four_question": [
-        28, 19
+        28, 9
     ],
     "four_option": [
-        32, 19
+        32, 9
     ],
 }
 
@@ -136,11 +125,6 @@ threads.start(function () {
 });
 requestScreenCapture(false);
 sleep(delay_time);
-
-if (!AK || !SK) {
-    toast("请配置百度AK和SK，具体看脚本说明");
-    exit();
-}
 
 /**
  * 定义HashTable类，用于存储本地题库，查找效率更高
@@ -308,11 +292,12 @@ function back_track() {
     var while_count = 0;
     while (!id('comm_head_title').exists() && while_count < 5) {
         while_count++;
-        back();
         sleep(random_time(delay_time));
         if (text("退出").exists()) {
             click("退出");
+            sleep(random_time(delay_time));
         }
+        back();
         sleep(random_time(delay_time));
     }
     log("switch " + back_track_flag)
@@ -421,18 +406,20 @@ if (!finish_list[10]) {
     while (!text("本地频道").exists()) {
         swipe(400, 200, 400, 800, 500);
     }
-    text("本地频道").findOne().parent().child(4).click();
+    var c = text("本地频道").findOne().parent().child(4).click();
 
-    log("等待本地菜单");
+    log("等待本地菜单:" + c);
     /**
      * 重庆学习平台、重庆农家书屋等数据
      */
     var tab_depth = app_index_version_map["tab_depth"][app_index_version];
     className('android.widget.LinearLayout').clickable(true).depth(tab_depth).waitFor();
     sleep(random_time(delay_time));
-    className('android.widget.LinearLayout').clickable(true).depth(tab_depth).findOne().click();
+    var c2 = className('android.widget.LinearLayout').clickable(true).depth(tab_depth).findOne().click();
+    log("等待本地菜单 点击:" + c2);
+
     sleep(random_time(delay_time));
-    back();
+    // back();
 }
 
 /*
@@ -566,43 +553,50 @@ if (!finish_list[2]) {
 }
 log("关闭电台广播 end");
 
-back_track_flag = 1;
-
 /*
  **********视听学习、听学习时长*********
  */
-log("视听学习 start:" + finish_list[2]);
+log("视听学习 start:" + finish_list[1]);
 if (!finish_list[1]) {
-    if (!id('comm_head_title').exists()) back_track();
-    log("百灵")
+    var video_depth = app_index_version_map["video_depth"][app_index_version];
+    var video_bar_depth = app_index_version_map["video_bar_depth"][app_index_version];
+
+    back_track_flag = 1;
+    if (!id('comm_head_title').exists()) {
+        back_track();
+    }
+    sleep(random_time(delay_time * 5));
     my_click_clickable('百灵');
     sleep(random_time(delay_time / 2));
     if (text("关闭").exists()) {
+        log("关闭？？");
         click("关闭");
     }
     log("竖")
     my_click_clickable('竖');
     // 等待视频加载
-    sleep(random_time(delay_time * 3));
     device.setMusicVolume(0);
+    log("设置静音")
     // 点击第一个视频
-    var firstVideo = text("").findOne();
-    var bound = firstVideo.bounds()
+    var firstVideo = text("").findOne(300);
+    if (firstVideo == null) {
+        firstVideo = className('android.widget.FrameLayout').clickable(true).depth(video_depth).findOne();
+    }
+    var bound = firstVideo.bounds();
     click(bound.centerX(), bound.centerY());
-    toast("点击第一个视频")
+    toast("点击第一个视频");
     sleep(random_time(delay_time));
     log("completed_watch_count:" + completed_watch_count)
-    var video_bar_depth = app_index_version_map["video_bar_depth"][app_index_version];
     while (completed_watch_count < 6) {
         log("completed_watch_count:" + completed_watch_count);
         sleep(random_time(delay_time / 2));
+        var video_time_text = className('android.widget.TextView').clickable(false).depth(video_bar_depth).findOne().text();
         if (video_time_text.search("当前网络未非WiFi网络") != -1) {
             text("刷新重试").findOnce().click();
             sleep(200);
             video_time_text = className('android.widget.TextView').clickable(false).depth(video_bar_depth).findOne().text();
         }
         // 当前视频的时间长度
-        var video_time_text = className('android.widget.TextView').clickable(false).depth(video_bar_depth).findOne().text();
         video_time_text = video_time_text.toString();
         //&& text("刷新重试").findOnce() != null
         // log("短视频时长:" + video_time_text);
@@ -871,98 +865,13 @@ function restart() {
     }
 }
 
-/*
- ********************调用百度API实现ocr********************
- */
-log("get_baidu_token")
-
-/**
- * 获取用户token
- */
-function get_baidu_token() {
-    var res = http.post(
-        'https://aip.baidubce.com/oauth/2.0/token', {
-        grant_type: 'client_credentials',
-        client_id: AK,
-        client_secret: SK
-    }
-    );
-    return res.body.json()['access_token'];
-}
-
-var token = get_baidu_token();
-
-/**
- * 百度ocr接口，传入图片返回文字和选项文字
- * @param {image} img 传入图片
- * @returns {string} question 文字
- * @returns {list[string]} options_text 选项文字 
- */
-function baidu_ocr_api(img) {
-    var options_text = [];
-    var question = "";
-    var res = http.post(
-        'https://aip.baidubce.com/rest/2.0/ocr/v1/general', {
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        access_token: token,
-        image: images.toBase64(img),
-    }
-    );
-    var res = res.body.json();
-    try {
-        var words_list = res.words_result;
-        log("baidu ocr result:" + JSON.stringify(words_list))
-    } catch (error) {
-        log("error" + error);
-    }
-    if (words_list) {
-        // question是否读取完成的标志位
-        var question_flag = false;
-        for (var i in words_list) {
-            if (!question_flag) {
-                // 如果是选项则后面不需要加到question中
-                if (words_list[i].words[0] == "A") question_flag = true;
-                // 将题目读取到下划线处，如果读到下划线则不需要加到question中
-                // 利用location之差判断是否之中有下划线
-                /**
-                 * location:
-                 * 识别到的文字块的区域位置信息，列表形式，
-                 * location['left']表示定位位置的长方形左上顶点的水平坐标
-                 * location['top']表示定位位置的长方形左上顶点的垂直坐标
-                 */
-                if (words_list[0].words.indexOf('.') != -1 && i > 0 &&
-                    Math.abs(words_list[i].location['left'] -
-                        words_list[i - 1].location['left']) > 100) question_flag = true;
-                if (!question_flag) question += words_list[i].words;
-                // 如果question已经大于10了也不需要读取了
-                if (question > 10) question_flag = true;
-            }
-            // 这里不能用else，会漏读一次
-            if (question_flag) {
-                // 其他的就是选项了
-                if (words_list[i].words[1] == '.') options_text.push(words_list[i].words.slice(2));
-            }
-        }
-    }
-    log("baidu ocr result raw:" + question)
-
-    // 处理question
-    question = question.replace(/\s*/g, "");
-    question = question.replace(/,/g, "，");
-    question = question.slice(question.indexOf('.') + 1);
-    question = question.slice(0, 10);
-    return [question, options_text];
-}
-
 function paddle_ocr_api(img) {
     var question = "";
     var options_text = [];
     /**
      * @see http://doc.autoxjs.com/#/AI
      */
-    var words_list = paddle.ocrText(img, cpu_num, true);
+    var words_list = paddle.ocrText(img, 8, true);
     log("paddle ocr result:" + JSON.stringify(words_list))
     if (words_list) {
         // question是否读取完成的标志位
@@ -1570,7 +1479,7 @@ if (!finish_list[9] && whether_complete_speech == "yes") {
     log("等待欢迎发表你的观点");
     text('欢迎发表你的观点').waitFor();
     sleep(random_time(delay_time));
-    click("欢迎发表你的观点");
+    my_click_clickable("欢迎发表你的观点");
     log("等待欢迎发表你的观点 end");
     sleep(random_time(delay_time));
     setText(speechs[random(0, speechs.length - 1)]);
