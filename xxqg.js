@@ -52,7 +52,7 @@ var app_index_version_map = {
         25, 12
     ],
     "tab_depth": [
-        26, 2
+        26, 6
     ],
     "look": [
         13, 14
@@ -112,7 +112,7 @@ device.keepScreenOn(30 * 60 * 1000);
 var storage = storages.create('data');
 // 更新题库为
 var answer_question_map_name = "answer_question_map_name";
-// storage.remove(answer_question_map_name);
+storage.remove(answer_question_map_name);
 
 //请求横屏截图权限
 threads.start(function () {
@@ -419,7 +419,7 @@ if (!finish_list[10]) {
     log("等待本地菜单 点击:" + c2);
 
     sleep(random_time(delay_time));
-    // back();
+    back();
 }
 
 /*
