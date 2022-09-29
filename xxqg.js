@@ -70,10 +70,13 @@ var app_index_version_map = {
         28, 15
     ],
     "four_question": [
-        28, 9
+        28, 16, 9
     ],
     "four_option": [
-        32, 9
+        32, 17, 9
+    ],
+    "two_option": [
+        32, 19, 9
     ],
     "blank_depth": [
         25, 12
@@ -323,10 +326,7 @@ function back_track() {
         case 1:
             break;
         case 2:
-            my_click_clickable('我的');
-            sleep(random_time(delay_time));
-            my_click_clickable('学习积分');
-            sleep(random_time(delay_time));
+            id("comm_head_xuexi_score").findOne().click();
             text('登录').waitFor();
             break;
     }
@@ -1315,7 +1315,7 @@ log("挑战答题end");
 
 function do_2_contest() {
     var q_index = app_index_version_map["four_question"][app_index_version];
-    var o_index = app_index_version_map["four_option"][app_index_version];
+    var o_index = app_index_version_map["two_option"][app_index_version];
     while (!text('继续挑战').exists()) {
         // 等待下一题题目加载
         log("双人赛 题目加载 等题目出现");
@@ -1335,12 +1335,11 @@ function do_2_contest() {
                 do_contest_answer(o_index, question, options_text);
             } else {
                 log("选项加载 题目查找失败，选首个");
-                className('android.widget.RadioButton').depth(o_index).findOne().click();
+                className('android.widget.RadioButton').depth(o_index).findOne(200).click();
             }
         } catch (e) {
-            log(e);
-            log("选项加载 题目查找失败，选首个");
-            className('android.widget.RadioButton').depth(o_index).findOne().click();
+            log("选项加载 题目查找失败，选首个eee");
+            className('android.widget.RadioButton').depth(o_index).findOne(200).click();
         }
 
     }
@@ -1375,7 +1374,7 @@ function do_4_contest() {
             do_contest_answer(o_index, question, options_text);
         } else {
             log("选项加载 题目查找失败，选首个");
-            className('android.widget.RadioButton').depth(o_index).findOne().click();
+            className('android.widget.RadioButton').depth(o_index).findOne(200).click();
         }
         //加这个等待出现 继续挑战
         sleep(random_time(delay_time));
@@ -1427,7 +1426,7 @@ if (!finish_list[6] && four_players_scored < 3) {
  **********双人对战*********
  !finish_list[7] && two_players_scored < 1
  */
-if (!finish_list[7] && two_players_scored < 1) {
+if (true) {
     log("双人对战");
     sleep(random_time(delay_time));
 

@@ -120,5 +120,5 @@ function is_select_all_choice() {
     return options.length / 2 == (question.match(/\s+/g) || []).length;
 }
 
-var all = is_select_all_choice();
-log("all:" + all);
+id("comm_head_xuexi_score").findOne().click();
+text('登录').waitFor();
