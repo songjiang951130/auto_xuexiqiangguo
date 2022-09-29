@@ -25,12 +25,6 @@ var all_weekly_answers_completed = "no";
 var all_special_answer_completed = "yes";
 
 /**
- * 是否完成订阅模块
- * 请填入"yes"或"no"(默认为"yes")
- *  */
-var whether_complete_subscription = "no";
-
-/**
  * 是否完成发表言论模块
  * 请填入"yes"或"no"(默认为"yes")
  *  */
@@ -52,7 +46,7 @@ var app_index_version_map = {
         25, 12
     ],
     "tab_depth": [
-        26, 6
+        26, 2, 6
     ],
     "look": [
         13, 14
@@ -447,10 +441,9 @@ if (!finish_list[2]) {
     my_click_clickable('听广播');
     log("点击听广播")
     sleep(random_time(delay_time));
-    var icon_id = app_index_version_map["icon_id"][app_index_version];
-    var v = id(icon_id).findOne();
-    log("点击听广播2")
-    if (id(icon_id).findOne() != null && !textStartsWith("正在收听").exists()) {
+    if (!textStartsWith("正在收听").exists()) {
+        var icon_id = app_index_version_map["icon_id"][app_index_version];
+        var v = id(icon_id).findOne();
         log("播放按钮获取成功")
         var lay_state_icon_pos = v.bounds();
         click(lay_state_icon_pos.centerX(), lay_state_icon_pos.centerY());
