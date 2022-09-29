@@ -75,6 +75,15 @@ var app_index_version_map = {
     "four_option": [
         32, 9
     ],
+    "blank_depth": [
+        25, 12
+    ],
+    "daily_choice_depth": [
+        26, 13
+    ],
+    "daily_question_depth": [
+        23, 10
+    ]
 }
 
 var lock_number = "303178";
@@ -723,7 +732,8 @@ back_track_flag = 2;
 // 填空题
 function fill_in_blank(answer) {
     // 获取每个空
-    var blanks = className('android.view.View').depth(25).find();
+    var blank_depth = app_index_version_map["blank_depth"][app_index_version];
+    var blanks = className('android.view.View').depth(blank_depth).find();
     for (var i = 0; i < blanks.length; i++) {
         // 需要点击一下空才能paste
         blanks[i].click();
@@ -774,9 +784,10 @@ function getSimilarity(str1, str2) {
 
 // 选择题
 function multiple_choice(answer) {
+    var daily_choice_depth = app_index_version_map["daily_choice_depth"][app_index_version];
     var whether_selected = false;
     // options数组：下标为i基数时对应着ABCD，下标为偶数时对应着选项i-1(ABCD)的数值
-    var options = className('android.view.View').depth(26).find();
+    var options = className('android.view.View').depth(daily_choice_depth).find();
     for (var i = 1; i < options.length; i += 2) {
         if (answer.indexOf(options[i].text()) != -1) {
             // 答案正确
@@ -804,12 +815,14 @@ function multiple_choice(answer) {
 
 // 多选题是否全选
 function is_select_all_choice() {
+    var options_depth = app_index_version_map["daily_choice_depth"][app_index_version];
+    var daily_question_depth = app_index_version_map["daily_question_depth"][app_index_version];
     // options数组：下标为i基数时对应着ABCD，下标为偶数时对应着选项i-1(ABCD)的数值
-    var options = className('android.view.View').depth(26).find();
+    var options = className('android.view.View').depth(options_depth).find();
     // question是题目(专项答题是第4个，其他是第2个)
-    var question = (className('android.view.View').depth(23).findOnce(1).text().length > 2) ?
-        className('android.view.View').depth(23).findOnce(1).text() :
-        className('android.view.View').depth(23).findOnce(3).text();
+    var question = (className('android.view.View').depth(daily_question_depth).findOnce(1).text().length > 2) ?
+        className('android.view.View').depth(daily_question_depth).findOnce(1).text() :
+        className('android.view.View').depth(daily_question_depth).findOnce(3).text();
     return options.length / 2 == (question.match(/\s+/g) || []).length;
 }
 
