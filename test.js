@@ -42,13 +42,4 @@ function multiple_choice(answer) {
     }
 }
 
-var o_index = 28;
-var jump = text('再来一局').exists() || text('结束本局').exists()|| text('立即复活').exists();
-do {
-    if (className('android.widget.RadioButton').depth(o_index).exists()) {
-        className('android.widget.RadioButton').depth(o_index).findOne().click();
-        log("随意点击直到退出");
-    }
-    sleep(800);
-} while (!text('再来一局').exists() || !text('结束本局').exists());
-log("end");
+id("v_playing").findOne().click();

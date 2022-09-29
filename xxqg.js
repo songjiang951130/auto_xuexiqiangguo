@@ -94,10 +94,6 @@ var app_index_version_map = {
     ],
 }
 
-function getIndex(taskType, app_index_version) {
-    return app_map[taskType][app_index_version];
-}
-
 var lock_number = "303178";
 var start = new Date();
 
@@ -307,9 +303,8 @@ function push_weixin_message(account, score) {
  * back_track_flag = 2时，表示竞赛、答题部分和准备部分
  */
 function back_track() {
-    var home_bottom_tab = "home_bottom_tab_button_work"
     app.launchApp('学习强国');
-    sleep(random_time(delay_time * 3));
+    sleep(random_time(delay_time * 4));
     var while_count = 0;
     while (!id('comm_head_title').exists() && while_count < 5) {
         while_count++;
@@ -325,6 +320,7 @@ function back_track() {
         case 0:
             // 去中心模块
             toast("等待-中间按钮")
+            var home_bottom_tab = "home_bottom_tab_button_work"
             id(home_bottom_tab).waitFor();
             sleep(random_time(delay_time));
             var home_bottom = id(home_bottom_tab).findOne().bounds();
@@ -377,11 +373,12 @@ function get_finish_list() {
         var task_parent = app_index_version_map["task_parent"][app_index_version];
         var model = className('android.view.View').depth(task_parent).findOnce(i);
         if (model == null) {
-            app_index_version--;
+            app_index_version++;
             i--;
-            log("app版本修改depth版本");
+            log("app版本修改depth版本:" + app_index_version);
             continue;
         }
+        // log("model: " + model);
         log("task:" + (i - 4) + " " + model.child(0).text());
         if (i == 4) {
             completed_read_count = parseInt(model.child(child_index).child(0).text());
@@ -558,7 +555,11 @@ if (!finish_list[2]) {
     if (!textStartsWith("最近收听").exists() && !textStartsWith("推荐收听").exists()) {
         // 换成通过text寻找控件
         textStartsWith("正在收听").waitFor();
-        textStartsWith("正在收听").findOne().parent().child(1).child(0).click();
+        if (textStartsWith("正在收听").findOne().parent().child(1).child(0) != null) {
+            textStartsWith("正在收听").findOne().parent().child(1).child(0).click();
+        } else {
+            id("v_playing").findOne().click();
+        }
     }
     sleep(random_time(delay_time));
     device.setMusicVolume(currentVolume);
@@ -1043,9 +1044,9 @@ function do_periodic_answer(number) {
             } else {
                 var try_web = try_web_query();
                 if (try_web) {
-                    sleep(random_time(delay_time)); 
+                    sleep(random_time(delay_time));
                     click("确定");
-                    sleep(random_time(delay_time)); 
+                    sleep(random_time(delay_time));
                     continue;
                 }
                 my_click_clickable('查看提示');
@@ -1069,7 +1070,7 @@ function do_periodic_answer(number) {
 
                 text('提示').waitFor();
                 back();
-                sleep(200); 
+                sleep(200);
                 if (textContains('多选题').exists() || textContains('单选题').exists()) {
                     multiple_choice(answer);
                 } else {
@@ -1087,7 +1088,7 @@ function do_periodic_answer(number) {
             } else {
                 // 不是专项答题时
                 click('确定');
-                sleep(random_time(delay_time)); 
+                sleep(random_time(delay_time));
                 // 如果错误（ocr识别有误）则重来
                 if (text('下一题').exists() || (text('完成').exists() && !special_flag)) {
                     // 如果视频题错误，则每周答题就不需要重新答
@@ -1121,7 +1122,7 @@ function try_web_query() {
     if (answer == null) {
         return false;
     } else {
-        log("点击答案:" + answer+" end");
+        log("点击答案:" + answer + " end");
         return my_click_non_clickable(answer);
     }
 }
@@ -1314,10 +1315,9 @@ if (!finish_list[4] && special_answer_scored < 8) {
 
 /*
  **********挑战答题*********
- !finish_list[5]
  */
 log("挑战答题")
-if (true) {
+if (!finish_list[5]) {
     log("挑战答题start")
     var q_index = app_index_version_map["challenge_question"][app_index_version]; //12 26
     var o_index = app_index_version_map["challenge_option"][app_index_version];
@@ -1327,7 +1327,6 @@ if (true) {
     entry_model(9);
     // 加载页面
     log("挑战答题 加载页面");
-    //12 26
     className('android.view.View').depth(q_index).waitFor();
     log("挑战答题 加载完成");
 
