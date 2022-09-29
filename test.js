@@ -50,7 +50,7 @@ var app_index_version_map = {
 var app_index_version = 1;
 
 function my_click_non_clickable(target) {
-    if (typeof (target) == 'string') {
+    if (typeof(target) == 'string') {
         log("waitfor");
         text(target).waitFor();
         var tmp = text(target).findOne().bounds();
@@ -95,7 +95,7 @@ function multiple_choice(answer) {
 
 function getSimilarity(str1, str2) {
     var sameNum = 0
-    //寻找相同字符
+        //寻找相同字符
     for (var i = 0; i < str1.length; i++) {
         for (var j = 0; j < str2.length; j++) {
             if (str1[i] === str2[j]) {
@@ -120,9 +120,7 @@ function is_select_all_choice() {
     return options.length / 2 == (question.match(/\s+/g) || []).length;
 }
 
-id("comm_head_xuexi_score").findOne().click();
-text('登录').waitFor();
-
 //8.飞书，中国古代法律术语，指","告状信，又称“投书”。
 var c1 = "8.飞书，中国古代法律术语，指\",\"告状信，又称“投书”";
-question_search(c1);
+
+question_search.getAnswerText(c1);
