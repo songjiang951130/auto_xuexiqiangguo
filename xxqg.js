@@ -294,9 +294,13 @@ function push_weixin_message(account, score) {
  */
 function back_track() {
     app.launchApp('学习强国');
-    sleep(random_time(delay_time * 4));
     var while_count = 0;
     while (!id('comm_head_title').exists() && while_count < 5) {
+        //会存在app启动的情况
+        sleep(8000);
+        if (id('comm_head_title').exists()) {
+            break;
+        }
         while_count++;
         sleep(random_time(delay_time));
         if (text("退出").exists()) {
@@ -1324,22 +1328,22 @@ function do_2_contest() {
         log("双人赛 题目加载 等答题按钮出现");
         className('android.widget.RadioButton').depth(o_index).clickable(true).waitFor();
         var rawImage = captureScreen();
-        var img = images.inRange(captureScreen(), '#000000', '#444444');
+        var img = images.inRange(rawImage, '#000000', '#444444');
         try {
+            //图片剪切
             img = images.clip(img, pos.left, pos.top, pos.width(), device.height - pos.top);
             var result = paddle_ocr_api(img);
             var question = result[0];
             var options_text = result[1];
             if (question) {
-                log("选项匹配");
                 do_contest_answer(o_index, question, options_text);
             } else {
                 log("选项加载 题目查找失败，选首个");
                 className('android.widget.RadioButton').depth(o_index).findOne(200).click();
             }
         } catch (e) {
-            log("选项加载 题目查找失败，选首个eee");
-            className('android.widget.RadioButton').depth(o_index).findOne(200).click();
+            log("选项加载 题目查找失败，选首个" + e);
+            // className('android.widget.RadioButton').depth(o_index).findOne(200).click();
         }
 
     }
@@ -1477,8 +1481,8 @@ if (!finish_list[9] && whether_complete_speech == "yes") {
         log("滑动查找文章");
         artcle = id("general_card_title_id").findOnce();
     }
-    log("点击文章:" + artcle.text());
-    artcle.parent().parent().click();
+    var c = artcle.parent().parent().click();
+    log("点击文章:" + artcle.text() + " c:" + c);
     sleep(random_time(delay_time));
 
     log("等待欢迎发表你的观点");

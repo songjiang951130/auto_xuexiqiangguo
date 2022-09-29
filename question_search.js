@@ -7,6 +7,7 @@ question_search.getAnswerText = function (question) {
     if(question == null){
         return null;
     }
+    //qustion 选取文本最多的
     //补全唐代诗人王维《田园乐》诗句
     // 此网站只支持十个字符的搜索
     var r1 = http.get('http://www.syiban.com/search/index/init.html?modelid=1&q=' + encodeURI(question.slice(0, 6)));

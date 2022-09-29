@@ -1,5 +1,5 @@
 var delay_time = 1000
-
+var question_search = require('question_search.js');
 var app_index_version_map = {
     "task_parent": [
         24, 11
@@ -122,3 +122,7 @@ function is_select_all_choice() {
 
 id("comm_head_xuexi_score").findOne().click();
 text('登录').waitFor();
+
+//8.飞书，中国古代法律术语，指","告状信，又称“投书”。
+var c1 = "8.飞书，中国古代法律术语，指\",\"告状信，又称“投书”";
+question_search(c1);
