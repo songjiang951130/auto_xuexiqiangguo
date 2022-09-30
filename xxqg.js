@@ -297,7 +297,7 @@ function back_track() {
     var while_count = 0;
     while (!id('comm_head_title').exists() && while_count < 5) {
         //会存在app启动的情况
-        sleep(8000);
+        sleep(5000);
         if (id('comm_head_title').exists()) {
             break;
         }
@@ -367,8 +367,10 @@ function get_finish_list() {
         if (model == null) {
             app_index_version++;
             i--;
-            log("app版本修改depth版本:" + app_index_version);
+            log("app版本:" + app_index_version);
             continue;
+        } else {
+            log("app版本:" + app_index_version);
         }
         // log("model: " + model);
         log("task:" + (i - 4) + " " + model.child(0).text());
@@ -702,7 +704,7 @@ function do_contest_answer(depth_click_option, question, options_text) {
             if (b != null) {
                 b.click();
             } else {
-                error("未找到按钮")
+                log("未找到按钮");
             }
         }
     } else {
@@ -947,7 +949,7 @@ function do_periodic_answer(number) {
             } else {
                 var try_web = try_web_query();
                 if (try_web) {
-                    sleep(random_time(delay_time));5
+                    sleep(random_time(delay_time)); 5
                     click("确定");
                     sleep(random_time(delay_time));
                     continue;
@@ -955,9 +957,9 @@ function do_periodic_answer(number) {
                 my_click_clickable('查看提示');
                 // 打开查看提示的时间
                 sleep(800);
-                var sc = captureScreen();
                 var tipsModel = text("提示").findOne().parent().parent().child(1).child(0);
                 var pos = tipsModel.bounds();
+                var sc = captureScreen();
                 sc = images.clip(sc, pos.left, pos.top, pos.width(), device.height - pos.top);
                 sc = images.inRange(sc, '#800000', '#FF0000');
                 var baidu_res = paddle_ocr_api(sc);
@@ -966,6 +968,7 @@ function do_periodic_answer(number) {
                 if (!answer) {
                     toast("未找到答案 ocr失败");
                     log("未找到答案 ocr失败");
+                    images.save(sc, "./fail.jpg");
                     exit();
                 }
                 log("answer:" + answer + " options_text:" + options_text);
@@ -1346,7 +1349,6 @@ function do_4_contest() {
         log("四人赛选项加载");
         className('android.widget.RadioButton').depth(o_index).clickable(true).findOne(2000);
 
-        var rawImage = captureScreen();
         var img = images.inRange(captureScreen(), '#000000', '#444444');
         img = images.clip(img, pos.left, pos.top, pos.width(), device.height - pos.top);
         var result = paddle_ocr_api(img);
@@ -1361,11 +1363,11 @@ function do_4_contest() {
             do_contest_answer(o_index, question, options_text);
         } else {
             log("选项加载 题目查找失败，选首个");
-            className('android.widget.RadioButton').depth(o_index).findOne(200).click();
+            var firstModel = className('android.widget.RadioButton').depth(o_index).findOne(200);
+            if (firstModel != null) {
+                firstModel.click();
+            }
         }
-        //加这个等待出现 继续挑战
-        sleep(random_time(delay_time));
-
     }
     log("四人赛 do_4_contest end");
 
@@ -1413,7 +1415,7 @@ if (!finish_list[6] && four_players_scored < 3) {
  **********双人对战*********
  !finish_list[7] && two_players_scored < 1
  */
-if (true) {
+if (!finish_list[7] && two_players_scored < 1) {
     log("双人对战");
     sleep(random_time(delay_time));
 
@@ -1492,11 +1494,8 @@ if (pushplus_token) {
     var score = textStartsWith('今日已累积').findOne().text();
     score = score.match(/\d+/);
     sleep(random_time(delay_time));
-    back();
     // 获取账号名
     var account = id('my_display_name').findOne().text();
-
-    // 推送消息
     push_weixin_message(account, score);
 }
 
