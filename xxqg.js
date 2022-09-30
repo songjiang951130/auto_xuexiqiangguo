@@ -34,7 +34,7 @@ var whether_complete_speech = "yes";
  * 选填，是否要使用微信消息推送功能
  * 如是 请填写pushplus的token，如何获取请见说明
  *  */
-var pushplus_token = ["99ab8953122344c9bfefdbbe591612fd", "183cda2f82d346fa858e8d7233f027f1"];
+var pushplus_token = [];
 
 var app_index_version = 0;
 
@@ -89,7 +89,7 @@ var app_index_version_map = {
     ]
 }
 
-var lock_number = "303178";
+var lock_number = "";
 var start = new Date();
 
 /* **********************请填写如上信息********************** */
