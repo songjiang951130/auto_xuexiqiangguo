@@ -1,73 +1,38 @@
-<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
 
-<!-- code_chunk_output -->
 # 目录
-- [目录](#目录)
 - [免责声明](#免责声明)
-- [v15.53 更新内容:](#v1553-更新内容)
 - [脚本声明](#脚本声明)
 - [使用说明](#使用说明)
-  - [Hamibot](#hamibot)
-  - [Auto.js](#autojs)
+  - [Autox.js](#Autox.js)
   - [满足条件](#满足条件)
   - [编辑配置说明](#编辑配置说明)
-  - [百度API配置](#百度api配置)
 - [额外衍生脚本](#额外衍生脚本)
 - [常见问题](#常见问题)
 - [待编写](#待编写)
 
 <!-- /code_chunk_output -->
 
-# 免责声明
-**本脚本为免费使用，本脚本只供个人学习使用，不得盈利传播，不得用于违法用途，否则造成的一切后果自负！**
+
 
 如果喜欢的话可以star一下噢，谢谢！
 
-# v15.53 更新内容:
-1. 修复挑战答题复活bug
-
 # 脚本声明
-**本脚本适用于安卓、鸿蒙系统，不适用于IOS，请将强国软件换为2.33.0版本（[安装包](https://github.com/dundunnp/auto_xuexiqiangguo/tree/version-14.5/%E5%AE%89%E8%A3%85%E5%8C%85)），这之后的版本脚本运行可能报错**
+**本脚本适用于安卓、鸿蒙系统，不适用于IOS，请将强国软件换为2.33.0版本（[安装包](https://github.com/songjiang951130/auto_xuexiqiangguo/tree/master/%E5%AE%89%E8%A3%85%E5%8C%85)），这之后的版本脚本运行可能报错**
 **如果因为bug或各种原因不得不终止脚本，请重新运行脚本，脚本会自动跳过已完成的部分**
 **如果遇到bug问题，请先查看[常见问题](#常见问题)，如果没有找到类似问题或还是不行请反馈bug给我**
 **因为本人是在校学生无法把全部精力放在这，因此如果有想合作的小伙伴请在Github上一起完成更新项目**
 
 # 使用说明
 
-脚本可以在Hamibot上使用，也可以在Auto.js上使用，但由于Auto.js使用的是免费版，**不支持OCR**，Auto.js只能使用百度OCR，因此如果完整运行学习强国.js脚本的话（四人赛双人对战两个平台是一样的）将可能**调用百度OCR大约35次**，请谨慎使用，**超出百度OCR免费次数所产生的费用概不负责**
+脚本仅可以在Autox.js上使用，OCR使用百度飞浆（弃用百度OCR虽然每月1000额度，但是经不住随便玩）
 
-具体操作如下：
+### 安装流程
+#### Autox.js
+历史科普，本来有个auto.js的，后来作者不再更新，出了个付费的pro，有人后来出了个免费开源的autox.js。为什么选择？问就是回答贫穷限制了我<br/>
+安装地址：[地址](https://github.com/kkevsekk1/AutoX/releases/tag/6.3.5)
 
-## Hamibot
-1. 先跟随着[Hamibot指导](https://hamibot.com/guide)安装Hamibot并配对好机器人：
 
-2. 点击图标导入脚本
-
-<div align=center>
-<a href="https://hamibot.com/dashboard/scripts/import?url=https%3A%2F%2Fgithub.com%2Fdundunnp%2Fauto_xuexiqiangguo%2Ftree%2Fversion-15.52%2FHamibot" title="导入脚本到 Hamibot">
-<img src="https://hamibot.com/badge_import.png"/>
-</a>
-</div>
-
-3. 点击导入
-<div align=center>
-<img src="https://i.bmp.ovh/imgs/2022/07/28/a67622eba07c5a33.png" alt="msedge_WRzp0mov3N" width="600px" style="zoom:33%;" />
-</div>
-
-4. 点击配置，将信息填入后保存
-<div align=center>
-<img src="https://i.bmp.ovh/imgs/2022/07/28/b258833fb7a8229c.png" alt="msedge_WRzp0mov3N" width="600px" style="zoom:33%;" />
-</div>
-
-<div align=center>
-<img src="https://s3.bmp.ovh/imgs/2022/01/2ce43a5d3b4e052a.png" alt="msedge_WRzp0mov3N" width="600px" style="zoom:33%;" />
-</div>
-5. 就可以点运行了
-<div align=center>
-<img src="https://s3.bmp.ovh/imgs/2022/01/54884dc3a8fa9d01.png" alt="msedge_WRzp0mov3N" width="600px" style="zoom:33%;" />
-</div>
-
-## Auto.js
+## Autox.js
 先下载安装包[(安装包链接)](https://github.com/dundunnp/hamibot-auto_xuexiqiangguo/blob/version-14.4/%E5%AE%89%E8%A3%85%E5%8C%85/autojsv4.1.1alpha2_downcc.com.apk)，将Auto.js安装到手机上，打开Auto.js根据提示开启权限
 
 点击右下角的浮球，点击文件，取一个脚本名称并确定
