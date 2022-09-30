@@ -955,25 +955,25 @@ function do_periodic_answer(number) {
                     continue;
                 }
                 my_click_clickable('查看提示');
+                text('提示').waitFor();
                 // 打开查看提示的时间
-                sleep(800);
+                sleep(1000);
                 var tipsModel = text("提示").findOne().parent().parent().child(1).child(0);
                 var pos = tipsModel.bounds();
                 var sc = captureScreen();
-                sc = images.clip(sc, pos.left, pos.top, pos.width(), device.height - pos.top);
-                sc = images.inRange(sc, '#800000', '#FF0000');
-                var baidu_res = paddle_ocr_api(sc);
+                var imageC = images.clip(sc, pos.left, pos.top, pos.width(), device.height - pos.top);
+                var image = images.inRange(imageC, '#800000', '#FF0000');
+                var baidu_res = paddle_ocr_api(image);
                 answer = baidu_res[0];
                 var options_text = baidu_res[1];
                 if (!answer) {
                     toast("未找到答案 ocr失败");
                     log("未找到答案 ocr失败");
                     images.save(sc, "./fail.jpg");
+                    images.save(imageC, "./fail_c.jpg");
                     exit();
                 }
                 log("answer:" + answer + " options_text:" + options_text);
-
-                text('提示').waitFor();
                 back();
                 sleep(200);
                 if (textContains('多选题').exists() || textContains('单选题').exists()) {

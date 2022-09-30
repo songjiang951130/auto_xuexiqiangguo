@@ -122,5 +122,5 @@ function is_select_all_choice() {
 
 //8.飞书，中国古代法律术语，指","告状信，又称“投书”。
 var c1 = "唐代诗人         曾经夜宿小山楼，留下诗作《题金陵渡》:“金陵津渡小山楼，一宿行人自可愁，潮落夜江斜月里，两三星火是瓜洲。”";
-
-question_search.getAnswerText(c1);
+var c2 = "每年9月的第三个星期六为全民    "
+question_search.getAnswerText(c2);

@@ -3,14 +3,14 @@
  */
 
 var question_search = {};
-question_search.getAnswerText = function(question) {
-    if (question == null) {
+question_search.getAnswerText = function (question) {
+    if (question == undefined || question == null || question == '') {
         return null;
     }
-    log("question raw:" + question );
+    log("question raw:" + question);
 
     //qustion 选取文本最多的
-    question = question.replace(/\d./g, "");
+    question = question.replace(/\d\./, "");
     question = question.replace(",", "，");
     var q_list = question.split("，");
     question = "";
