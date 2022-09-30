@@ -692,26 +692,8 @@ function do_contest_answer(depth_click_option, question, options_text) {
     log("找到答案-哈希表 :" + answer)
     // 如果本地题库没搜到，则搜网络题库
     if (answer == null) {
-
-        var result;
-        // 发送http请求获取答案 网站搜题速度 r1 > r2
-        try {
-            // 此网站只支持十个字符的搜索
-            var r1 = http.get('http://www.syiban.com/search/index/init.html?modelid=1&q=' + encodeURI(question.slice(0, 6)));
-            result = r1.body.string().match(/答案：.*</);
-            log("r1:" + result);
-            if (result == null) {
-                log("url:" + 'http://www.syiban.com/search/index/init.html?modelid=1&q=' + encodeURI(question.slice(0, 10)))
-                toast('答案查询失败');
-            }
-        } catch (error) { }
-
+        var result = question_search.getAnswerText(question);
         if (result) {
-            log("找到答案-文本匹配");
-            // 答案文本
-            var result = result[0].slice(5, result[0].indexOf('<'));
-            result = result.replace(/、/, "");
-            log('答案 site: ' + result);
             select_option(result, depth_click_option, options_text);
         } else {
             log("找到答案-第一个");
@@ -719,6 +701,8 @@ function do_contest_answer(depth_click_option, question, options_text) {
             var b = className('android.widget.RadioButton').depth(depth_click_option).clickable(true).findOnce();
             if (b != null) {
                 b.click();
+            } else {
+                error("未找到按钮")
             }
         }
     } else {
@@ -972,12 +956,11 @@ function do_periodic_answer(number) {
                 // 打开查看提示的时间
                 sleep(800);
                 var sc = captureScreen();
-                // var tipsModel = text("提示").findOne().parent().parent().child(1).child(0);
-                // var tipsBounds = tipsModel.bounds();
-                // var img = images.clip(sc, tipsBounds.left, tipsBounds.top, tipsBounds.right, tipsBounds.bottom);
-                // images.save(sc, "./num_" + num + ".jpg");
-                img = images.inRange(sc, '#800000', '#FF0000');
-                var baidu_res = paddle_ocr_api(img);
+                var tipsModel = text("提示").findOne().parent().parent().child(1).child(0);
+                var pos = tipsModel.bounds();
+                sc = images.clip(sc, pos.left, pos.top, pos.width(), device.height - pos.top);
+                sc = images.inRange(sc, '#800000', '#FF0000');
+                var baidu_res = paddle_ocr_api(sc);
                 answer = baidu_res[0];
                 var options_text = baidu_res[1];
                 if (!answer) {
@@ -1457,12 +1440,12 @@ log("发表观点 start")
 if (!finish_list[9] && whether_complete_speech == "yes") {
 
     var speechs = [
-        "好好学习，天天向上" + random_time(1),
-        "大国领袖，高瞻远瞩" + random_time(1),
-        "请党放心，强国有我" + random_time(1),
-        "坚持信念，砥砺奋进" + random_time(1),
-        "团结一致，共建美好" + random_time(1),
-        "为人民谋幸福" + random_time(1)
+        "好好学习，天天向上",
+        // "大国领袖，高瞻远瞩",
+        // "请党放心，强国有我",
+        // "坚持信念，砥砺奋进",
+        // "团结一致，共建美好",
+        // "为人民谋幸福"
     ];
 
     sleep(random_time(delay_time));
