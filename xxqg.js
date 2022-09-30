@@ -1226,7 +1226,7 @@ if (!finish_list[4] && special_answer_scored < 8) {
 }
 
 /*
- **********挑战答题*********
+ **********挑战答题********* !finish_list[5]
  */
 log("挑战答题")
 if (!finish_list[5]) {
@@ -1252,19 +1252,13 @@ if (!finish_list[5]) {
             sleep(random_time(delay_time * 2));
             // 如果答错，第一次通过分享复活
             if (text("立即复活").exists()) {
-                num -= 2;
                 click("立即复活");
                 sleep(random_time(delay_time * 3));
-                if (text("访问异常").exists()) {
-                    handling_access_exceptions();
-                    sleep(random_time(delay_time * 7));
-                }
-                // 等待题目加载
-                sleep(random_time(delay_time * 3));
             }
-            // 第二次重新开局
+            //复活后 第二次重新开局
             if (text('再来一局').exists()) {
                 log("再来一局 b");
+                num = 0;
                 my_click_clickable('再来一局');
                 break;
             }
@@ -1287,20 +1281,29 @@ if (!finish_list[5]) {
                 options_text[index] = element.parent().child(1).text();
             });
             do_contest_answer(o_index, question, options_text);
-            num++;
+            num++; //这一步其实不准，
         }
         sleep(random_time(delay_time * 2));
-        if (num == 5 && !text('再来一局').exists() && !text('结束本局').exists()) flag = true;
+        if (num == 5 && !text('再来一局').exists() && !text('结束本局').exists()) {
+            flag = true;
+            log("set flag");
+            sleep(3000);
+        }
     }
     // 随意点击直到退出
     do {
         sleep(random_time(delay_time * 2.5));
         log("随意点击直到退出 b");
-        className('android.widget.RadioButton').depth(o_index).findOne().click();
+        var radio = className('android.widget.RadioButton').depth(o_index).findOne(300);
+        if (radio == null) {
+            break;
+        }
+        radio.click();
         log("随意点击直到退出 a");
         sleep(random_time(delay_time * 2.5));
     } while (!textStartsWith('本次答对').exists());
     click('结束本局');
+    textStartsWith('本次答对').waitFor();
     sleep(random_time(delay_time));
     back();
 }

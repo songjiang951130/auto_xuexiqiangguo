@@ -50,7 +50,7 @@ var app_index_version_map = {
 var app_index_version = 1;
 
 function my_click_non_clickable(target) {
-    if (typeof(target) == 'string') {
+    if (typeof (target) == 'string') {
         log("waitfor");
         text(target).waitFor();
         var tmp = text(target).findOne().bounds();
@@ -95,7 +95,7 @@ function multiple_choice(answer) {
 
 function getSimilarity(str1, str2) {
     var sameNum = 0
-        //寻找相同字符
+    //寻找相同字符
     for (var i = 0; i < str1.length; i++) {
         for (var j = 0; j < str2.length; j++) {
             if (str1[i] === str2[j]) {
@@ -125,10 +125,11 @@ var c1 = "唐代诗人         曾经夜宿小山楼，留下诗作《�
 var c2 = "每年9月的第三个星期六为全民    "
 question_search.getAnswerText(c2);
 
+var txt = "本次答对 0 题";
+txt = txt.match(/\d+/);
+log("txt:" + txt);
 
-var questionModel = className('android.view.View').depth(23).drawingOrder(0).findOnce(1);
-if (questionModel == null) {
-    log("null");
-}
-var q = questionModel.text();
-log("qqq:"+q);
+var txt2 = "本次答对 5 题";
+txt2 = txt2.match(/\d+/);
+log("txt2:" + txt2);
+
