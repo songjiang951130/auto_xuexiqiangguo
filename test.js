@@ -124,3 +124,11 @@ function is_select_all_choice() {
 var c1 = "唐代诗人         曾经夜宿小山楼，留下诗作《题金陵渡》:“金陵津渡小山楼，一宿行人自可愁，潮落夜江斜月里，两三星火是瓜洲。”";
 var c2 = "每年9月的第三个星期六为全民    "
 question_search.getAnswerText(c2);
+
+
+var questionModel = className('android.view.View').depth(23).drawingOrder(0).findOnce(1);
+if (questionModel == null) {
+    log("null");
+}
+var q = questionModel.text();
+log("qqq:"+q);

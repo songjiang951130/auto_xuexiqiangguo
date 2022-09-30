@@ -324,10 +324,15 @@ function back_track() {
             sleep(random_time(delay_time));
             var tab_depth = app_index_version_map["tab_depth"][app_index_version];
             var localModel = className('android.widget.LinearLayout').depth(tab_depth).findOnce(15);
-            toast("点击本地模块")
+            toast("点击本地模块");
             localModel.click();
             break;
         case 1:
+            //我的->学习积分
+            id("comm_head_xuexi_mine").findOne().click();
+            text('学习积分').waitFor();
+            click("学习积分");
+            text('登录').waitFor();
             break;
         case 2:
             id("comm_head_xuexi_score").findOne().click();
@@ -369,8 +374,6 @@ function get_finish_list() {
             i--;
             log("app版本:" + app_index_version);
             continue;
-        } else {
-            log("app版本:" + app_index_version);
         }
         // log("model: " + model);
         log("task:" + (i - 4) + " " + model.child(0).text());
@@ -949,7 +952,7 @@ function do_periodic_answer(number) {
             } else {
                 var try_web = try_web_query();
                 if (try_web) {
-                    sleep(random_time(delay_time)); 5
+                    sleep(random_time(delay_time));
                     click("确定");
                     sleep(random_time(delay_time));
                     continue;
@@ -961,8 +964,8 @@ function do_periodic_answer(number) {
                 var tipsModel = text("提示").findOne().parent().parent().child(1).child(0);
                 var pos = tipsModel.bounds();
                 var sc = captureScreen();
-                var imageC = images.clip(sc, pos.left, pos.top, pos.width(), device.height - pos.top);
-                var image = images.inRange(imageC, '#800000', '#FF0000');
+                // var imageC = images.clip(sc, pos.left, pos.top, pos.width(), device.height - pos.top);
+                var image = images.inRange(sc, '#800000', '#FF0000');
                 var baidu_res = paddle_ocr_api(image);
                 answer = baidu_res[0];
                 var options_text = baidu_res[1];
@@ -971,7 +974,7 @@ function do_periodic_answer(number) {
                     log("未找到答案 ocr失败");
                     images.save(sc, "./fail.jpg");
                     images.save(imageC, "./fail_c.jpg");
-                    exit();
+                    // exit();
                 }
                 log("answer:" + answer + " options_text:" + options_text);
                 back();
@@ -1028,7 +1031,11 @@ function try_web_query() {
         return false;
     } else {
         log("点击答案:" + answer + " end");
-        return my_click_non_clickable(answer);
+        var textModel = text(answer).findOne(1000);
+        if (textModel == null) {
+            return false;
+        }
+        return textModel.parent().child(0).click();
     }
 }
 
@@ -1292,7 +1299,7 @@ if (!finish_list[5]) {
         className('android.widget.RadioButton').depth(o_index).findOne().click();
         log("随意点击直到退出 a");
         sleep(random_time(delay_time * 2.5));
-    } while (!text('再来一局').exists() && !text('结束本局').exists());
+    } while (!textStartsWith('本次答对').exists());
     click('结束本局');
     sleep(random_time(delay_time));
     back();
@@ -1461,13 +1468,14 @@ if (!finish_list[9] && whether_complete_speech == "yes") {
     className("android.widget.TextView").text("文化").findOne().parent().click();
     sleep(random_time(delay_time));
     var artcle = null;
-    while (artcle == null) {
+    var c = false;
+    while (!c) {
         swipe(500, 600, 500, 300, 600);
         log("滑动查找文章");
         artcle = id("general_card_title_id").findOnce();
+        c = artcle.parent().parent().click();
+        log("点击文章:" + artcle.text() + " c:" + c);
     }
-    var c = artcle.parent().parent().click();
-    log("点击文章:" + artcle.text() + " c:" + c);
     sleep(random_time(delay_time));
 
     log("等待欢迎发表你的观点");
@@ -1484,16 +1492,17 @@ if (!finish_list[9] && whether_complete_speech == "yes") {
     sleep(random_time(delay_time));
     my_click_clickable('确认');
 }
-log("发表观点 end")
+log("发表观点 end");
 
 
 if (pushplus_token) {
-    back_track_flag = 2;
+    back_track_flag = 1;
     back_track();
     // 获取今日得分
     var score = textStartsWith('今日已累积').findOne().text();
     score = score.match(/\d+/);
     sleep(random_time(delay_time));
+    back();
     // 获取账号名
     var account = id('my_display_name').findOne().text();
     push_weixin_message(account, score);
