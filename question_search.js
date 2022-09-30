@@ -7,13 +7,18 @@ question_search.getAnswerText = function(question) {
     if (question == null) {
         return null;
     }
+    log("question raw:" + question );
+
     //qustion 选取文本最多的
     question = question.replace(/\d./g, "");
     question = question.replace(",", "，");
     var q_list = question.split("，");
     question = "";
     q_list.forEach(element => {
-        question = element.length > question.length ? element : question;
+        var blank_list = element.split("         ");
+        blank_list.forEach(b_element => {
+            question = b_element.length > question.length ? b_element : question;
+        });
     });
     //补全唐代诗人王维《田园乐》诗句
     // 此网站只支持十个字符的搜索

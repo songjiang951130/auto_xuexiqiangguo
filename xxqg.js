@@ -947,7 +947,7 @@ function do_periodic_answer(number) {
             } else {
                 var try_web = try_web_query();
                 if (try_web) {
-                    sleep(random_time(delay_time));
+                    sleep(random_time(delay_time));5
                     click("确定");
                     sleep(random_time(delay_time));
                     continue;
