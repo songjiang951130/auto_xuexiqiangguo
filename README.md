@@ -18,7 +18,7 @@
 
 # 脚本声明
 首先感谢原作者的付出，原项目地址见fork，
-**本脚本适用于安卓系统，请将强国软件换为2.33.0版本（[安装包](https://github.com/songjiang951130/auto_xuexiqiangguo/tree/master/%E5%AE%89%E8%A3%85%E5%8C%85)），高版本没有截图权限，这一点会造成无法OCR**。**如果因为bug或各种原因不得不终止脚本，请重新运行脚本，脚本会自动跳过已完成的部分**
+**本脚本适用于安卓系统，请将强国软件换为2.33.0版本（[安装包](https://github.com/dundunnp/auto_xuexiqiangguo/blob/version-15.6/%E5%AE%89%E8%A3%85%E5%8C%85/v2.33.0)），高版本没有截图权限，这一点会造成无法OCR**。**如果因为bug或各种原因不得不终止脚本，请重新运行脚本，脚本会自动跳过已完成的部分**
 **如果遇到bug问题，请先查看[常见问题](#常见问题)，如果没有找到类似问题或还是不行请反馈bug给我**
 **因为本人是帮女朋友完成任务，对答题准确率上没有太高的要求，只要跑完任务即可每日40-42分不等，因此如果有想合作的小伙伴请在Github上一起完善项目**
 
@@ -38,13 +38,9 @@
 
 ## 安装Autoxjs
 历史科普，本来有个auto.js的，后来作者不再更新，出了个付费的pro，有人后来出了个免费开源的autox.js。为什么选择？问就是回答贫穷限制了我<br/>
-安装地址：[地址](https://github.com/kkevsekk1/AutoX/releases/tag/6.3.5)
+安装地址：[地址](https://github.com/kkevsekk1/AutoX/releases/)
 
-点击右下角的浮球，点击文件，取一个脚本名称并确定
-<div align=center>
-<img src="https://user-images.githubusercontent.com/68000706/160570166-9e696d71-1cd0-4dc5-a63e-4530497668dd.jpg" alt="msedge_WRzp0mov3N" width="300px" style="zoom:33%;" />
-</div>
-将Auto.js文件夹下的学习强国.js文件的代码复制到这里去
+将整个项目复制到脚本文件夹下，运行xxqg_autojsx.js
 <div align=center>
 <img src="https://user-images.githubusercontent.com/68000706/160570183-1e384421-6f4d-461d-b8c8-a0bc5a40da2c.jpg" alt="msedge_WRzp0mov3N" width="300px" style="zoom:33%;" />
 </div>
