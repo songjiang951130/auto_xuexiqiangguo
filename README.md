@@ -40,31 +40,21 @@
 历史科普，本来有个auto.js的，后来作者不再更新，出了个付费的pro，有人后来出了个免费开源的autox.js。为什么选择？问就是回答贫穷限制了我<br/>
 安装地址：[地址](https://github.com/kkevsekk1/AutoX/releases/)
 
-将整个项目复制到脚本文件夹下，运行xxqg_autojsx.js
+将整个项目复制到【脚本】文件夹下，运行xxqg_autojsx.js即可
 <div align=center>
-<img src="https://user-images.githubusercontent.com/68000706/160570183-1e384421-6f4d-461d-b8c8-a0bc5a40da2c.jpg" alt="msedge_WRzp0mov3N" width="300px" style="zoom:33%;" />
+<img src="https://raw.githubusercontent.com/songjiang951130/auto_xuexiqiangguo/master/image/unzip_index.jpg" width="300px" style="zoom:33%;" />
 </div>
-将代码划到最上面，根据提示填写配置信息，并点击右上角的保存
 <div align=center>
-<img src="https://user-images.githubusercontent.com/68000706/160570186-026415c6-b770-475c-86a2-5d08aeacb324.jpg" alt="msedge_WRzp0mov3N" width="300px" style="zoom:33%;" />
+<img src="https://raw.githubusercontent.com/songjiang951130/auto_xuexiqiangguo/master/image/index.jpg" width="300px" style="zoom:33%;" />
 </div>
 点击右三角运行按钮，脚本就开始运行了
-<div align=center>
-<img src="https://user-images.githubusercontent.com/68000706/160570195-3960b0ec-947d-4571-83c7-8732ed80c0ce.jpg" alt="msedge_WRzp0mov3N" width="300px" style="zoom:33%;" />
-</div>
 
-如果想要使用其他版本的如v10.11，可以点击这里其他流程一样（不建议）
-<div align=center>
-<img src="https://s3.bmp.ovh/imgs/2022/01/12258501b035ee0e.png" alt="msedge_WRzp0mov3N"  width="300px" style="zoom:33%;" />
-</div>
 
-其他脚本也类似上述操作，只是代码不同
 
 **如果喜欢的话可以star一下噢，谢谢！**
 <div align=center>
 <img src="https://s3.bmp.ovh/imgs/2022/01/2fc8345bdc719323.png" alt="msedge_WRzp0mov3N"  width="300px" style="zoom:33%;" />
 </div>
-
 
 **pushplus_token**
 
