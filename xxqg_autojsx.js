@@ -1237,17 +1237,15 @@ if (!finish_list[5]) {
     sleep(random_time(delay_time));
     if (!text('挑战答题').exists()) back_track();
     entry_model(9);
-    // 加载页面
-    log("挑战答题 加载页面");
     className('android.view.View').depth(q_index).waitFor();
-    log("挑战答题 加载完成");
-
+    //由于可以复活，所以5分满分加复活一次，就是6次
+    var times = 6;
     // flag为true时挑战成功拿到6分
     var flag = false;
     while (!flag) {
         sleep(random_time(delay_time * 3));
         var num = 0;
-        while (num < 5) {
+        while (num < times) {
             // 每题的过渡
             sleep(random_time(delay_time * 2));
             // 如果答错，第一次通过分享复活
@@ -1284,10 +1282,8 @@ if (!finish_list[5]) {
             num++; //这一步其实不准，
         }
         sleep(random_time(delay_time * 2));
-        if (num == 5 && !text('再来一局').exists() && !text('结束本局').exists()) {
+        if (num == times && !text('再来一局').exists() && !text('结束本局').exists()) {
             flag = true;
-            log("set flag");
-            sleep(3000);
         }
     }
     // 随意点击直到退出
@@ -1303,7 +1299,9 @@ if (!finish_list[5]) {
         sleep(random_time(delay_time * 2.5));
     } while (!textStartsWith('本次答对').exists());
     click('结束本局');
-    textStartsWith('本次答对').waitFor();
+    //此时会出现异常检查
+    sleep(1000);
+    textStartsWith('本地答对').waitFor();
     sleep(random_time(delay_time));
     back();
 }
