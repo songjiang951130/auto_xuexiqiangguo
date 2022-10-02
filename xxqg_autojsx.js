@@ -691,7 +691,6 @@ function do_contest_answer(depth_click_option, question, options_text) {
     }
     // 从哈希表中取出答案
     var answer = map_get(question);
-    log("找到答案-哈希表 :" + answer)
     // 如果本地题库没搜到，则搜网络题库
     if (answer == null) {
         var result = question_search.getAnswerText(question);
@@ -869,7 +868,7 @@ function paddle_ocr_api(img) {
      * @see http://doc.autoxjs.com/#/AI
      */
     var words_list = paddle.ocrText(img, 8, true);
-    log("paddle ocr result:" + JSON.stringify(words_list))
+    log("paddle ocr result:" + JSON.stringify(words_list));
     if (words_list) {
         // question是否读取完成的标志位
         var question_flag = false;
@@ -890,7 +889,6 @@ function paddle_ocr_api(img) {
     question = question.replace(/,/g, "，");
     question = question.slice(question.indexOf('.') + 1);
     question = question.slice(0, 6);
-    log("question:" + question + " options_text:" + options_text)
     return [question, options_text]
 }
 
@@ -1347,6 +1345,7 @@ function do_2_contest() {
             log("选项加载 题目查找失败，选首个" + e);
             // className('android.widget.RadioButton').depth(o_index).findOne(200).click();
         }
+        sleep(2000);
 
     }
 }
@@ -1431,7 +1430,7 @@ if (!finish_list[6] && four_players_scored < 3) {
  **********双人对战*********
  !finish_list[7] && two_players_scored < 1
  */
-if (!finish_list[7] && two_players_scored < 1) {
+if (true) {
     log("双人对战");
     sleep(random_time(delay_time));
 
@@ -1514,7 +1513,7 @@ if (pushplus_token) {
     back();
     // 获取账号名
     var account = id('my_display_name').findOne().text();
-    push_weixin_message(account, score);
+    // push_weixin_message(account, score);
 }
 
 device.cancelKeepingAwake();
