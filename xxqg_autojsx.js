@@ -650,7 +650,9 @@ function select_option(answer, depth_click_option, options_text) {
         try {
             className('android.widget.RadioButton').depth(depth_click_option).clickable(true).findOnce(option_i).click();
             return;
-        } catch (error) { }
+        } catch (error) {
+            log("点击失败" + error)
+        }
     }
 
     // 如果运行到这，说明很有可能是选项ocr错误，导致答案无法匹配，因此用最大相似度匹配
@@ -666,15 +668,10 @@ function select_option(answer, depth_click_option, options_text) {
                 }
             }
         }
-        try {
-            className('android.widget.RadioButton').depth(depth_click_option).clickable(true).findOnce(max_similarity_index).click();
-            return;
-        } catch (error) { }
+        className('android.widget.RadioButton').depth(depth_click_option).clickable(true).findOnce(max_similarity_index).click();
     } else {
-        try {
-            // 没找到答案，点击第一个
-            className('android.widget.RadioButton').depth(depth_click_option).clickable(true).findOne().click();
-        } catch (error) { }
+        // 没找到答案，点击第一个
+        className('android.widget.RadioButton').depth(depth_click_option).clickable(true).findOne().click();
     }
 }
 
@@ -699,6 +696,7 @@ function do_contest_answer(depth_click_option, question, options_text) {
     if (answer == null) {
         var result = question_search.getAnswerText(question);
         if (result) {
+            log("找到答案-网络搜索 :" + answer)
             select_option(result, depth_click_option, options_text);
         } else {
             log("找到答案-第一个");
@@ -1260,7 +1258,7 @@ if (!finish_list[5]) {
                 my_click_clickable('再来一局');
                 break;
             }
-            log("挑战答题 题目等待");
+            log("挑战答题 题目等待 num:" + num);
             // 题目
             className('android.view.View').depth(q_index).waitFor();
             var question = className('android.view.View').depth(q_index).findOne().text();
@@ -1472,10 +1470,8 @@ if (!finish_list[9] && whether_complete_speech == "yes") {
     var c = false;
     while (!c) {
         swipe(500, 600, 500, 300, 600);
-        log("滑动查找文章");
         artcle = id("general_card_title_id").findOnce();
         c = artcle.parent().parent().click();
-        log("点击文章:" + artcle.text() + " c:" + c);
     }
     sleep(random_time(delay_time));
 
