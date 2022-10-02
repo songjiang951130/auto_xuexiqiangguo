@@ -133,3 +133,6 @@ var txt2 = "本次答对 5 题";
 txt2 = txt2.match(/\d+/);
 log("txt2:" + txt2);
 
+var life = text("立即复活").exists();
+log("life:"+life);
+

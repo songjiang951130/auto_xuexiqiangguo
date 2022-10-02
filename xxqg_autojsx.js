@@ -1246,6 +1246,15 @@ if (!finish_list[5]) {
         while (num < times) {
             // 每题的过渡
             sleep(random_time(delay_time * 2));
+            if (textStartsWith("本次答题").exists()) {
+                var txt = textStartsWith("本次答题").findOne().text();
+                var score = txt.match(/\d+/);
+                if (score >= 5) {
+                    num = score;
+                    flag = true;
+                    break;
+                }
+            }
             // 如果答错，第一次通过分享复活
             if (text("立即复活").exists()) {
                 click("立即复活");
@@ -1278,22 +1287,23 @@ if (!finish_list[5]) {
             });
             do_contest_answer(o_index, question, options_text);
             num++; //这一步其实不准，
+            sleep(random_time(delay_time));
         }
-        sleep(random_time(delay_time * 2));
-        if (num == times && !text('再来一局').exists() && !text('结束本局').exists()) {
+        sleep(random_time(delay_time));
+        if (num >= times && !text('再来一局').exists() && !text('结束本局').exists()) {
             flag = true;
         }
     }
     // 随意点击直到退出
     do {
         sleep(random_time(delay_time * 2.5));
-        log("随意点击直到退出 b");
-        var radio = className('android.widget.RadioButton').depth(o_index).findOne(300);
+        log("挑战完成 选第一个 start");
+        var radio = className('android.widget.RadioButton').depth(o_index).findOne(3000);
         if (radio == null) {
             break;
         }
         radio.click();
-        log("随意点击直到退出 a");
+        log("挑战完成 选第一个 end");
         sleep(random_time(delay_time * 2.5));
     } while (!textStartsWith('本次答对').exists());
     click('结束本局');
@@ -1509,6 +1519,6 @@ if (pushplus_token) {
 
 device.cancelKeepingAwake();
 
-log('脚本运行完成，时间：' + (new Date() - start) / 1000 / 60 + "分钟");
+log('脚本运行完成，时间：' + ((new Date() - start) / 1000 / 60 + "").slice(0, 4) + "分钟");
 
-toast('脚本运行完成，时间：' + (new Date() - start) / 1000 / 60 + "分钟");
+toast('脚本运行完成，时间：' + ((new Date() - start) / 1000 / 60 + "").slice(0, 4) + "分钟");
