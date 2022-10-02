@@ -1300,8 +1300,8 @@ if (!finish_list[5]) {
     } while (!textStartsWith('本次答对').exists());
     click('结束本局');
     //此时会出现异常检查
-    sleep(1000);
-    textStartsWith('本地答对').waitFor();
+    sleep(2000);
+    textStartsWith('本次答对').waitFor();
     sleep(random_time(delay_time));
     back();
 }
