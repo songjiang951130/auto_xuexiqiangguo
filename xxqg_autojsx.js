@@ -11,13 +11,6 @@ var question_search = require('question_search.js');
 var delay_time = 500;
 
 /**
- * 之前的每周答题是否全部完成
- * 请填入"yes"或"no"(默认为"no")
- * 如果完成就不需要浪费时间向下搜索
- *  */
-var all_weekly_answers_completed = "no";
-
-/**
  * 之前的专项答题是否全部完成
  * 请填入"yes"或"no"(默认为"no")
  * 如果完成就不需要浪费时间向下搜索
