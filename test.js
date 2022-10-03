@@ -120,23 +120,13 @@ function is_select_all_choice() {
     return options.length / 2 == (question.match(/\s+/g) || []).length;
 }
 
-//请求横屏截图权限
-threads.start(function () {
-    try {
-        var beginBtn;
-        if (beginBtn = classNameContains("Button").textContains("开始").findOne(delay_time));
-        else (beginBtn = classNameContains("Button").textContains("允许").findOne(delay_time));
-        beginBtn.click();
-    } catch (error) { }
-});
-sleep(2000);
-requestScreenCapture(false);
-var rawImage = captureScreen();
-if(!files.exists("./image/")){
-    files.create("./image/");
-}
-var t = new Date().toLocaleTimeString().toString().split(" ")[0].replace(/:/g, "-");
-images.save(rawImage, "./image/fail_" + t + "_raw.jpg");
-images.save(rawImage, "./image/fail" + t + "_flip.jpg");
+var question = "111";
+var options_text = ["a"];
+var q_set = new Set();
+q_set.has(question + options_text);
+q_set.add(question + options_text);
+
+log("q set:" + q_set.keys());
+
 
 
