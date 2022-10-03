@@ -1082,12 +1082,12 @@ log("每日答题 end")
  */
 log("挑战答题")
 if (!finish_list[5]) {
-    log("挑战答题start")
+    log("挑战答题start");
+    if (!text('挑战答题').exists()) back_track();
     var q_index = app_index_version_map["challenge_question"][app_index_version]; //12 26
     var o_index = app_index_version_map["challenge_option"][app_index_version];
-    log("q_index:" + q_index + " o_index:" + o_index)
+    log("q_index:" + q_index + " o_index:" + o_index);
     sleep(random_time(delay_time));
-    if (!text('挑战答题').exists()) back_track();
     entry_model(9);
     className('android.view.View').depth(q_index).waitFor();
     //由于可以复活，所以5分满分加复活一次，就是6次
