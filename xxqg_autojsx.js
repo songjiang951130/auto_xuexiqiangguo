@@ -1186,7 +1186,6 @@ log("挑战答题end");
 
 function saveOcrError(bizName, rawImage, clip) {
     var imageDir = "./image/" + bizName + "/";
-    files.removeDir(imageDir);
     if (!files.exists(imageDir)) {
         files.create(imageDir);
     }
