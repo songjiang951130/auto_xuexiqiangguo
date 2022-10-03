@@ -1382,7 +1382,7 @@ if (pushplus_token) {
     back();
     // 获取账号名
     var account = id('my_display_name').findOne().text();
-    // push_weixin_message(account, score);
+    push_weixin_message(account, score);
 }
 
 device.cancelKeepingAwake();
