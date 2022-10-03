@@ -335,21 +335,15 @@ function back_track() {
 }
 
 /**
+ * 注意各个版本位置不同需要分辨
  * 获取各模块完成情况的列表、以及全局变量
  * 先获取有哪些模块还没有完成，并生成一个列表，其中第一个是我要选读文章模块，以此类推
  * 再获取阅读模块和视听模块已完成的时间和次数
  */
-
 // 已阅读文章次数
 var completed_read_count;
 // 已观看视频次数
 var completed_watch_count;
-// 每周答题已得分
-var weekly_answer_scored;
-// 专项答题已得分
-var special_answer_scored;
-// 四人赛已得分
-var four_players_scored;
 // 双人对战已得分
 var two_players_scored;
 /**
@@ -374,17 +368,9 @@ function get_finish_list() {
             completed_read_count = parseInt(model.child(child_index).child(0).text());
         } else if (i == 5) {
             completed_watch_count = parseInt(model.child(child_index).child(0).text());
-        } else if (i == 16) {
-            weekly_answer_scored = parseInt(model.child(child_index).child(0).text());
-        } else if (i == 8) {
-            special_answer_scored = parseInt(model.child(child_index).child(0).text());
-            special_answer_scored = 8;
-        } else if (i == 10) {
-            four_players_scored = parseInt(model.child(child_index).child(0).text());
         } else if (i == 11) {
             two_players_scored = parseInt(model.child(child_index).child(0).text());
         }
-
         finish_list.push(model.child(4).text() == '已完成');
     }
     log("已完成情况:" + finish_list);
@@ -404,7 +390,6 @@ var finish_list = get_finish_list();
 /*
  **********本地频道*********
  */
-// finish_list[10] = false;
 if (!finish_list[10]) {
     log("进入本地");
     //14是本地
@@ -494,12 +479,7 @@ if (!finish_list[4] && completed_read_count < 12) {
             if (count >= need_count) {
                 break;
             }
-            if (titleSet.has(articles[i].text())) {
-                log("已阅读+" + articles[i].text());
-                continue;
-            }
-            if (articles[i].text().includes("朗读") || articles[i].text().includes("朗诵") || articles[i].text().includes("专题")) {
-                log("跳过+" + articles[i].text());
+            if (titleSet.has(articles[i].text()) || articles[i].text().includes("朗读") || articles[i].text().includes("朗诵") || articles[i].text().includes("专题")) {
                 continue;
             }
             log("标题+:" + articles[i].text() + " index:" + i)
@@ -522,7 +502,7 @@ if (!finish_list[4] && completed_read_count < 12) {
                 }
             }
             sleep(Math.abs(single_total_read - use_time));
-            log("阅读完成 article length", articles.length, " i:", i, "title:", articles[i].text());
+            log("阅读完成 article length:", articles.length, " i:", i, "title:", articles[i].text());
             titleSet.add(articles[i].text());
             count++;
             back();
@@ -573,7 +553,6 @@ if (!finish_list[1]) {
     my_click_clickable('百灵');
     sleep(random_time(delay_time / 2));
     if (text("关闭").exists()) {
-        log("关闭？？");
         click("关闭");
     }
     log("竖")
@@ -666,6 +645,7 @@ function select_option(answer, depth_click_option, options_text) {
 
     } else {
         // 没找到答案，点击第一个
+        log("ocr 失败，匹配不到，请检查代码");
         var op = className('android.widget.RadioButton').depth(depth_click_option).clickable(true).findOne(300);
         if (op != null) {
             op.click();
@@ -683,6 +663,7 @@ function do_contest_answer(depth_click_option, question, options_text) {
     question = question.slice(0, 10);
     // 如果是特殊问题需要用选项搜索答案，而不是问题
     if (special_problem.indexOf(question.slice(0, 7)) != -1) {
+        log("special_problem:" + question.slice(0, 7));
         var original_options_text = options_text.concat();
         var sorted_options_text = original_options_text.sort();
         question = sorted_options_text.join('|');
@@ -859,38 +840,51 @@ function restart() {
 }
 
 function paddle_ocr_api(img) {
-    var question = "";
-    var options_text = [];
     /**
      * @see http://doc.autoxjs.com/#/AI
      */
     var words_list = paddle.ocrText(img, 8, true);
     log("paddle ocr result:" + JSON.stringify(words_list));
+    var question = "";
+    var options_text = [];
+    var options_str = "";
     if (words_list) {
         // question是否读取完成的标志位
         var question_flag = false;
         for (var i in words_list) {
             if (!question_flag) {
                 // 如果是选项则后面不需要加到question中
+                if (words_list[i][0].match(/^[A-Z]/)) {
+                    question_flag = true;
+                }
                 if (words_list[i][0] == "A") question_flag = true;
                 if (!question_flag) question += words_list[i];
             }
             // 这里不能用else，会漏读一次
             if (question_flag) {
                 // 其他的就是选项了
-                if (words_list[i][1] == '.') options_text.push(words_list[i].slice(2));
+                options_str = options_str + words_list[i];
+            }
+        }
+    }
+    //看这里能不能一步到位处理了
+    var options_array = options_str.split(/[A-Z]\./);
+    for (var i in options_array) {
+        var t = options_array[i].split(/[A-Z]/);
+        for (var j in t) {
+            if (t[j].length > 0) {
+                options_text.push(t[j]);
             }
         }
     }
     question = question.replace(/\s*/g, "");
     question = question.replace(/,/g, "，");
-    question = question.slice(question.indexOf('.') + 1);
-    question = question.slice(0, 6);
-    return [question, options_text]
+    question = question.replace(/\d\./, "");
+    return [question, options_text];
 }
 
 /**
- * 答题（每日、每周、专项）
+ * 答题 每日
  * @param {int} number 需要做题目的数量
  */
 function do_periodic_answer(number) {
@@ -1076,7 +1070,7 @@ function handling_access_exceptions() {
 /* 
 处理访问异常，滑动验证
 */
-var thread_handling_access_exceptions = handling_access_exceptions();
+handling_access_exceptions();
 
 /*
  **********每日答题*********
@@ -1086,7 +1080,10 @@ var restart_flag = 0;
 log("每日答题 start")
 if (!finish_list[3]) {
     sleep(random_time(delay_time));
-    if (!className('android.view.View').depth(22).text('学习积分').exists()) back_track();
+    if (!text('积分规则').exists()) {
+        restart_flag = 2;
+        back_track();
+    }
     entry_model(7);
     // 等待题目加载
     text('查看提示').waitFor();
@@ -1096,35 +1093,16 @@ if (!finish_list[3]) {
 log("每日答题 end")
 
 /*
- **********专项答题*********
- */
-
-// 保存本地变量，如果已经做完之前的所有题目则跳过
-if (!storage.contains("all_special_answer_completed_storage")) {
-    storage.put("all_special_answer_completed_storage", "no");
-}
-
-// 保存本地变量，改变存储上次搜索未完成的题目所需时间，用于加速搜索
-if (!storage.contains("quick_search_special_answer_time_storage")) {
-    storage.put("quick_search_special_answer_time_storage", 0);
-}
-
-// 当该账号已完成专项答题，但配置没有转为yes时，也自动跳过
-if (all_special_answer_completed == "no") {
-    all_special_answer_completed = storage.get("all_special_answer_completed_storage");
-}
-
-/*
  **********挑战答题********* !finish_list[5]
  */
 log("挑战答题")
 if (!finish_list[5]) {
-    log("挑战答题start")
+    log("挑战答题start");
+    if (!text('挑战答题').exists()) back_track();
     var q_index = app_index_version_map["challenge_question"][app_index_version]; //12 26
     var o_index = app_index_version_map["challenge_option"][app_index_version];
-    log("q_index:" + q_index + " o_index:" + o_index)
+    log("q_index:" + q_index + " o_index:" + o_index);
     sleep(random_time(delay_time));
-    if (!text('挑战答题').exists()) back_track();
     entry_model(9);
     className('android.view.View').depth(q_index).waitFor();
     //由于可以复活，所以5分满分加复活一次，就是6次
@@ -1206,45 +1184,15 @@ if (!finish_list[5]) {
 }
 log("挑战答题end");
 
-/*
- ********************双人对战********************
- */
-
-function do_2_contest() {
-    var q_index = app_index_version_map["four_question"][app_index_version];
-    var o_index = app_index_version_map["two_option"][app_index_version];
-    while (!text('继续挑战').exists()) {
-        // 等待下一题题目加载
-        log("双人赛 题目加载 等题目出现");
-        className("android.view.View").depth(q_index).waitFor();
-        log("双人赛 题目加载 等答题按钮出现");
-        className('android.widget.RadioButton').depth(o_index).clickable(true).waitFor();
-        var rawImage = captureScreen();
-        var img = images.inRange(rawImage, '#000000', '#444444');
-        try {
-            //图片剪切
-            var pos = className("android.view.View").depth(q_index).findOne().bounds();
-            img = images.clip(img, pos.left, pos.top, pos.width(), device.height - pos.top);
-            var result = paddle_ocr_api(img);
-            var question = result[0];
-            if (question == "") {
-                var t = new Date().toLocaleTimeString().toString().split(" ")[0].replace(/:/g, "-");
-                images.save(rawImage, "./image/raw_fail" + t + ".jpg");
-                images.save(img, "./image/f_fail" + t + ".jpg");
-            }
-            var options_text = result[1];
-            log("题目: " + question + " 选项:" + options_text);
-            if (question) {
-                do_contest_answer(o_index, question, options_text);
-            } else {
-                log("选项加载 题目查找失败，选首个");
-                className('android.widget.RadioButton').depth(o_index).findOne(200).click();
-            }
-        } catch (e) {
-            log("选项加载 题目查找失败，选首个" + e);
-            // className('android.widget.RadioButton').depth(o_index).findOne(200).click();
-        }
+function saveOcrError(bizName, rawImage, clip) {
+    var imageDir = "./image/" + bizName + "/";
+    files.removeDir(imageDir);
+    if (!files.exists(imageDir)) {
+        files.create(imageDir);
     }
+    var t = new Date().toLocaleTimeString().toString().split(" ")[0].replace(/:/g, "-");
+    images.save(rawImage, imageDir + "fail" + t + "_raw.jpg");
+    images.save(clip, imageDir + "fail" + t + "_clip.jpg");
 }
 
 /**
@@ -1254,14 +1202,26 @@ function do_4_contest() {
     log("四人赛 do_4_contest");
     var q_index = app_index_version_map["four_question"][app_index_version];
     var o_index = app_index_version_map["four_option"][app_index_version];
+    var questionMap = new Map();
     while (!text('继续挑战').exists()) {
-        log("四人赛题目加载 等答题按钮出现");
         className("android.view.View").depth(q_index).waitFor();
         var pos = className("android.view.View").depth(q_index).findOne().bounds();
-        log("四人赛选项加载");
+        log("四人赛 选项加载");
         className('android.widget.RadioButton').depth(o_index).clickable(true).waitFor();
-
-        var img = images.inRange(captureScreen(), '#000000', '#444444');
+        /**
+         * 选项虽然加载完毕，会截图到过渡页的情况 “第二题”，见image/ocr_time_error.jpg
+         * 太早ocr会找不到选项，两次日志相差一秒，先设置sleep 1秒试试，甚至会出现多次ocr的情况，所以sleep2秒
+         * 
+         * 15:40:48.296/D: 题目: 1923年6月，中国共产党第三次全国代表大会在广州举行。出席大会的代表30多人，代表全国名党员。 选项:
+         * 15:40:48.296/D: 选项匹配
+         * 15:40:48.299/D: 答题 题库: 420
+         * 15:40:48.305/D: 四人赛题目加载 等答题按钮出现
+         * 15:40:48.315/D: 四人赛选项加载
+         * 15:40:49.371/D: paddle ocr result:["2.1923年6月，中国共产党第三次全","国代表大会在广州举行。出席大会的","代表30多人，代表全国","名党","员。","A.520","B.420","C.410"]
+         */
+        sleep(500);
+        var rawImage = captureScreen();
+        var img = images.inRange(rawImage, '#000000', '#444444');
         img = images.clip(img, pos.left, pos.top, pos.width(), device.height - pos.top);
         var result = paddle_ocr_api(img);
 
@@ -1269,23 +1229,34 @@ function do_4_contest() {
         var options_text = result[1];
 
         log("题目: " + question + " 选项:" + options_text);
+        var key = question + options_text;
+        if (questionMap.has(key)) {
+            log("已经ocr");
+            questionMap.set(key, questionMap.get(key) + 1);
+            continue;
+        }
+        if (question == "") {
+            saveOcrError("question4", rawImage, img);
+        }
+        if (!options_text || options_text.length == 0) {
+            saveOcrError("option4", rawImage, img);
+            if (questionMap.get(key) < 5) {
+                continue;
+            }
+
+        }
         if (question) {
             log("选项匹配");
             do_contest_answer(o_index, question, options_text);
-        } else {
-            log("选项加载 题目查找失败，选首个");
-            var firstModel = className('android.widget.RadioButton').depth(o_index).findOne(200);
-            if (firstModel != null) {
-                firstModel.click();
-            }
         }
+        questionMap.set(key, 1);
     }
     log("四人赛 do_4_contest end");
 
 }
 
 /*
- **********四人赛*********
+ **********四人赛********* !finish_list[6]
  */
 if (!finish_list[6]) {
     log("四人赛");
@@ -1300,7 +1271,7 @@ if (!finish_list[6]) {
         sleep(random_time(delay_time));
         for (var i = 0; i < 2; i++) {
             //非积分局退出
-            if (!textStartsWith("今日积分奖励局").exists()) {
+            if (!textStartsWith("今日积分奖励局").exists() || text("非积分奖励局").exists()) {
                 break;
             }
             sleep(random_time(delay_time));
@@ -1319,6 +1290,48 @@ if (!finish_list[6]) {
     }
     sleep(random_time(delay_time));
     back();
+}
+
+/*
+ ********************双人对战********************
+ */
+
+function do_2_contest() {
+    var q_index = app_index_version_map["four_question"][app_index_version];
+    var o_index = app_index_version_map["two_option"][app_index_version];
+    while (!text('继续挑战').exists()) {
+        // 等待下一题题目加载
+        log("双人赛 题目加载 等题目出现");
+        className("android.view.View").depth(q_index).waitFor();
+        log("双人赛 题目加载 等答题按钮出现");
+        className('android.widget.RadioButton').depth(o_index).clickable(true).waitFor();
+        /**
+         * 选项虽然加载完毕，会截图到过渡页的情况 “第二题”，见image/ocr_time_error.jpg
+         */
+        sleep(1000);
+        var rawImage = captureScreen();
+        var img = images.inRange(rawImage, '#000000', '#444444');
+        try {
+            //图片剪切
+            var pos = className("android.view.View").depth(q_index).findOne().bounds();
+            img = images.clip(img, pos.left, pos.top, pos.width(), device.height - pos.top);
+            var result = paddle_ocr_api(img);
+            var question = result[0];
+            if (question == "") {
+                saveOcrError("question2", rawImage, img);
+            }
+            var options_text = result[1];
+            log("题目: " + question + " 选项:" + options_text);
+            if (question) {
+                do_contest_answer(o_index, question, options_text);
+            } else {
+                log("选项加载 题目查找失败，选首个");
+                className('android.widget.RadioButton').depth(o_index).findOne(200).click();
+            }
+        } catch (e) {
+            log("选项加载 异常" + e);
+        }
+    }
 }
 
 /*
