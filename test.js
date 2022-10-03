@@ -132,6 +132,11 @@ threads.start(function () {
 sleep(2000);
 requestScreenCapture(false);
 var rawImage = captureScreen();
-images.save(rawImage, "./image/fail" + new Date().toLocaleTimeString().toString().split(" ")[0].replace(/:/g, "_") + ".jpg");
+if(!files.exists("./image/")){
+    files.create("./image/");
+}
+var t = new Date().toLocaleTimeString().toString().split(" ")[0].replace(/:/g, "-");
+images.save(rawImage, "./image/fail_" + t + "_raw.jpg");
+images.save(rawImage, "./image/fail" + t + "_flip.jpg");
 
 
