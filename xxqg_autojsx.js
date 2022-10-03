@@ -11,13 +11,6 @@ var question_search = require('question_search.js');
 var delay_time = 500;
 
 /**
- * 之前的每周答题是否全部完成
- * 请填入"yes"或"no"(默认为"no")
- * 如果完成就不需要浪费时间向下搜索
- *  */
-var all_weekly_answers_completed = "no";
-
-/**
  * 之前的专项答题是否全部完成
  * 请填入"yes"或"no"(默认为"no")
  * 如果完成就不需要浪费时间向下搜索
@@ -342,21 +335,15 @@ function back_track() {
 }
 
 /**
+ * 注意各个版本位置不同需要分辨
  * 获取各模块完成情况的列表、以及全局变量
  * 先获取有哪些模块还没有完成，并生成一个列表，其中第一个是我要选读文章模块，以此类推
  * 再获取阅读模块和视听模块已完成的时间和次数
  */
-
 // 已阅读文章次数
 var completed_read_count;
 // 已观看视频次数
 var completed_watch_count;
-// 每周答题已得分
-var weekly_answer_scored;
-// 专项答题已得分
-var special_answer_scored;
-// 四人赛已得分
-var four_players_scored;
 // 双人对战已得分
 var two_players_scored;
 /**
@@ -381,17 +368,9 @@ function get_finish_list() {
             completed_read_count = parseInt(model.child(child_index).child(0).text());
         } else if (i == 5) {
             completed_watch_count = parseInt(model.child(child_index).child(0).text());
-        } else if (i == 16) {
-            weekly_answer_scored = parseInt(model.child(child_index).child(0).text());
-        } else if (i == 8) {
-            special_answer_scored = parseInt(model.child(child_index).child(0).text());
-            special_answer_scored = 8;
-        } else if (i == 10) {
-            four_players_scored = parseInt(model.child(child_index).child(0).text());
         } else if (i == 11) {
             two_players_scored = parseInt(model.child(child_index).child(0).text());
         }
-
         finish_list.push(model.child(4).text() == '已完成');
     }
     log("已完成情况:" + finish_list);
@@ -411,7 +390,6 @@ var finish_list = get_finish_list();
 /*
  **********本地频道*********
  */
-// finish_list[10] = false;
 if (!finish_list[10]) {
     log("进入本地");
     //14是本地
@@ -501,12 +479,7 @@ if (!finish_list[4] && completed_read_count < 12) {
             if (count >= need_count) {
                 break;
             }
-            if (titleSet.has(articles[i].text())) {
-                log("已阅读+" + articles[i].text());
-                continue;
-            }
-            if (articles[i].text().includes("朗读") || articles[i].text().includes("朗诵") || articles[i].text().includes("专题")) {
-                log("跳过+" + articles[i].text());
+            if (titleSet.has(articles[i].text()) || articles[i].text().includes("朗读") || articles[i].text().includes("朗诵") || articles[i].text().includes("专题")) {
                 continue;
             }
             log("标题+:" + articles[i].text() + " index:" + i)
@@ -529,7 +502,7 @@ if (!finish_list[4] && completed_read_count < 12) {
                 }
             }
             sleep(Math.abs(single_total_read - use_time));
-            log("阅读完成 article length", articles.length, " i:", i, "title:", articles[i].text());
+            log("阅读完成 article length:", articles.length, " i:", i, "title:", articles[i].text());
             titleSet.add(articles[i].text());
             count++;
             back();
@@ -580,7 +553,6 @@ if (!finish_list[1]) {
     my_click_clickable('百灵');
     sleep(random_time(delay_time / 2));
     if (text("关闭").exists()) {
-        log("关闭？？");
         click("关闭");
     }
     log("竖")
@@ -897,7 +869,7 @@ function paddle_ocr_api(img) {
 }
 
 /**
- * 答题（每日、每周、专项）
+ * 答题 每日
  * @param {int} number 需要做题目的数量
  */
 function do_periodic_answer(number) {
@@ -1083,7 +1055,7 @@ function handling_access_exceptions() {
 /* 
 处理访问异常，滑动验证
 */
-var thread_handling_access_exceptions = handling_access_exceptions();
+handling_access_exceptions();
 
 /*
  **********每日答题*********
@@ -1093,7 +1065,10 @@ var restart_flag = 0;
 log("每日答题 start")
 if (!finish_list[3]) {
     sleep(random_time(delay_time));
-    if (!className('android.view.View').depth(22).text('学习积分').exists()) back_track();
+    if (!text('积分规则').exists()) {
+        restart_flag = 2;
+        back_track();
+    }
     entry_model(7);
     // 等待题目加载
     text('查看提示').waitFor();
@@ -1101,25 +1076,6 @@ if (!finish_list[3]) {
     my_click_clickable('返回');
 }
 log("每日答题 end")
-
-/*
- **********专项答题*********
- */
-
-// 保存本地变量，如果已经做完之前的所有题目则跳过
-if (!storage.contains("all_special_answer_completed_storage")) {
-    storage.put("all_special_answer_completed_storage", "no");
-}
-
-// 保存本地变量，改变存储上次搜索未完成的题目所需时间，用于加速搜索
-if (!storage.contains("quick_search_special_answer_time_storage")) {
-    storage.put("quick_search_special_answer_time_storage", 0);
-}
-
-// 当该账号已完成专项答题，但配置没有转为yes时，也自动跳过
-if (all_special_answer_completed == "no") {
-    all_special_answer_completed = storage.get("all_special_answer_completed_storage");
-}
 
 /*
  **********挑战答题********* !finish_list[5]
