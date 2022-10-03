@@ -120,19 +120,18 @@ function is_select_all_choice() {
     return options.length / 2 == (question.match(/\s+/g) || []).length;
 }
 
-//8.飞书，中国古代法律术语，指","告状信，又称“投书”。
-var c1 = "唐代诗人         曾经夜宿小山楼，留下诗作《题金陵渡》:“金陵津渡小山楼，一宿行人自可愁，潮落夜江斜月里，两三星火是瓜洲。”";
-var c2 = "每年9月的第三个星期六为全民    "
-question_search.getAnswerText(c2);
+//请求横屏截图权限
+threads.start(function () {
+    try {
+        var beginBtn;
+        if (beginBtn = classNameContains("Button").textContains("开始").findOne(delay_time));
+        else (beginBtn = classNameContains("Button").textContains("允许").findOne(delay_time));
+        beginBtn.click();
+    } catch (error) { }
+});
+sleep(2000);
+requestScreenCapture(false);
+var rawImage = captureScreen();
+images.save(rawImage, "./image/fail" + new Date().toLocaleTimeString().toString().split(" ")[0].replace(/:/g, "_") + ".jpg");
 
-var txt = "本次答对 0 题";
-txt = txt.match(/\d+/);
-log("txt:" + txt);
-
-var txt2 = "本次答对 5 题";
-txt2 = txt2.match(/\d+/);
-log("txt2:" + txt2);
-
-var life = text("立即复活").exists();
-log("life:"+life);
 
