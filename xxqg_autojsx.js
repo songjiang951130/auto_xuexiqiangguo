@@ -1197,15 +1197,19 @@ function saveOcrError(bizName, rawImage, clip) {
 /**
  * 四人赛先加载题目再加载答案，而且是单选题，所以可以先题目识别，找到答案，答案一加载，就点击答案
  */
-function do_4_contest() {
-    log("四人赛 do_4_contest");
+function do_battle_contest(type) {
+    log("do_battle_contest do_4_contest");
     var q_index = app_index_version_map["four_question"][app_index_version];
     var o_index = app_index_version_map["four_option"][app_index_version];
+    if(type == 2){
+        o_index = app_index_version_map["two_option"][app_index_version];
+
+    }
     var questionMap = new Map();
     while (!text('继续挑战').exists()) {
         className("android.view.View").depth(q_index).waitFor();
         var pos = className("android.view.View").depth(q_index).findOne().bounds();
-        log("四人赛 选项加载");
+        log("do_battle_contest 选项加载");
         className('android.widget.RadioButton').depth(o_index).clickable(true).waitFor();
         /**
          * 选项虽然加载完毕，会截图到过渡页的情况 “第二题”，见image/ocr_time_error.jpg
@@ -1250,7 +1254,7 @@ function do_4_contest() {
         }
         questionMap.set(key, 1);
     }
-    log("四人赛 do_4_contest end");
+    log("do_battle_contest end");
 
 }
 
@@ -1275,7 +1279,7 @@ if (!finish_list[6]) {
             }
             sleep(random_time(delay_time));
             my_click_clickable("开始比赛");
-            do_4_contest();
+            do_battle_contest(4);
             if (i == 0) {
                 sleep(random_time(delay_time * 2));
                 my_click_clickable("继续挑战");
@@ -1289,48 +1293,6 @@ if (!finish_list[6]) {
     }
     sleep(random_time(delay_time));
     back();
-}
-
-/*
- ********************双人对战********************
- */
-
-function do_2_contest() {
-    var q_index = app_index_version_map["four_question"][app_index_version];
-    var o_index = app_index_version_map["two_option"][app_index_version];
-    while (!text('继续挑战').exists()) {
-        // 等待下一题题目加载
-        log("双人赛 题目加载 等题目出现");
-        className("android.view.View").depth(q_index).waitFor();
-        log("双人赛 题目加载 等答题按钮出现");
-        className('android.widget.RadioButton').depth(o_index).clickable(true).waitFor();
-        /**
-         * 选项虽然加载完毕，会截图到过渡页的情况 “第二题”，见image/ocr_time_error.jpg
-         */
-        sleep(1000);
-        var rawImage = captureScreen();
-        var img = images.inRange(rawImage, '#000000', '#444444');
-        try {
-            //图片剪切
-            var pos = className("android.view.View").depth(q_index).findOne().bounds();
-            img = images.clip(img, pos.left, pos.top, pos.width(), device.height - pos.top);
-            var result = paddle_ocr_api(img);
-            var question = result[0];
-            if (question == "") {
-                saveOcrError("question2", rawImage, img);
-            }
-            var options_text = result[1];
-            log("题目: " + question + " 选项:" + options_text);
-            if (question) {
-                do_contest_answer(o_index, question, options_text);
-            } else {
-                log("选项加载 题目查找失败，选首个");
-                className('android.widget.RadioButton').depth(o_index).findOne(200).click();
-            }
-        } catch (e) {
-            log("选项加载 异常" + e);
-        }
-    }
 }
 
 /*
@@ -1349,7 +1311,7 @@ if (!finish_list[7] && two_players_scored < 1) {
     text("随机匹配").waitFor();
     sleep(random_time(delay_time * 2));
     text("随机匹配").findOne().parent().child(0).click();
-    do_2_contest();
+    do_battle_contest(2);
     sleep(random_time(delay_time));
     back();
     sleep(random_time(delay_time));
