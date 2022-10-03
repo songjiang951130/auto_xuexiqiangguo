@@ -620,14 +620,12 @@ if (!finish_list[1]) {
             sleep(random_time(delay_time));
             continue;
         }
-        log("completed_watch_count:" + completed_watch_count)
         sleep(Number(current_video_time.slice(4)) * 1000 + 1000);
-
         completed_watch_count++;
     }
+    back();
     sleep(1000);
     device.setMusicVolume(currentVolume);
-    back();
 }
 log("视听学习 end");
 
@@ -650,7 +648,9 @@ function select_option(answer, depth_click_option, options_text) {
         try {
             className('android.widget.RadioButton').depth(depth_click_option).clickable(true).findOnce(option_i).click();
             return;
-        } catch (error) { }
+        } catch (error) {
+            log("点击失败" + error)
+        }
     }
 
     // 如果运行到这，说明很有可能是选项ocr错误，导致答案无法匹配，因此用最大相似度匹配
@@ -666,15 +666,17 @@ function select_option(answer, depth_click_option, options_text) {
                 }
             }
         }
-        try {
-            className('android.widget.RadioButton').depth(depth_click_option).clickable(true).findOnce(max_similarity_index).click();
-            return;
-        } catch (error) { }
+        var op = className('android.widget.RadioButton').depth(depth_click_option).clickable(true).findOnce(max_similarity_index)
+        if (op != null) {
+            op.click();
+        }
+
     } else {
-        try {
-            // 没找到答案，点击第一个
-            className('android.widget.RadioButton').depth(depth_click_option).clickable(true).findOne().click();
-        } catch (error) { }
+        // 没找到答案，点击第一个
+        var op = className('android.widget.RadioButton').depth(depth_click_option).clickable(true).findOne(300);
+        if (op != null) {
+            op.click();
+        }
     }
 }
 
@@ -694,25 +696,25 @@ function do_contest_answer(depth_click_option, question, options_text) {
     }
     // 从哈希表中取出答案
     var answer = map_get(question);
-    log("找到答案-哈希表 :" + answer)
     // 如果本地题库没搜到，则搜网络题库
     if (answer == null) {
         var result = question_search.getAnswerText(question);
         if (result) {
+            log("答题 找到答案-网络搜索 :" + result);
             select_option(result, depth_click_option, options_text);
         } else {
-            log("找到答案-第一个");
+            log("答题 找到答案-第一个");
             // 没找到答案，点击第一个
             var b = className('android.widget.RadioButton').depth(depth_click_option).clickable(true).findOnce();
             if (b != null) {
                 b.click();
             } else {
-                log("未找到按钮");
+                log("答题 未找到按钮");
             }
         }
     } else {
         select_option(answer, depth_click_option, options_text);
-        log('答案 题库: ' + answer);
+        log('答题 题库: ' + answer);
 
     }
 }
@@ -789,7 +791,6 @@ function multiple_choice(answer) {
             whether_selected = true;
         }
     }
-    // 如果这里因为ocr错误没选到一个选项，那么则选择相似度最大的
     if (!whether_selected) {
         log("最大相似度匹配 start");
         var max_similarity = 0;
@@ -871,7 +872,7 @@ function paddle_ocr_api(img) {
      * @see http://doc.autoxjs.com/#/AI
      */
     var words_list = paddle.ocrText(img, 8, true);
-    log("paddle ocr result:" + JSON.stringify(words_list))
+    log("paddle ocr result:" + JSON.stringify(words_list));
     if (words_list) {
         // question是否读取完成的标志位
         var question_flag = false;
@@ -892,7 +893,6 @@ function paddle_ocr_api(img) {
     question = question.replace(/,/g, "，");
     question = question.slice(question.indexOf('.') + 1);
     question = question.slice(0, 6);
-    log("question:" + question + " options_text:" + options_text)
     return [question, options_text]
 }
 
@@ -1121,110 +1121,6 @@ if (all_special_answer_completed == "no") {
     all_special_answer_completed = storage.get("all_special_answer_completed_storage");
 }
 
-if (!finish_list[4] && special_answer_scored < 8) {
-    log("专项答题");
-    sleep(random_time(delay_time));
-
-    if (!className("android.view.View").depth(22).text("学习积分").exists()) back_track();
-    entry_model(8);
-    className("android.view.View").clickable(true).depth(23).waitFor();
-    // 打开第一个出现未完成作答的题目
-    // 第一个未完成作答的索引
-    var special_i = 0;
-    // 是否找到未作答的标志
-    var special_flag = false;
-    // 是否答题的标志
-    var is_answer_special_flag = false;
-    // 均速搜索次数（需要根据此更新加速搜索次数）
-    var comm_search_special_answer_time = 0
-    // 加速搜索次数
-    var quick_search_special_answer_time = storage.get("quick_search_special_answer_time_storage");
-
-    // 如果之前的答题全部完成则不向下搜索
-    if (all_special_answer_completed == "yes") {
-        special_flag = true;
-    }
-    while (!special_flag) {
-        if (text("开始答题").exists()) {
-            special_flag = true;
-            break;
-        }
-        while (text("继续答题").findOnce(special_i)) {
-            if (text("继续答题").findOnce(special_i).parent().childCount() < 3) {
-                special_flag = true;
-                break;
-            } else {
-                special_i++;
-            }
-        }
-        // 根据上次搜索时间 加速搜索
-        while (quick_search_special_answer_time > 0) {
-            swipe(device.width / 2, (device.height * 13) / 15, device.width / 2, (device.height * 2) / 15, 100);
-            quick_search_special_answer_time--;
-        }
-        if (!special_flag) {
-            refresh(true);
-            comm_search_special_answer_time++;
-        }
-        // 如果搜索到底部
-        if (text("您已经看到了我的底线").exists()) {
-            storage.put("all_special_answers_completed_storage", "yes");
-            break;
-        }
-    }
-    sleep(random_time(delay_time * 2));
-    // 更新加速搜索次数
-    if (storage.get("quick_search_special_answer_time_storage") == 0) {
-        // 如果是第一次更新
-        storage.put("quick_search_special_answer_time_storage", comm_search_special_answer_time);
-    } else {
-        var tmp = storage.get("quick_search_special_answer_time_storage");
-        storage.put("quick_search_special_answer_time_storage", tmp + comm_search_special_answer_time);
-    }
-
-
-    if (text("开始答题").exists() || text("您已经看到了我的底线").exists()) {
-        log("点击:" + "开始答题");
-        text("开始答题").findOne().click();
-        is_answer_special_flag = true;
-        // 总题数
-        className("android.view.View").depth(24).waitFor();
-        sleep(random_time(delay_time));
-        // 为兼容新版本新题只有5题，老版有10题
-        var num_string = className("android.view.View").depth(24).findOnce(1).text();
-        var total_question_num = parseInt(num_string.slice(num_string.indexOf('/') + 1));
-        do_periodic_answer(total_question_num);
-    } else if (text("继续答题").exists()) {
-        log("点击:" + "继续答题");
-        text("继续答题").findOnce(special_i).click();
-        // 等待题目加载
-        sleep(random_time(delay_time));
-        is_answer_special_flag = true;
-        className("android.view.View").depth(24).waitFor();
-        sleep(random_time(delay_time));
-        var num_string = className("android.view.View").depth(24).findOnce(1).text();
-        // 已完成题数
-        var completed_question_num = parseInt(num_string);
-        // 总题数
-        var total_question_num = parseInt(num_string.slice(num_string.indexOf('/') + 1));
-        do_periodic_answer(total_question_num - completed_question_num + 1);
-    } else {
-        sleep(random_time(delay_time));
-        className("android.view.View").clickable(true).depth(23).waitFor();
-        className("android.view.View").clickable(true).depth(23).findOne().click();
-    }
-
-    if (is_answer_special_flag) {
-        // 点击退出
-        sleep(random_time(delay_time));
-        className("android.view.View").clickable(true).depth(20).waitFor();
-        className("android.view.View").clickable(true).depth(20).findOne().click();
-        sleep(random_time(delay_time));
-        className("android.view.View").clickable(true).depth(23).waitFor();
-        className("android.view.View").clickable(true).depth(23).findOne().click();
-    }
-}
-
 /*
  **********挑战答题********* !finish_list[5]
  */
@@ -1248,6 +1144,15 @@ if (!finish_list[5]) {
         while (num < times) {
             // 每题的过渡
             sleep(random_time(delay_time * 2));
+            if (textStartsWith("本次答题").exists()) {
+                var txt = textStartsWith("本次答题").findOne().text();
+                var score = txt.match(/\d+/);
+                if (score >= 5) {
+                    num = score;
+                    flag = true;
+                    break;
+                }
+            }
             // 如果答错，第一次通过分享复活
             if (text("立即复活").exists()) {
                 click("立即复活");
@@ -1260,7 +1165,7 @@ if (!finish_list[5]) {
                 my_click_clickable('再来一局');
                 break;
             }
-            log("挑战答题 题目等待");
+            log("挑战答题 题目等待 num:" + num);
             // 题目
             className('android.view.View').depth(q_index).waitFor();
             var question = className('android.view.View').depth(q_index).findOne().text();
@@ -1280,22 +1185,23 @@ if (!finish_list[5]) {
             });
             do_contest_answer(o_index, question, options_text);
             num++; //这一步其实不准，
+            sleep(random_time(delay_time));
         }
-        sleep(random_time(delay_time * 2));
-        if (num == times && !text('再来一局').exists() && !text('结束本局').exists()) {
+        sleep(random_time(delay_time));
+        if (num >= times && !text('再来一局').exists() && !text('结束本局').exists()) {
             flag = true;
         }
     }
     // 随意点击直到退出
     do {
         sleep(random_time(delay_time * 2.5));
-        log("随意点击直到退出 b");
-        var radio = className('android.widget.RadioButton').depth(o_index).findOne(300);
+        log("挑战完成 选第一个 start");
+        var radio = className('android.widget.RadioButton').depth(o_index).findOne(3000);
         if (radio == null) {
             break;
         }
         radio.click();
-        log("随意点击直到退出 a");
+        log("挑战完成 选第一个 end");
         sleep(random_time(delay_time * 2.5));
     } while (!textStartsWith('本次答对').exists());
     click('结束本局');
@@ -1318,17 +1224,23 @@ function do_2_contest() {
         // 等待下一题题目加载
         log("双人赛 题目加载 等题目出现");
         className("android.view.View").depth(q_index).waitFor();
-        var pos = className("android.view.View").depth(q_index).findOne().bounds();
         log("双人赛 题目加载 等答题按钮出现");
         className('android.widget.RadioButton').depth(o_index).clickable(true).waitFor();
         var rawImage = captureScreen();
         var img = images.inRange(rawImage, '#000000', '#444444');
         try {
             //图片剪切
+            var pos = className("android.view.View").depth(q_index).findOne().bounds();
             img = images.clip(img, pos.left, pos.top, pos.width(), device.height - pos.top);
             var result = paddle_ocr_api(img);
             var question = result[0];
+            if (question == "") {
+                var t = new Date().toLocaleTimeString().toString().split(" ")[0].replace(/:/g, "-");
+                images.save(rawImage, "./image/raw_fail" + t + ".jpg");
+                images.save(img, "./image/f_fail" + t + ".jpg");
+            }
             var options_text = result[1];
+            log("题目: " + question + " 选项:" + options_text);
             if (question) {
                 do_contest_answer(o_index, question, options_text);
             } else {
@@ -1339,7 +1251,6 @@ function do_2_contest() {
             log("选项加载 题目查找失败，选首个" + e);
             // className('android.widget.RadioButton').depth(o_index).findOne(200).click();
         }
-
     }
 }
 
@@ -1355,7 +1266,7 @@ function do_4_contest() {
         className("android.view.View").depth(q_index).waitFor();
         var pos = className("android.view.View").depth(q_index).findOne().bounds();
         log("四人赛选项加载");
-        className('android.widget.RadioButton').depth(o_index).clickable(true).findOne(2000);
+        className('android.widget.RadioButton').depth(o_index).clickable(true).waitFor();
 
         var img = images.inRange(captureScreen(), '#000000', '#444444');
         img = images.clip(img, pos.left, pos.top, pos.width(), device.height - pos.top);
@@ -1364,8 +1275,7 @@ function do_4_contest() {
         var question = result[0];
         var options_text = result[1];
 
-        log("题目: " + question);
-        log("选项: " + options_text);
+        log("题目: " + question + " 选项:" + options_text);
         if (question) {
             log("选项匹配");
             do_contest_answer(o_index, question, options_text);
@@ -1383,9 +1293,8 @@ function do_4_contest() {
 
 /*
  **********四人赛*********
- && four_players_scored < 3
  */
-if (!finish_list[6] && four_players_scored < 3) {
+if (!finish_list[6]) {
     log("四人赛");
     if (!text("四人赛").exists()) back_track();
     swipe(500, 1700, 500, 500, random_time(delay_time / 2));
@@ -1430,8 +1339,8 @@ if (!finish_list[7] && two_players_scored < 1) {
     if (!text("双人对战").exists()) back_track();
     entry_model(11);
 
-    // 点击随机匹配
-    log("等待:" + "随机匹配");
+    // // 点击随机匹配
+    // log("等待:" + "随机匹配");
     text("随机匹配").waitFor();
     sleep(random_time(delay_time * 2));
     text("随机匹配").findOne().parent().child(0).click();
@@ -1472,10 +1381,8 @@ if (!finish_list[9] && whether_complete_speech == "yes") {
     var c = false;
     while (!c) {
         swipe(500, 600, 500, 300, 600);
-        log("滑动查找文章");
         artcle = id("general_card_title_id").findOnce();
         c = artcle.parent().parent().click();
-        log("点击文章:" + artcle.text() + " c:" + c);
     }
     sleep(random_time(delay_time));
 
@@ -1508,11 +1415,11 @@ if (pushplus_token) {
     back();
     // 获取账号名
     var account = id('my_display_name').findOne().text();
-    push_weixin_message(account, score);
+    // push_weixin_message(account, score);
 }
 
 device.cancelKeepingAwake();
 
-log('脚本运行完成，时间：' + (new Date() - start) / 1000 / 60 + "分钟");
-
-toast('脚本运行完成，时间：' + (new Date() - start) / 1000 / 60 + "分钟");
+toastLog('脚本运行完成，时间：' + ((new Date() - start) / 1000 / 60 + "").slice(0, 4) + "分钟");
+//起了线程的，加个这个进行退出
+exit();

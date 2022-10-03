@@ -26,8 +26,7 @@ question_search.getAnswerText = function (question) {
     result = r1.body.string().match(/答案：.*</);
     log("question:" + question + " r1:" + result);
     if (result == null) {
-        log("url:" + 'http://www.syiban.com/search/index/init.html?modelid=1&q=' + encodeURI(question.slice(0, 10)))
-        toast('答案查询失败');
+        log("url:" + 'http://www.syiban.com/search/index/init.html?modelid=1&q=' + encodeURI(question.slice(0, 10)));
     } else {
         var result = result[0].slice(5, result[0].indexOf('<'));
         result = result.replace(/、/, "");
