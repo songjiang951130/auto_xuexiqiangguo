@@ -1350,6 +1350,9 @@ if (!finish_list[9] && whether_complete_speech == "yes") {
     while (!c) {
         swipe(500, 600, 500, 300, 600);
         artcle = id("general_card_title_id").findOnce();
+        if (artcle == null||artcle.parent() == null || artcle.parent().parent() == null) {
+            continue;
+        }
         c = artcle.parent().parent().click();
     }
     sleep(random_time(delay_time));
