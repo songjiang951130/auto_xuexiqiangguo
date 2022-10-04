@@ -39,7 +39,7 @@
 脚本仅可以在Autox.js上使用，OCR使用百度飞浆（弃用百度OCR虽然每月1000额度，但是经不住随便玩）
 
 ## 安装Autoxjs
-历史科普，本来有个auto.js的，后来作者不再更新，出了个付费的pro，有人后来出了个免费开源的autox.js。为什么选择？问就是回答贫穷限制了我<br/>
+历史科普，本来有个auto.js的，后来作者不再更新，出了个付费的pro，后来有人出了个免费开源的autox.js。为什么选择？问就是回答贫穷限制了我<br/>
 安装地址：[地址](https://github.com/kkevsekk1/AutoX/releases/)
 
 将整个项目复制到【脚本】文件夹下，运行xxqg_autojsx.js即可
@@ -62,18 +62,13 @@
 
 请根据[官网](http://www.pushplus.plus/)指导，获取token
 
-**sct_token**
-
-请根据[官网](https://sc.ftqq.com/?c=wechat&a=bind)指导，获取token
-
 
 # 常见问题
 
 Q1: 点击运行脚本没有反应，甚至连学习强国都没有打开
 
 A: 
-1. 请确保Hamibot或Auto.js已经打开**无障碍服务权限**
-2. 由于hamibot软件原因或某种原因，脚本无法运行（我也出现过这种情况）你可以重新下载hamibot软件
+1. 请确保Autox.js已经打开**无障碍服务权限**
 
 ***
 
@@ -98,9 +93,10 @@ A: 请在[GitHub](https://github.com/songjiang951130/hamibot-auto_xuexiqiangguo/
 
 
 # todo
-## 提高答题正确率，目前发现截图的问题
+
 
 # done
 ## 挑战答题判题错误 已经修复稳定运行
+## 提高答题正确率，目前发现截图的问题; 答完题后需要歇1.5秒左右进行ocr。优化文本识别等
 
 
