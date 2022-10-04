@@ -135,7 +135,7 @@ sleep(delay_time);
 var answer_question_map = [];
 
 // 当题目为这些词时，题目较多会造成hash表上的一个index过多，此时存储其选项
-var special_problem = '选择正确的读音 选择词语的正确词形 下列词形正确的是 根据《中华人民共和国';
+var special_problem = '选择正确的读音 选择词语的正确词形 下列词形正确的是 根据《中华人民共和国 补全唐代诗人 唐代诗人';
 
 /**
  * hash函数
@@ -674,22 +674,21 @@ function do_contest_answer(depth_click_option, question, options_text) {
     if (answer == null) {
         var result = question_search.getAnswerText(question);
         if (result) {
-            log("答题 找到答案-网络搜索 :" + result);
+            log("答题 网络搜索 :" + result);
             select_option(result, depth_click_option, options_text);
         } else {
-            log("答题 找到答案-第一个");
+            log("答题 网络搜索失败");
             // 没找到答案，点击第一个
             var b = className('android.widget.RadioButton').depth(depth_click_option).clickable(true).findOnce();
             if (b != null) {
                 b.click();
             } else {
-                log("答题 未找到按钮");
+                log("答题 网络搜索失败 未找到按钮");
             }
         }
     } else {
         select_option(answer, depth_click_option, options_text);
         log('答题 题库: ' + answer);
-
     }
 }
 /*
@@ -848,6 +847,7 @@ function paddle_ocr_api(img) {
     var question = "";
     var options_text = [];
     var options_str = "";
+    var question_content_end = false;
     if (words_list) {
         // question是否读取完成的标志位
         var question_flag = false;
@@ -857,17 +857,21 @@ function paddle_ocr_api(img) {
                 if (words_list[i][0].match(/^[A-Z]/)) {
                     question_flag = true;
                 }
-                if (words_list[i][0] == "A") question_flag = true;
                 if (!question_flag) question += words_list[i];
             }
             // 这里不能用else，会漏读一次
             if (question_flag) {
                 // 其他的就是选项了
-                options_str = options_str + words_list[i];
+                if (words_list[i].match("出题")) {
+                    question_content_end = true;
+                }
+                if (!question_content_end) {
+                    options_str = options_str + words_list[i];
+                }
+
             }
         }
     }
-    //看这里能不能一步到位处理了
     var options_array = options_str.split(/[A-Z]\./);
     for (var i in options_array) {
         var t = options_array[i].split(/[A-Z]/);
@@ -1187,7 +1191,7 @@ log("挑战答题end");
 function saveOcrError(bizName, rawImage, clip) {
     var imageDir = "./image/" + bizName + "/";
     if (!files.exists(imageDir)) {
-        files.create(imageDir);
+        files.createWithDirs(imageDir);
     }
     var t = new Date().toLocaleTimeString().toString().split(" ")[0].replace(/:/g, "-");
     images.save(rawImage, imageDir + "fail" + t + "_raw.jpg");
@@ -1201,7 +1205,7 @@ function do_battle_contest(type) {
     log("do_battle_contest do_4_contest");
     var q_index = app_index_version_map["four_question"][app_index_version];
     var o_index = app_index_version_map["four_option"][app_index_version];
-    if(type == 2){
+    if (type == 2) {
         o_index = app_index_version_map["two_option"][app_index_version];
 
     }
@@ -1222,35 +1226,33 @@ function do_battle_contest(type) {
          * 15:40:48.315/D: 四人赛选项加载
          * 15:40:49.371/D: paddle ocr result:["2.1923年6月，中国共产党第三次全","国代表大会在广州举行。出席大会的","代表30多人，代表全国","名党","员。","A.520","B.420","C.410"]
          */
-        sleep(500);
         var rawImage = captureScreen();
         var img = images.inRange(rawImage, '#000000', '#444444');
         img = images.clip(img, pos.left, pos.top, pos.width(), device.height - pos.top);
         var result = paddle_ocr_api(img);
-
         var question = result[0];
-        var options_text = result[1];
-
-        log("题目: " + question + " 选项:" + options_text);
-        var key = question + options_text;
-        if (questionMap.has(key)) {
-            log("已经ocr");
-            questionMap.set(key, questionMap.get(key) + 1);
+        if (question == "") {
             continue;
         }
-        if (question == "") {
-            saveOcrError("question4", rawImage, img);
+        var options_text = result[1];
+
+        log("do_battle_contest 题目: " + question + " 选项:" + options_text);
+        var key = question + options_text;
+        if (questionMap.has(key)) {
+            questionMap.set(key, questionMap.get(key) + 1);
+            console.log("do_battle_contest 已经ocr times:%d", questionMap.get(key));
+            continue;
         }
         if (!options_text || options_text.length == 0) {
-            saveOcrError("option4", rawImage, img);
-            if (questionMap.get(key) < 5) {
+            // saveOcrError("option4", rawImage, img);
+            if (questionMap.get(key) < 3) {
                 continue;
             }
-
         }
         if (question) {
-            log("选项匹配");
             do_contest_answer(o_index, question, options_text);
+            //答完题后的休息时间
+            sleep(1500);
         }
         questionMap.set(key, 1);
     }
@@ -1269,18 +1271,17 @@ if (!finish_list[6]) {
     model.click();
     sleep(random_time(delay_time));
     var isPlay = textStartsWith("今日积分奖励局").exists();
-    isPlay = true;
     if (isPlay) {
         sleep(random_time(delay_time));
         for (var i = 0; i < 2; i++) {
-            //非积分局退出
-            if (!textStartsWith("今日积分奖励局").exists() || text("非积分奖励局").exists()) {
-                break;
-            }
             sleep(random_time(delay_time));
             my_click_clickable("开始比赛");
             do_battle_contest(4);
             if (i == 0) {
+                //非积分局退出
+                if (!textStartsWith("今日积分奖励局").exists() || text("非积分奖励局").exists()) {
+                    break;
+                }
                 sleep(random_time(delay_time * 2));
                 my_click_clickable("继续挑战");
                 sleep(random_time(delay_time));
@@ -1328,7 +1329,7 @@ if (!finish_list[9] && whether_complete_speech == "yes") {
     var speechs = [
         "好好学习，天天向上",
         // "大国领袖，高瞻远瞩",
-        // "请党放心，强国有我",
+        "请党放心，强国有我",
         // "坚持信念，砥砺奋进",
         // "团结一致，共建美好",
         // "为人民谋幸福"
