@@ -1271,7 +1271,6 @@ if (!finish_list[6]) {
     model.click();
     sleep(random_time(delay_time));
     var isPlay = textStartsWith("今日积分奖励局1").exists() || textStartsWith("今日积分奖励局2").exists();
-    isPlay = true;
     if (isPlay) {
         sleep(random_time(delay_time));
         for (var i = 0; i < 2; i++) {
