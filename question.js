@@ -54,7 +54,7 @@ function paddle_ocr_api(words_list) {
             // 这里不能用else，会漏读一次
             if (question_flag) {
                 // 其他的就是选项了
-                if (words_list[i].match("出题")) {
+                if (words_list[i].match("出题")||words_list[i].match("推荐")) {
                     question_content_end = true;
                 }
                 if (!question_content_end) {
