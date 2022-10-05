@@ -1238,17 +1238,18 @@ function do_battle_contest(type) {
 
         log("do_battle_contest 题目: " + question + " 选项:" + options_text);
         var key = question + options_text;
-        if (questionMap.has(key)) {
-            questionMap.set(key, questionMap.get(key) + 1);
-            console.log("do_battle_contest 已经ocr times:%d", questionMap.get(key));
-            continue;
-        }
         if (!options_text || options_text.length == 0) {
-            // saveOcrError("option4", rawImage, img);
+            var val = questionMap.get(key);
+            val = val == null ? 0 : val;
+            val++;
+            questionMap.set(key, val);
+            saveOcrError("option4", rawImage, img);
             if (questionMap.get(key) < 3) {
+                log("do_battle_contest 选项异常");
                 continue;
             }
         }
+        // && options_text.length > 0
         if (question) {
             do_contest_answer(o_index, question, options_text);
             //答完题后的休息时间
@@ -1257,7 +1258,6 @@ function do_battle_contest(type) {
         questionMap.set(key, 1);
     }
     log("do_battle_contest end");
-
 }
 
 /*
@@ -1270,7 +1270,8 @@ if (!finish_list[6]) {
     var model = textStartsWith("四人赛").findOne().parent().child(4);
     model.click();
     sleep(random_time(delay_time));
-    var isPlay = textStartsWith("今日积分奖励局").exists();
+    var isPlay = textStartsWith("今日积分奖励局1").exists() || textStartsWith("今日积分奖励局2").exists();
+    isPlay = true;
     if (isPlay) {
         sleep(random_time(delay_time));
         for (var i = 0; i < 2; i++) {
@@ -1350,7 +1351,7 @@ if (!finish_list[9] && whether_complete_speech == "yes") {
     while (!c) {
         swipe(500, 600, 500, 300, 600);
         artcle = id("general_card_title_id").findOnce();
-        if (artcle == null||artcle.parent() == null || artcle.parent().parent() == null) {
+        if (artcle == null || artcle.parent() == null || artcle.parent().parent() == null) {
             continue;
         }
         c = artcle.parent().parent().click();
