@@ -1376,7 +1376,7 @@ if (!finish_list[9] && whether_complete_speech == "yes") {
 log("发表观点 end");
 
 
-if (pushplus_token) {
+if (pushplus_token.length > 0) {
     back_track_flag = 1;
     back_track();
     // 获取今日得分
