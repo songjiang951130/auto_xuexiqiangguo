@@ -1271,7 +1271,7 @@ if (!finish_list[6]) {
     log("四人赛");
     if (!text("四人赛").exists()) back_track();
     swipe(500, 1700, 500, 500, random_time(delay_time / 2));
-    var model = textStartsWith("四人赛").findOne().parent().child(4);
+    var model = text("四人赛").findOne().parent().child(4);
     model.click();
     sleep(random_time(delay_time));
     var isPlay = textStartsWith("今日积分奖励局1").exists() || textStartsWith("今日积分奖励局2").exists();
@@ -1281,11 +1281,10 @@ if (!finish_list[6]) {
             sleep(random_time(delay_time));
             my_click_clickable("开始比赛");
             do_battle_contest(4);
-            if (i == 0) {
-                //非积分局退出
-                if (!textStartsWith("今日积分奖励局").exists() || text("非积分奖励局").exists()) {
-                    break;
-                }
+            if (text("非积分奖励局").exists()) {
+                break;
+            }
+            if (i == 0) { 
                 sleep(random_time(delay_time * 2));
                 my_click_clickable("继续挑战");
                 sleep(random_time(delay_time));
