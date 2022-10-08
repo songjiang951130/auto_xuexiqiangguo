@@ -545,10 +545,11 @@ if (!finish_list[1]) {
     var video_depth = app_index_version_map["video_depth"][app_index_version];
     var video_bar_depth = app_index_version_map["video_bar_depth"][app_index_version];
 
-    back_track_flag = 1;
-    if (!id('comm_head_title').exists()) {
+    back_track_flag = 2;
+    if (!text('视听学习').exists()) {
         back_track();
     }
+    entry_model(5);
     sleep(random_time(delay_time * 5));
     my_click_clickable('百灵');
     sleep(random_time(delay_time / 2));
