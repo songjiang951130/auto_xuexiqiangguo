@@ -39,7 +39,7 @@
 
 ## 安装Autoxjs
 历史科普，本来有个auto.js的，后来作者不再更新，出了个付费的pro版本，后来又有大神出了个免费开源的autox.js。
-安装地址：[地址](https://github.com/kkevsekk1/AutoX/releases/)
+安装地址：[autox地址](https://github.com/kkevsekk1/AutoX/releases/)
 
 将整个项目复制到【脚本】文件夹下，运行xxqg_autojsx.js即可
 <div align=center>
