@@ -1074,7 +1074,7 @@ function handling_access_exceptions() {
 /* 
 处理访问异常，滑动验证
 */
-handling_access_exceptions();
+var thread_handling_access_exceptions = handling_access_exceptions();
 
 /*
  **********每日答题*********
@@ -1393,4 +1393,4 @@ device.cancelKeepingAwake();
 
 toastLog('脚本运行完成，时间：' + ((new Date() - start) / 1000 / 60 + "").slice(0, 4) + "分钟");
 //起了线程的，加个这个进行退出
-exit();
+threads.shutDownAll();
