@@ -1103,7 +1103,10 @@ log("每日答题 end")
 log("挑战答题")
 if (!finish_list[5]) {
     log("挑战答题start");
-    if (!text('挑战答题').exists()) back_track();
+    if (!text('挑战答题').exists()) {
+        back_track_flag = 2;
+        back_track()
+    };
     var q_index = app_index_version_map["challenge_question"][app_index_version]; //12 26
     var o_index = app_index_version_map["challenge_option"][app_index_version];
     log("q_index:" + q_index + " o_index:" + o_index);
