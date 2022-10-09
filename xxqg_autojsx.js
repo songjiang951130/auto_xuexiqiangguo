@@ -75,7 +75,7 @@ var app_index_version_map = {
     ]
 }
 
-var lock_number = "";
+var lock_number = "303178";
 var start = new Date();
 
 /* **********************请填写如上信息********************** */
