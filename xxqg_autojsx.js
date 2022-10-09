@@ -835,8 +835,9 @@ function restart() {
 function paddle_ocr_api(img) {
     /**
      * @see http://doc.autoxjs.com/#/AI
+     * useSlim true 速度更快，false准确率高
      */
-    var words_list = paddle.ocrText(img, 8, true);
+    var words_list = paddle.ocrText(img, 8, false);
     log("paddle ocr result:" + JSON.stringify(words_list));
     var question = "";
     var options_text = [];
