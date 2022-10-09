@@ -442,6 +442,7 @@ if (!finish_list[2]) {
     }
 }
 log("打开电台广播end");
+var startRead = new Date();
 if (!finish_list[4] && completed_read_count < 12) {
     log("选读文章 start")
     back_track_flag = 0;
