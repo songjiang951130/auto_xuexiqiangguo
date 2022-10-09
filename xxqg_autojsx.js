@@ -420,8 +420,10 @@ var currentVolume = device.getMusicVolume();
 if (!finish_list[2]) {
     log("打开电台广播")
     device.setMusicVolume(0);
-    var model = text("视听学习时长").findOne().parent().child(4);
-    model.click();
+    if(text("视听学习时长").exists()){
+        var model = text("视听学习时长").findOne().parent().child(4);
+        model.click();
+    }
     sleep(random_time(delay_time));
     my_click_clickable('电台');
     sleep(random_time(delay_time));
