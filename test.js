@@ -8,7 +8,7 @@ var app_index_version_map = {
         25, 12
     ],
     "tab_depth": [
-        26, 2, 6
+        26, 16, 2
     ],
     "look": [
         13, 14
@@ -128,5 +128,8 @@ q_set.add(question + options_text);
 
 log("q set:" + q_set.keys());
 
-
-
+// app_index_version = 1;
+// var tab_depth = app_index_version_map["tab_depth"][app_index_version];
+// var localModel = className('android.widget.LinearLayout').depth(tab_depth).findOnce(15);
+var m =  text("思想").findOne().parent().parent().child(3);
+m.click();

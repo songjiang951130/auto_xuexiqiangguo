@@ -308,10 +308,8 @@ function back_track() {
             click(home_bottom.centerX(), home_bottom.centerY());
             // 去province模块
             sleep(random_time(delay_time));
-            var tab_depth = app_index_version_map["tab_depth"][app_index_version];
-            var localModel = className('android.widget.LinearLayout').depth(tab_depth).findOnce(15);
-            toast("点击本地模块");
-            localModel.click();
+            var m = text("思想").findOne().parent().parent().child(3);
+            m.click();
             break;
         case 1:
             //我的->学习积分
@@ -422,8 +420,8 @@ var currentVolume = device.getMusicVolume();
 if (!finish_list[2]) {
     log("打开电台广播")
     device.setMusicVolume(0);
-    //点击去看看
-    click('去学习');
+    var model = text("视听学习时长").findOne().parent().child(4);
+    model.click();
     sleep(random_time(delay_time));
     my_click_clickable('电台');
     sleep(random_time(delay_time));
@@ -455,10 +453,10 @@ if (!finish_list[4] && completed_read_count < 12) {
     var article_depth = app_index_version_map["article_depth"][app_index_version];
     var need_count = (12 - completed_read_count) / 2 + 1;
     while (count < need_count) {
-        log("开始阅读：need_count:{} count:{}", need_count, count)
-        swipe(800, 2000, 800, 600, 2000);
+        console.log("开始阅读：need_count:%d count:%d", need_count, count)
+        swipe(800, 2000, 800, 600, 1000);
         sleep(random_time(delay_time));
-        var articles = id("general_card_title_id").className("android.widget.TextView").depth(article_depth).find();
+        var articles = className("android.widget.TextView").id("general_card_title_id").depth(article_depth).find();
         log("找文章列表 length:", articles.length)
 
         if (articles.length == 0) {
@@ -485,15 +483,6 @@ if (!finish_list[4] && completed_read_count < 12) {
             var use_time = 0;
             log("阅读中");
             swipe(500, 1700, 500, 700, 500);
-            while (!text('点赞').exists()) {
-                //向下滑动
-                swipe(500, 1700, 500, 700, 3000);
-                log("滑动中" + use_time);
-                use_time += 3000;
-                if (use_time > 20000) {
-                    break;
-                }
-            }
             sleep(Math.abs(single_total_read - use_time));
             log("阅读完成 article length:", articles.length, " i:", i, "title:", articles[i].text());
             titleSet.add(articles[i].text());
@@ -502,7 +491,7 @@ if (!finish_list[4] && completed_read_count < 12) {
         }
     }
 }
-log("选读文章 end");
+log("选读文章 end" + (new Date() - startRead) / 1000 / 60);
 
 /*
  *********************视听部分********************
@@ -1278,7 +1267,7 @@ if (!finish_list[6]) {
             if (text("非积分奖励局").exists()) {
                 break;
             }
-            if (i == 0) { 
+            if (i == 0) {
                 sleep(random_time(delay_time * 2));
                 my_click_clickable("继续挑战");
                 sleep(random_time(delay_time));
