@@ -75,7 +75,7 @@ var app_index_version_map = {
     ]
 }
 
-var lock_number = "303178";
+var lock_number = "";
 var start = new Date();
 
 /* **********************请填写如上信息********************** */
@@ -116,7 +116,7 @@ threads.start(function () {
     } catch (error) { }
 });
 requestScreenCapture(false);
-sleep(delay_time);
+sleep(1000);
 
 /**
  * 定义HashTable类，用于存储本地题库，查找效率更高
