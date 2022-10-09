@@ -20,7 +20,7 @@ var whether_complete_speech = "yes";
  * 选填，是否要使用微信消息推送功能
  * 如是 请填写pushplus的token，如何获取请见说明
  *  */
-var pushplus_token = ["99ab8953122344c9bfefdbbe591612fd", "183cda2f82d346fa858e8d7233f027f1"];
+var pushplus_token = [];
 
 var app_index_version = 0;
 
@@ -1230,7 +1230,7 @@ function do_battle_contest(type) {
             val = val == null ? 0 : val;
             val++;
             questionMap.set(key, val);
-            saveOcrError("option4", rawImage, img);
+            // saveOcrError("option4", rawImage, img);
             if (questionMap.get(key) < 3) {
                 log("do_battle_contest 选项异常");
                 continue;
