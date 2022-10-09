@@ -420,7 +420,7 @@ var currentVolume = device.getMusicVolume();
 if (!finish_list[2]) {
     log("打开电台广播")
     device.setMusicVolume(0);
-    if(text("视听学习时长").exists()){
+    if (text("视听学习时长").exists()) {
         var model = text("视听学习时长").findOne().parent().child(4);
         model.click();
     }
@@ -535,9 +535,9 @@ if (!finish_list[1]) {
         back_track();
     }
     entry_model(5);
-    sleep(random_time(delay_time * 5));
+    sleep(random_time(delay_time * 2));
     my_click_clickable('百灵');
-    sleep(random_time(delay_time / 2));
+    sleep(random_time(delay_time));
     if (text("关闭").exists()) {
         click("关闭");
     }
@@ -545,7 +545,8 @@ if (!finish_list[1]) {
     my_click_clickable('竖');
     // 等待视频加载
     device.setMusicVolume(0);
-    log("设置静音")
+    log("设置静音");
+    sleep(random_time(delay_time * 2));
     // 点击第一个视频
     var firstVideo = text("").findOne(300);
     if (firstVideo == null) {
@@ -888,7 +889,10 @@ function do_periodic_answer(number) {
         var answer = "";
         var num = 0;
         for (num; num < number; num++) {
-
+            if (text("登录").exists()) {
+                entry_model(7);
+                num = 0;
+            }
             // 下滑到底防止题目过长，选项没有读取到
             swipe(500, 1700, 500, 500, random_time(delay_time / 2));
             sleep(random_time(delay_time));
@@ -908,23 +912,8 @@ function do_periodic_answer(number) {
                 if (answer) {
                     fill_in_blank(answer);
                 } else {
-                    // 如果没搜到答案
-                    // 如果是每周答题那么重做也没用就直接跳过
-                    if (restart_flag == 1) {
-                        fill_in_blank('cao');
-                        sleep(random_time(delay_time * 2));
-                        if (text('下一题').exists()) click('下一题');
-                        if (text('确定').exists()) click('确定');
-                        sleep(random_time(delay_time));
-                        if (text('完成').exists()) {
-                            click('完成');
-                            flag = true;
-                            break;
-                        }
-                    } else {
-                        restart();
-                        break;
-                    }
+                    back();
+                    my_click_clickable('退出');
                 }
 
             } else {
@@ -965,29 +954,21 @@ function do_periodic_answer(number) {
             }
 
             sleep(400);
-            // 对于专项答题没有确定
-            if (text('下一题').exists()) {
-                click('下一题');
-            } else if (text("完成").exists()) {
-                // 如果专项答题完成点击完成
-                click("完成");
-            } else {
-                // 不是专项答题时
-                click('确定');
-                sleep(random_time(delay_time));
-                // 如果错误（ocr识别有误）则重来
-                if (text('下一题').exists() || (text('完成').exists() && !special_flag)) {
-                    // 如果视频题错误，则每周答题就不需要重新答
-                    if (restart_flag == 1 && className("android.widget.Image").exists()) {
-                        if (text('下一题').exists()) click('下一题');
-                        else click('完成');
-                    } else {
-                        restart();
-                        break;
-                    }
+
+            // 不是专项答题时
+            click('确定');
+            sleep(random_time(delay_time));
+            // 如果错误（ocr识别有误）则重来
+            if (text('下一题').exists() || (text('完成').exists() && !special_flag)) {
+                // 如果视频题错误，则每周答题就不需要重新答
+                if (restart_flag == 1 && className("android.widget.Image").exists()) {
+                    if (text('下一题').exists()) click('下一题');
+                    else click('完成');
+                } else {
+                    back();
+                    my_click_clickable('退出');
                 }
             }
-
             sleep(random_time(delay_time * 2)); // 每题之间的过渡时间
         }
         if (num == number) flag = true;
