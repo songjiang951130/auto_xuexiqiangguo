@@ -1,5 +1,8 @@
 /** 代码模块化 */
 var question_search = require('question_search.js');
+var utils = require('utils.js');
+var my_log = require('log.js');
+my_log.config();
 
 /* **********************请填写如下信息********************** */
 
@@ -9,12 +12,6 @@ var question_search = require('question_search.js');
  * 时间越长出bug的可能越小，但同时耗费的时间越长
  *  */
 var delay_time = 500;
-
-/**
- * 是否完成发表言论模块
- * 请填入"yes"或"no"(默认为"yes")
- *  */
-var whether_complete_speech = "yes";
 
 /**
  * 选填，是否要使用微信消息推送功能
@@ -128,7 +125,7 @@ sleep(delay_time);
 var answer_question_map = [];
 
 // 当题目为这些词时，题目较多会造成hash表上的一个index过多，此时存储其选项
-var special_problem = '选择正确的读音 选择词语的正确词形 下列词形正确的是 根据《中华人民共和国 补全唐代诗人 唐代诗人';
+var special_problem = '选择正确的读音 选择词语的正确词形 下列词形正确的是 下列词语字形正确的是 根据《中华人民共和国 补全唐代诗人 唐代诗人';
 
 /**
  * hash函数
@@ -272,60 +269,6 @@ function push_weixin_message(account, score) {
 }
 
 /**
- * 如果因为某种不知道的bug退出了界面，则使其回到正轨
- * 全局变量back_track_flag说明:
- * back_track_flag = 0时，表示阅读部分
- * back_track_flag = 1时，表示视听部分
- * back_track_flag = 2时，表示竞赛、答题部分和准备部分
- */
-function back_track() {
-    app.launchApp('学习强国');
-    var while_count = 0;
-    while (!id('comm_head_title').exists() && while_count < 5) {
-        //会存在app启动的情况
-        sleep(5000);
-        if (id('comm_head_title').exists()) {
-            break;
-        }
-        while_count++;
-        sleep(random_time(delay_time));
-        if (text("退出").exists()) {
-            click("退出");
-            sleep(random_time(delay_time));
-        }
-        back();
-        sleep(random_time(delay_time));
-    }
-    log("switch " + back_track_flag)
-    switch (back_track_flag) {
-        case 0:
-            // 去中心模块
-            toast("等待-中间按钮")
-            var home_bottom_tab = "home_bottom_tab_button_work"
-            id(home_bottom_tab).waitFor();
-            sleep(random_time(delay_time));
-            var home_bottom = id(home_bottom_tab).findOne().bounds();
-            click(home_bottom.centerX(), home_bottom.centerY());
-            // 去province模块
-            sleep(random_time(delay_time));
-            var m = text("思想").findOne().parent().parent().child(3);
-            m.click();
-            break;
-        case 1:
-            //我的->学习积分
-            id("comm_head_xuexi_mine").findOne().click();
-            text('学习积分').waitFor();
-            click("学习积分");
-            text('登录').waitFor();
-            break;
-        case 2:
-            id("comm_head_xuexi_score").findOne().click();
-            text('登录').waitFor();
-            break;
-    }
-}
-
-/**
  * 注意各个版本位置不同需要分辨
  * 获取各模块完成情况的列表、以及全局变量
  * 先获取有哪些模块还没有完成，并生成一个列表，其中第一个是我要选读文章模块，以此类推
@@ -371,9 +314,7 @@ function get_finish_list() {
 /*
  *********************准备部分********************
  */
-
-var back_track_flag = 2;
-back_track();
+utils.back_track(2);
 sleep(random_time(delay_time));
 var finish_list = get_finish_list();
 
@@ -443,10 +384,9 @@ if (!finish_list[2]) {
 }
 log("打开电台广播end");
 var startRead = new Date();
+log("选读文章 start");
 if (!finish_list[4] && completed_read_count < 12) {
-    log("选读文章 start")
-    back_track_flag = 0;
-    back_track();
+    utils.back_track(0);
     sleep(random_time(delay_time));
 
     // 阅读文章次数
@@ -479,7 +419,7 @@ if (!finish_list[4] && completed_read_count < 12) {
             log("标题+:" + articles[i].text() + " index:" + i)
             var cr = click(articles[i].text());
             //这里存在点击失败，但是进文章成功
-            if (!cr && !text("地方发布平台内容").exists()) {
+            if (!cr && !textStartsWith("地方发布平台内容").depth(21).exists()) {
                 log("点击失败 " + articles[i].text());
                 continue;
             }
@@ -530,9 +470,8 @@ if (!finish_list[1]) {
     var video_depth = app_index_version_map["video_depth"][app_index_version];
     var video_bar_depth = app_index_version_map["video_bar_depth"][app_index_version];
 
-    back_track_flag = 2;
     if (!text('视听学习').exists()) {
-        back_track();
+        utils.back_track(2);
     }
     entry_model(5);
     sleep(random_time(delay_time * 2));
@@ -1053,8 +992,7 @@ log("每日答题 start")
 if (!finish_list[3]) {
     sleep(random_time(delay_time));
     if (!text('积分规则').exists()) {
-        restart_flag = 2;
-        back_track();
+        utils.back_track(2);
     }
     entry_model(7);
     // 等待题目加载
@@ -1071,8 +1009,7 @@ log("挑战答题")
 if (!finish_list[5]) {
     log("挑战答题start");
     if (!text('挑战答题').exists()) {
-        back_track_flag = 2;
-        back_track()
+        utils.back_track(2);
     };
     var q_index = app_index_version_map["challenge_question"][app_index_version]; //12 26
     var o_index = app_index_version_map["challenge_option"][app_index_version];
@@ -1178,8 +1115,8 @@ function do_battle_contest(type) {
     var o_index = app_index_version_map["four_option"][app_index_version];
     if (type == 2) {
         o_index = app_index_version_map["two_option"][app_index_version];
-
     }
+
     var questionMap = new Map();
     while (!text('继续挑战').exists()) {
         className("android.view.View").depth(q_index).waitFor();
@@ -1236,7 +1173,7 @@ function do_battle_contest(type) {
  */
 if (!finish_list[6]) {
     log("四人赛");
-    if (!text("四人赛").exists()) back_track();
+    if (!text("四人赛").exists()) utils.back_track(2);
     swipe(500, 1700, 500, 500, random_time(delay_time / 2));
     var model = text("四人赛").findOne().parent().child(4);
     model.click();
@@ -1274,7 +1211,7 @@ if (!finish_list[7] && two_players_scored < 1) {
     log("双人对战");
     sleep(random_time(delay_time));
 
-    if (!text("双人对战").exists()) back_track();
+    if (!text("双人对战").exists()) utils.back_track(2);
     entry_model(11);
 
     // // 点击随机匹配
@@ -1294,7 +1231,7 @@ if (!finish_list[7] && two_players_scored < 1) {
  **********发表观点*********
  */
 log("发表观点 start")
-if (!finish_list[9] && whether_complete_speech == "yes") {
+if (!finish_list[9]) {
 
     var speechs = [
         "好好学习，天天向上",
@@ -1307,8 +1244,7 @@ if (!finish_list[9] && whether_complete_speech == "yes") {
 
     sleep(random_time(delay_time));
     if (!text('发表观点').exists()) {
-        back_track_flag = 2;
-        back_track();
+        utils.back_track(2);
     }
     entry_model(13);
     // 随意找一篇文章
@@ -1347,8 +1283,7 @@ log("发表观点 end");
 
 
 if (pushplus_token.length > 0) {
-    back_track_flag = 1;
-    back_track();
+    utils.back_track(1);
     // 获取今日得分
     var score = textStartsWith('今日已累积').findOne().text();
     score = score.match(/\d+/);

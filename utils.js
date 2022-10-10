@@ -13,32 +13,46 @@ utils.random_time = function (time) {
 
 utils.back_track = function (back_track_flag) {
     app.launchApp('学习强国');
-    sleep(this.random_time(delay_time * 3));
     var while_count = 0;
     while (!id('comm_head_title').exists() && while_count < 5) {
+        //会存在app启动的情况
+        sleep(5000);
+        if (id('comm_head_title').exists()) {
+            break;
+        }
         while_count++;
+        sleep(random_time(delay_time));
+        if (text("退出").exists()) {
+            click("退出");
+            sleep(random_time(delay_time));
+        }
         back();
-        sleep(this.random_time(delay_time));
+        sleep(random_time(delay_time));
     }
+    log("switch " + back_track_flag)
     switch (back_track_flag) {
         case 0:
             // 去中心模块
-            id('home_bottom_tab_icon_large').waitFor();
-            sleep(this.random_time(delay_time));
-            var home_bottom = id('home_bottom_tab_icon_large').findOne().bounds();
+            toast("等待-中间按钮")
+            var home_bottom_tab = "home_bottom_tab_button_work"
+            id(home_bottom_tab).waitFor();
+            sleep(random_time(delay_time));
+            var home_bottom = id(home_bottom_tab).findOne().bounds();
             click(home_bottom.centerX(), home_bottom.centerY());
             // 去province模块
-            className('adnroid.view.ViewGroup').depth(15).waitFor();
-            sleep(this.random_time(delay_time));
-            className('android.view.ViewGroup').depth(15).findOnce(2).child(3).click();
+            sleep(random_time(delay_time));
+            var m = text("思想").findOne().parent().parent().child(3);
+            m.click();
             break;
         case 1:
+            //我的->学习积分
+            id("comm_head_xuexi_mine").findOne().click();
+            text('学习积分').waitFor();
+            click("学习积分");
+            text('登录').waitFor();
             break;
         case 2:
-            click('我的');
-            sleep(this.random_time(delay_time));
-            click('学习积分');
-            sleep(this.random_time(delay_time));
+            id("comm_head_xuexi_score").findOne().click();
             text('登录').waitFor();
             break;
     }

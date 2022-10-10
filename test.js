@@ -131,5 +131,8 @@ log("q set:" + q_set.keys());
 // app_index_version = 1;
 // var tab_depth = app_index_version_map["tab_depth"][app_index_version];
 // var localModel = className('android.widget.LinearLayout').depth(tab_depth).findOnce(15);
-var m =  text("思想").findOne().parent().parent().child(3);
-m.click();
+
+// var m =  text("思想").findOne().parent().parent().child(3);
+// m.click();
+var d = new Date();
+log(d.getFullYear() + "-" + d.getMonth() + "-" + d.getDate());
