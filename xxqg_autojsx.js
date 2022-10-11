@@ -115,6 +115,19 @@ threads.start(function () {
 requestScreenCapture(false);
 sleep(delay_time);
 
+//强制关闭其他同名脚本
+let currentEngine = engines.myEngine();
+let runningEngines = engines.all();
+let currentSource = currentEngine.getSource() + '';
+if (runningEngines.length > 1) {
+  runningEngines.forEach(compareEngine => {
+    let compareSource = compareEngine.getSource() + '';
+    if (currentEngine.id !== compareEngine.id && compareSource === currentSource) {
+      compareEngine.forceStop();
+    }
+  });
+}
+
 /**
  * 定义HashTable类，用于存储本地题库，查找效率更高
  * 由于hamibot不支持存储自定义对象和new Map()，因此这里用列表存储自己实现
