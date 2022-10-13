@@ -115,6 +115,19 @@ threads.start(function () {
 requestScreenCapture(false);
 sleep(1000);
 
+//强制关闭其他同名脚本
+let currentEngine = engines.myEngine();
+let runningEngines = engines.all();
+let currentSource = currentEngine.getSource() + '';
+if (runningEngines.length > 1) {
+    runningEngines.forEach(compareEngine => {
+        let compareSource = compareEngine.getSource() + '';
+        if (currentEngine.id !== compareEngine.id && compareSource === currentSource) {
+            compareEngine.forceStop();
+        }
+    });
+}
+
 /**
  * 定义HashTable类，用于存储本地题库，查找效率更高
  * 由于hamibot不支持存储自定义对象和new Map()，因此这里用列表存储自己实现
@@ -350,7 +363,6 @@ if (!finish_list[10]) {
 
 // 把音乐暂停
 media.pauseMusic();
-var back_track_flag = 0;
 
 /*
  **********我要选读文章与分享与广播学习*********
@@ -621,8 +633,6 @@ function do_contest_answer(depth_click_option, question, options_text) {
  ********************答题部分********************
  */
 
-back_track_flag = 2;
-
 // 填空题
 function fill_in_blank(answer) {
     // 获取每个空
@@ -732,36 +742,6 @@ function entry_model(number) {
 function entry_text_model(model_text) {
     var model = text(model_text).parent();
     model.child(4).click();
-}
-
-/**
- * 如果错误则重新答题
- * 全局变量restart_flag说明:
- * restart_flag = 0时，表示每日答题
- * restart_flag = 1时，表示每周答题
- */
-function restart() {
-    // 点击退出
-    sleep(random_time(delay_time));
-    back();
-    my_click_clickable('退出');
-    switch (restart_flag) {
-        case 0:
-            text('登录').waitFor();
-            entry_model(7);
-            break;
-        case 1:
-            // 设置标志位
-            if_restart_flag = true;
-            // 等待列表加载
-            text('本月').waitFor();
-            // 打开第一个出现未作答的题目
-            while (!text('未作答').exists()) {
-                swipe(500, 1700, 500, 500, random_time(delay_time / 2));
-            }
-            text('未作答').findOne().parent().click();
-            break;
-    }
 }
 
 function paddle_ocr_api(img) {
@@ -876,11 +856,9 @@ function do_periodic_answer(number) {
                 answer = baidu_res[0];
                 var options_text = baidu_res[1];
                 if (!answer) {
-                    toast("未找到答案 ocr失败");
-                    log("未找到答案 ocr失败");
-                    images.save(sc, "./fail.jpg");
-                    images.save(imageC, "./fail_c.jpg");
-                    // exit();
+                    toastLog("未找到答案 ocr失败");
+                    images.save(sc, "./image/fail.jpg");
+                    images.save(image, "./image/fail_c.jpg");
                 }
                 log("answer:" + answer + " options_text:" + options_text);
                 back();
@@ -981,7 +959,7 @@ function handling_access_exceptions() {
 /* 
 处理访问异常，滑动验证
 */
-var thread_handling_access_exceptions = handling_access_exceptions();
+handling_access_exceptions();
 
 /*
  **********每日答题*********
@@ -1161,7 +1139,7 @@ function do_battle_contest(type) {
         if (question) {
             do_contest_answer(o_index, question, options_text);
             //答完题后的休息时间
-            sleep(1500);
+            sleep(1300);
         }
         questionMap.set(key, 1);
     }
