@@ -243,22 +243,14 @@ function my_click_clickable(target) {
     }
 }
 
-/** 
- * time 毫秒
- * 模拟随机时间
- */
-function random_time(time) {
-    return time + random(100, 1000);
-}
-
 /**
  * 刷新页面
  * @param {boolean} orientation 方向标识 true表示从下至上 false表示从上至下
  */
 function refresh(orientation) {
-    if (orientation) swipe(device.width / 2, device.height * 13 / 15, device.width / 2, device.height * 2 / 15, random_time(delay_time / 2));
-    else swipe(device.width / 2, device.height * 6 / 15, device.width / 2, device.height * 12 / 15, random_time(delay_time / 2));
-    sleep(random_time(delay_time * 2));
+    if (orientation) swipe(device.width / 2, device.height * 13 / 15, device.width / 2, device.height * 2 / 15, utils.utils.random_time(delay_time / 2));
+    else swipe(device.width / 2, device.height * 6 / 15, device.width / 2, device.height * 12 / 15, utils.utils.random_time(delay_time / 2));
+    sleep(utils.utils.random_time(delay_time * 2));
 }
 
 /**
@@ -328,7 +320,7 @@ function get_finish_list() {
  *********************准备部分********************
  */
 utils.back_track(2);
-sleep(random_time(delay_time));
+sleep(utils.random_time(delay_time));
 var finish_list = get_finish_list();
 
 // 返回首页
@@ -349,11 +341,11 @@ if (!finish_list[10]) {
      */
     var tab_depth = app_index_version_map["tab_depth"][app_index_version];
     className('android.widget.LinearLayout').clickable(true).depth(tab_depth).waitFor();
-    sleep(random_time(delay_time));
+    sleep(utils.random_time(delay_time));
     var c2 = className('android.widget.LinearLayout').clickable(true).depth(tab_depth).findOne().click();
     log("等待本地菜单 点击:" + c2);
 
-    sleep(random_time(delay_time));
+    sleep(utils.random_time(delay_time));
     back();
 }
 
@@ -377,19 +369,19 @@ if (!finish_list[2]) {
         var model = text("视听学习时长").findOne().parent().child(4);
         model.click();
     }
-    sleep(random_time(delay_time));
+    sleep(utils.random_time(delay_time));
     my_click_clickable('电台');
-    sleep(random_time(delay_time));
+    sleep(utils.random_time(delay_time));
     my_click_clickable('听广播');
     log("点击听广播")
-    sleep(random_time(delay_time));
+    sleep(utils.random_time(delay_time));
     if (!textStartsWith("正在收听").exists()) {
         var icon_id = app_index_version_map["icon_id"][app_index_version];
         var v = id(icon_id).findOne();
         log("播放按钮获取成功")
         var lay_state_icon_pos = v.bounds();
         click(lay_state_icon_pos.centerX(), lay_state_icon_pos.centerY());
-        sleep(random_time(delay_time));
+        sleep(utils.random_time(delay_time));
         var home_bottom = id('home_bottom_tab_button_work').findOne().bounds();
         click(home_bottom.centerX(), home_bottom.centerY());
     }
@@ -399,7 +391,7 @@ var startRead = new Date();
 log("选读文章 start");
 if (!finish_list[4] && completed_read_count < 12) {
     utils.back_track(0);
-    sleep(random_time(delay_time));
+    sleep(utils.random_time(delay_time));
 
     // 阅读文章次数
     var count = 0;
@@ -410,14 +402,14 @@ if (!finish_list[4] && completed_read_count < 12) {
     while (count < need_count) {
         console.log("开始阅读：need_count:%d count:%d", need_count, count)
         swipe(800, 2000, 800, 600, 1000);
-        sleep(random_time(delay_time));
+        sleep(utils.random_time(delay_time));
         var articles = className("android.widget.TextView").id("general_card_title_id").depth(article_depth).find();
         log("找文章列表 length:", articles.length)
 
         if (articles.length == 0) {
             toast("未找到文章，进行刷新");
             refresh(true);
-            sleep(random_time(delay_time));
+            sleep(utils.random_time(delay_time));
             continue;
         }
 
@@ -455,11 +447,11 @@ log("选读文章 end" + (new Date() - startRead) / 1000 / 60);
 // 关闭电台广播
 if (!finish_list[2]) {
     device.setMusicVolume(0);
-    sleep(random_time(delay_time));
+    sleep(utils.random_time(delay_time));
     my_click_clickable('电台');
-    sleep(random_time(delay_time));
+    sleep(utils.random_time(delay_time));
     my_click_clickable('听广播');
-    sleep(random_time(delay_time));
+    sleep(utils.random_time(delay_time));
     if (!textStartsWith("最近收听").exists() && !textStartsWith("推荐收听").exists()) {
         // 换成通过text寻找控件
         textStartsWith("正在收听").waitFor();
@@ -469,7 +461,7 @@ if (!finish_list[2]) {
             id("v_playing").findOne().click();
         }
     }
-    sleep(random_time(delay_time));
+    sleep(utils.random_time(delay_time));
     device.setMusicVolume(currentVolume);
 }
 log("关闭电台广播 end");
@@ -486,9 +478,9 @@ if (!finish_list[1]) {
         utils.back_track(2);
     }
     entry_model(5);
-    sleep(random_time(delay_time * 2));
+    sleep(utils.random_time(delay_time * 2));
     my_click_clickable('百灵');
-    sleep(random_time(delay_time));
+    sleep(utils.random_time(delay_time));
     if (text("关闭").exists()) {
         click("关闭");
     }
@@ -497,7 +489,7 @@ if (!finish_list[1]) {
     // 等待视频加载
     device.setMusicVolume(0);
     log("设置静音");
-    sleep(random_time(delay_time * 2));
+    sleep(utils.random_time(delay_time * 2));
     // 点击第一个视频
     var firstVideo = text("").findOne(300);
     if (firstVideo == null) {
@@ -506,11 +498,11 @@ if (!finish_list[1]) {
     var bound = firstVideo.bounds();
     click(bound.centerX(), bound.centerY());
     toast("点击第一个视频");
-    sleep(random_time(delay_time));
+    sleep(utils.random_time(delay_time));
     log("completed_watch_count:" + completed_watch_count)
     while (completed_watch_count < 6) {
         log("completed_watch_count:" + completed_watch_count);
-        sleep(random_time(delay_time / 2));
+        sleep(utils.random_time(delay_time / 2));
         var video_time_text = className('android.widget.TextView').clickable(false).depth(video_bar_depth).findOne().text();
         if (video_time_text.search("当前网络未非WiFi网络") != -1) {
             text("刷新重试").findOnce().click();
@@ -527,7 +519,7 @@ if (!finish_list[1]) {
         // 如果视频超过一分钟就跳过
         if (Number(current_video_time.slice(0, 3)) >= 1) {
             refresh(true);
-            sleep(random_time(delay_time));
+            sleep(utils.random_time(delay_time));
             continue;
         }
         sleep(Number(current_video_time.slice(4)) * 1000 + 1000);
@@ -803,7 +795,7 @@ function do_periodic_answer(number) {
     // flag为true时全对
     var flag = false;
     while (!flag) {
-        sleep(random_time(delay_time));
+        sleep(utils.random_time(delay_time));
         // 局部变量用于保存答案
         var answer = "";
         var num = 0;
@@ -813,8 +805,8 @@ function do_periodic_answer(number) {
                 num = 0;
             }
             // 下滑到底防止题目过长，选项没有读取到
-            swipe(500, 1700, 500, 500, random_time(delay_time / 2));
-            sleep(random_time(delay_time));
+            swipe(500, 1700, 500, 500, utils.random_time(delay_time / 2));
+            sleep(utils.random_time(delay_time));
 
             // 判断是否是全选，这样就不用ocr
             if (textContains('多选题').exists() && is_select_all_choice()) {
@@ -838,9 +830,9 @@ function do_periodic_answer(number) {
             } else {
                 var try_web = try_web_query();
                 if (try_web) {
-                    sleep(random_time(delay_time));
+                    sleep(utils.random_time(delay_time));
                     click("确定");
-                    sleep(random_time(delay_time));
+                    sleep(utils.random_time(delay_time));
                     continue;
                 }
                 my_click_clickable('查看提示');
@@ -874,7 +866,7 @@ function do_periodic_answer(number) {
 
             // 不是专项答题时
             click('确定');
-            sleep(random_time(delay_time));
+            sleep(utils.random_time(delay_time));
             // 如果错误（ocr识别有误）则重来
             if (text('下一题').exists() || (text('完成').exists() && !special_flag)) {
                 // 如果视频题错误，则每周答题就不需要重新答
@@ -886,7 +878,7 @@ function do_periodic_answer(number) {
                     my_click_clickable('退出');
                 }
             }
-            sleep(random_time(delay_time * 2)); // 每题之间的过渡时间
+            sleep(utils.random_time(delay_time * 2)); // 每题之间的过渡时间
         }
         if (num == number) flag = true;
     }
@@ -939,8 +931,8 @@ function handling_access_exceptions() {
             var y_end = random(bound.top, bound.bottom);
             x_start = random(x_start - 7, x_start);
             x_end = random(x_end, x_end + 10);
-            gesture(random_time(delay_time) * 2, [x_start, y_start], [x_mid, y_end], [x_mid - back_x, y_start], [x_end, y_end]);
-            sleep(random_time(delay_time) * 2);
+            gesture(utils.random_time(delay_time) * 2, [x_start, y_start], [x_mid, y_end], [x_mid - back_x, y_start], [x_end, y_end]);
+            sleep(utils.random_time(delay_time) * 2);
             if (textContains("刷新").exists()) {
                 click("刷新");
                 continue;
@@ -968,7 +960,7 @@ var restart_flag = 0;
 
 log("每日答题 start")
 if (!finish_list[3]) {
-    sleep(random_time(delay_time));
+    sleep(utils.random_time(delay_time));
     if (!text('积分规则').exists()) {
         utils.back_track(2);
     }
@@ -992,7 +984,7 @@ if (!finish_list[5]) {
     var q_index = app_index_version_map["challenge_question"][app_index_version]; //12 26
     var o_index = app_index_version_map["challenge_option"][app_index_version];
     log("q_index:" + q_index + " o_index:" + o_index);
-    sleep(random_time(delay_time));
+    sleep(utils.random_time(delay_time));
     entry_model(9);
     className('android.view.View').depth(q_index).waitFor();
     //由于可以复活，所以5分满分加复活一次，就是6次
@@ -1000,11 +992,11 @@ if (!finish_list[5]) {
     // flag为true时挑战成功拿到6分
     var flag = false;
     while (!flag) {
-        sleep(random_time(delay_time * 3));
+        sleep(utils.random_time(delay_time * 3));
         var num = 0;
         while (num < times) {
             // 每题的过渡
-            sleep(random_time(delay_time * 2));
+            sleep(utils.random_time(delay_time * 2));
             if (textStartsWith("本次答题").exists()) {
                 var txt = textStartsWith("本次答题").findOne().text();
                 var score = txt.match(/\d+/);
@@ -1017,7 +1009,7 @@ if (!finish_list[5]) {
             // 如果答错，第一次通过分享复活
             if (text("立即复活").exists()) {
                 click("立即复活");
-                sleep(random_time(delay_time * 3));
+                sleep(utils.random_time(delay_time * 3));
             }
             //复活后 第二次重新开局
             if (text('再来一局').exists()) {
@@ -1046,16 +1038,16 @@ if (!finish_list[5]) {
             });
             do_contest_answer(o_index, question, options_text);
             num++; //这一步其实不准，
-            sleep(random_time(delay_time));
+            sleep(utils.random_time(delay_time));
         }
-        sleep(random_time(delay_time));
+        sleep(utils.random_time(delay_time));
         if (num >= times && !text('再来一局').exists() && !text('结束本局').exists()) {
             flag = true;
         }
     }
     // 随意点击直到退出
     do {
-        sleep(random_time(delay_time * 2.5));
+        sleep(utils.random_time(delay_time * 2.5));
         log("挑战完成 选第一个 start");
         var radio = className('android.widget.RadioButton').depth(o_index).findOne(3000);
         if (radio == null) {
@@ -1063,13 +1055,13 @@ if (!finish_list[5]) {
         }
         radio.click();
         log("挑战完成 选第一个 end");
-        sleep(random_time(delay_time * 2.5));
+        sleep(utils.random_time(delay_time * 2.5));
     } while (!textStartsWith('本次答对').exists());
     click('结束本局');
     //此时会出现异常检查
     sleep(2000);
     textStartsWith('本次答对').waitFor();
-    sleep(random_time(delay_time));
+    sleep(utils.random_time(delay_time));
     back();
 }
 log("挑战答题end");
@@ -1135,7 +1127,6 @@ function do_battle_contest(type) {
                 continue;
             }
         }
-        // && options_text.length > 0
         if (question) {
             do_contest_answer(o_index, question, options_text);
             //答完题后的休息时间
@@ -1149,35 +1140,36 @@ function do_battle_contest(type) {
 /*
  **********四人赛********* !finish_list[6]
  */
-if (!finish_list[6]) {
+if (true) {
     log("四人赛");
     if (!text("四人赛").exists()) utils.back_track(2);
-    swipe(500, 1700, 500, 500, random_time(delay_time / 2));
+    swipe(500, 1700, 500, 500, utils.random_time(delay_time / 2));
     var model = text("四人赛").findOne().parent().child(4);
     model.click();
-    sleep(random_time(delay_time));
+    sleep(utils.random_time(delay_time));
     var isPlay = textStartsWith("今日积分奖励局1").exists() || textStartsWith("今日积分奖励局2").exists();
+    isPlay = true;
     if (isPlay) {
-        sleep(random_time(delay_time));
+        sleep(utils.random_time(delay_time));
         for (var i = 0; i < 2; i++) {
-            sleep(random_time(delay_time));
+            sleep(utils.random_time(delay_time));
             my_click_clickable("开始比赛");
             do_battle_contest(4);
             if (text("非积分奖励局").exists()) {
                 break;
             }
             if (i == 0) {
-                sleep(random_time(delay_time * 2));
+                sleep(utils.random_time(delay_time * 2));
                 my_click_clickable("继续挑战");
-                sleep(random_time(delay_time));
+                sleep(utils.random_time(delay_time));
             }
         }
-        sleep(random_time(delay_time));
+        sleep(utils.random_time(delay_time));
         back();
     } else {
         log("四人赛已完成跳过");
     }
-    sleep(random_time(delay_time));
+    sleep(utils.random_time(delay_time));
     back();
 }
 
@@ -1187,7 +1179,7 @@ if (!finish_list[6]) {
  */
 if (!finish_list[7] && two_players_scored < 1) {
     log("双人对战");
-    sleep(random_time(delay_time));
+    sleep(utils.random_time(delay_time));
 
     if (!text("双人对战").exists()) utils.back_track(2);
     entry_model(11);
@@ -1195,12 +1187,12 @@ if (!finish_list[7] && two_players_scored < 1) {
     // // 点击随机匹配
     // log("等待:" + "随机匹配");
     text("随机匹配").waitFor();
-    sleep(random_time(delay_time * 2));
+    sleep(utils.random_time(delay_time * 2));
     text("随机匹配").findOne().parent().child(0).click();
     do_battle_contest(2);
-    sleep(random_time(delay_time));
+    sleep(utils.random_time(delay_time));
     back();
-    sleep(random_time(delay_time));
+    sleep(utils.random_time(delay_time));
     back();
     my_click_clickable("退出");
 }
@@ -1220,15 +1212,15 @@ if (!finish_list[9]) {
         // "为人民谋幸福"
     ];
 
-    sleep(random_time(delay_time));
+    sleep(utils.random_time(delay_time));
     if (!text('发表观点').exists()) {
         utils.back_track(2);
     }
     entry_model(13);
     // 随意找一篇文章
-    sleep(random_time(delay_time * 2));
+    sleep(utils.random_time(delay_time * 2));
     className("android.widget.TextView").text("文化").findOne().parent().click();
-    sleep(random_time(delay_time));
+    sleep(utils.random_time(delay_time));
     var artcle = null;
     var c = false;
     while (!c) {
@@ -1239,22 +1231,22 @@ if (!finish_list[9]) {
         }
         c = artcle.parent().parent().click();
     }
-    sleep(random_time(delay_time));
+    sleep(utils.random_time(delay_time));
 
     log("等待欢迎发表你的观点");
     text('欢迎发表你的观点').waitFor();
-    sleep(random_time(delay_time));
+    sleep(utils.random_time(delay_time));
     my_click_clickable("欢迎发表你的观点");
     log("等待欢迎发表你的观点 end");
-    sleep(random_time(delay_time));
+    sleep(utils.random_time(delay_time));
     setText(speechs[random(0, speechs.length - 1)]);
-    sleep(random_time(delay_time));
+    sleep(utils.random_time(delay_time));
     my_click_clickable('发布');
-    sleep(random_time(delay_time * 2));
+    sleep(utils.random_time(delay_time * 2));
     my_click_clickable('删除');
-    sleep(random_time(delay_time));
+    sleep(utils.random_time(delay_time));
     my_click_clickable('确认');
-    sleep(random_time(delay_time));
+    sleep(utils.random_time(delay_time));
     back();
 }
 log("发表观点 end");
@@ -1265,7 +1257,7 @@ if (pushplus_token.length > 0) {
     // 获取今日得分
     var score = textStartsWith('今日已累积').findOne().text();
     score = score.match(/\d+/);
-    sleep(random_time(delay_time));
+    sleep(utils.random_time(delay_time));
     back();
     // 获取账号名
     var account = id('my_display_name').findOne().text();
