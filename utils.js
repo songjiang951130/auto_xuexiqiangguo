@@ -21,13 +21,13 @@ utils.back_track = function (back_track_flag) {
             break;
         }
         while_count++;
-        sleep(random_time(delay_time));
+        sleep(200);
         if (text("退出").exists()) {
             click("退出");
-            sleep(random_time(delay_time));
+            sleep(200);
         }
         back();
-        sleep(random_time(delay_time));
+        sleep(200);
     }
     log("switch " + back_track_flag)
     switch (back_track_flag) {
@@ -36,11 +36,11 @@ utils.back_track = function (back_track_flag) {
             toast("等待-中间按钮")
             var home_bottom_tab = "home_bottom_tab_button_work"
             id(home_bottom_tab).waitFor();
-            sleep(random_time(delay_time));
+            sleep(200);
             var home_bottom = id(home_bottom_tab).findOne().bounds();
             click(home_bottom.centerX(), home_bottom.centerY());
             // 去province模块
-            sleep(random_time(delay_time));
+            sleep(200);
             var m = text("思想").findOne().parent().parent().child(3);
             m.click();
             break;
