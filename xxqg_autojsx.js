@@ -868,7 +868,7 @@ function do_periodic_answer(number) {
             click('确定');
             sleep(utils.random_time(delay_time));
             // 如果错误（ocr识别有误）则重来
-            if (text('下一题').exists() || (text('完成').exists() && !special_flag)) {
+            if (text('下一题').exists() || text('完成').exists()) {
                 // 如果视频题错误，则每周答题就不需要重新答
                 if (restart_flag == 1 && className("android.widget.Image").exists()) {
                     if (text('下一题').exists()) click('下一题');
@@ -1140,7 +1140,7 @@ function do_battle_contest(type) {
 /*
  **********四人赛********* !finish_list[6]
  */
-if (true) {
+if (!finish_list[6]) {
     log("四人赛");
     if (!text("四人赛").exists()) utils.back_track(2);
     swipe(500, 1700, 500, 500, utils.random_time(delay_time / 2));
@@ -1148,7 +1148,6 @@ if (true) {
     model.click();
     sleep(utils.random_time(delay_time));
     var isPlay = textStartsWith("今日积分奖励局1").exists() || textStartsWith("今日积分奖励局2").exists();
-    isPlay = true;
     if (isPlay) {
         sleep(utils.random_time(delay_time));
         for (var i = 0; i < 2; i++) {
