@@ -248,9 +248,9 @@ function my_click_clickable(target) {
  * @param {boolean} orientation 方向标识 true表示从下至上 false表示从上至下
  */
 function refresh(orientation) {
-    if (orientation) swipe(device.width / 2, device.height * 13 / 15, device.width / 2, device.height * 2 / 15, utils.utils.random_time(delay_time / 2));
-    else swipe(device.width / 2, device.height * 6 / 15, device.width / 2, device.height * 12 / 15, utils.utils.random_time(delay_time / 2));
-    sleep(utils.utils.random_time(delay_time * 2));
+    if (orientation) swipe(device.width / 2, device.height * 13 / 15, device.width / 2, device.height * 2 / 15, utils.random_time(delay_time / 2));
+    else swipe(device.width / 2, device.height * 6 / 15, device.width / 2, device.height * 12 / 15, utils.random_time(delay_time / 2));
+    sleep(utils.random_time(delay_time * 2));
 }
 
 /**
