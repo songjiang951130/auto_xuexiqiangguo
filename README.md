@@ -92,5 +92,6 @@ A: 请在[GitHub](https://github.com/songjiang951130/hamibot-auto_xuexiqiangguo/
 # 计划完成情况
 ## 挑战答题判题错误 已经修复稳定运行
 ## 提高答题正确率，目前发现截图的问题; 答完题后需要歇1.5秒左右进行ocr。优化文本识别等
+## 修复四人赛和双人对战的截图问题
 
 

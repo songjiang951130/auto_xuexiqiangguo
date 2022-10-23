@@ -209,9 +209,9 @@ if (!storage.contains(answer_question_map_name)) {
     }
 
     storage.put(answer_question_map_name, answer_question_map);
-    log("题库 更新完成")
+    console.log("题库 更新完成")
 } else {
-    log("题库 跳过更新");
+    console.log("题库 跳过更新");
 }
 
 var answer_question_map = storage.get(answer_question_map_name);
@@ -298,11 +298,11 @@ function get_finish_list() {
         if (model == null) {
             app_index_version++;
             i--;
-            log("app版本:" + app_index_version);
+            console.log("app版本:" + app_index_version);
             continue;
         }
         // log("model: " + model);
-        log("task:" + (i - 4) + " " + model.child(0).text());
+        console.log("task:" + (i - 4) + " " + model.child(0).text());
         if (i == 4) {
             completed_read_count = parseInt(model.child(child_index).child(0).text());
         } else if (i == 5) {
@@ -312,7 +312,7 @@ function get_finish_list() {
         }
         finish_list.push(model.child(4).text() == '已完成');
     }
-    log("已完成情况:" + finish_list);
+    console.log("已完成情况:" + finish_list);
     return finish_list;
 }
 
@@ -328,14 +328,14 @@ var finish_list = get_finish_list();
  **********本地频道*********
  */
 if (!finish_list[10]) {
-    log("进入本地");
+    console.log("进入本地");
     //14是本地
     while (!text("本地频道").exists()) {
         swipe(400, 200, 400, 800, 500);
     }
     var c = text("本地频道").findOne().parent().child(4).click();
 
-    log("等待本地菜单:" + c);
+    console.log("等待本地菜单:" + c);
     /**
      * 重庆学习平台、重庆农家书屋等数据
      */
@@ -343,7 +343,7 @@ if (!finish_list[10]) {
     className('android.widget.LinearLayout').clickable(true).depth(tab_depth).waitFor();
     sleep(utils.random_time(delay_time));
     var c2 = className('android.widget.LinearLayout').clickable(true).depth(tab_depth).findOne().click();
-    log("等待本地菜单 点击:" + c2);
+    console.log("等待本地菜单 点击:" + c2);
 
     sleep(utils.random_time(delay_time));
     back();
@@ -363,7 +363,7 @@ var currentVolume = device.getMusicVolume();
 // 打开电台广播
 
 if (!finish_list[2]) {
-    log("打开电台广播")
+    console.log("打开电台广播")
     device.setMusicVolume(0);
     if (text("视听学习时长").exists()) {
         var model = text("视听学习时长").findOne().parent().child(4);
@@ -373,12 +373,12 @@ if (!finish_list[2]) {
     my_click_clickable('电台');
     sleep(utils.random_time(delay_time));
     my_click_clickable('听广播');
-    log("点击听广播")
+    console.log("点击听广播")
     sleep(utils.random_time(delay_time));
     if (!textStartsWith("正在收听").exists()) {
         var icon_id = app_index_version_map["icon_id"][app_index_version];
         var v = id(icon_id).findOne();
-        log("播放按钮获取成功")
+        console.log("播放按钮获取成功")
         var lay_state_icon_pos = v.bounds();
         click(lay_state_icon_pos.centerX(), lay_state_icon_pos.centerY());
         sleep(utils.random_time(delay_time));
@@ -386,9 +386,9 @@ if (!finish_list[2]) {
         click(home_bottom.centerX(), home_bottom.centerY());
     }
 }
-log("打开电台广播end");
+console.log("打开电台广播end");
 var startRead = new Date();
-log("选读文章 start");
+console.log("选读文章 start");
 if (!finish_list[4] && completed_read_count < 12) {
     utils.back_track(0);
     sleep(utils.random_time(delay_time));
@@ -404,7 +404,7 @@ if (!finish_list[4] && completed_read_count < 12) {
         swipe(800, 2000, 800, 600, 1000);
         sleep(utils.random_time(delay_time));
         var articles = className("android.widget.TextView").id("general_card_title_id").depth(article_depth).find();
-        log("找文章列表 length:", articles.length)
+        console.log("找文章列表 length:", articles.length)
 
         if (articles.length == 0) {
             toast("未找到文章，进行刷新");
@@ -420,25 +420,25 @@ if (!finish_list[4] && completed_read_count < 12) {
             if (titleSet.has(articles[i].text()) || articles[i].text().includes("朗读") || articles[i].text().includes("朗诵") || articles[i].text().includes("专题")) {
                 continue;
             }
-            log("标题+:" + articles[i].text() + " index:" + i)
+            console.log("标题+:" + articles[i].text() + " index:" + i)
             var cr = click(articles[i].text());
             //这里存在点击失败，但是进文章成功
             if (!cr && !textStartsWith("地方发布平台内容").depth(21).exists()) {
-                log("点击失败 " + articles[i].text());
+                console.log("点击失败 " + articles[i].text());
                 continue;
             }
             var use_time = 0;
-            log("阅读中");
+            console.log("阅读中");
             swipe(500, 1700, 500, 700, 500);
             sleep(Math.abs(single_total_read - use_time));
-            log("阅读完成 article length:", articles.length, " i:", i, "title:", articles[i].text());
+            console.log("阅读完成 article length:", articles.length, " i:", i, "title:", articles[i].text());
             titleSet.add(articles[i].text());
             count++;
             back();
         }
     }
 }
-log("选读文章 end" + (new Date() - startRead) / 1000 / 60);
+console.log("选读文章 end" + (new Date() - startRead) / 1000 / 60);
 
 /*
  *********************视听部分********************
@@ -464,12 +464,12 @@ if (!finish_list[2]) {
     sleep(utils.random_time(delay_time));
     device.setMusicVolume(currentVolume);
 }
-log("关闭电台广播 end");
+console.log("关闭电台广播 end");
 
 /*
  **********视听学习、听学习时长*********
  */
-log("视听学习 start:" + finish_list[1]);
+console.log("视听学习 start:" + finish_list[1]);
 if (!finish_list[1]) {
     var video_depth = app_index_version_map["video_depth"][app_index_version];
     var video_bar_depth = app_index_version_map["video_bar_depth"][app_index_version];
@@ -484,11 +484,11 @@ if (!finish_list[1]) {
     if (text("关闭").exists()) {
         click("关闭");
     }
-    log("竖")
+    console.log("竖")
     my_click_clickable('竖');
     // 等待视频加载
     device.setMusicVolume(0);
-    log("设置静音");
+    console.log("设置静音");
     sleep(utils.random_time(delay_time * 2));
     // 点击第一个视频
     var firstVideo = text("").findOne(300);
@@ -499,7 +499,7 @@ if (!finish_list[1]) {
     click(bound.centerX(), bound.centerY());
     toast("点击第一个视频");
     sleep(utils.random_time(delay_time));
-    log("completed_watch_count:" + completed_watch_count)
+    console.log("completed_watch_count:" + completed_watch_count)
     while (completed_watch_count < 6) {
         log("completed_watch_count:" + completed_watch_count);
         sleep(utils.random_time(delay_time / 2));
@@ -978,7 +978,7 @@ log("每日答题 end")
 log("挑战答题")
 if (!finish_list[5]) {
     log("挑战答题start");
-    if (!text('挑战答题').exists()) {
+    if (!text('登录').exists()) {
         utils.back_track(2);
     };
     var q_index = app_index_version_map["challenge_question"][app_index_version]; //12 26
