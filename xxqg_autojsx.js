@@ -104,13 +104,13 @@ var answer_question_map_name = "answer_question_map_name";
 storage.remove(answer_question_map_name);
 
 //请求横屏截图权限
-threads.start(function () {
+threads.start(function() {
     try {
         var beginBtn;
         if (beginBtn = classNameContains("Button").textContains("开始").findOne(delay_time));
-        else (beginBtn = classNameContains("Button").textContains("允许").findOne(delay_time));
+        else(beginBtn = classNameContains("Button").textContains("允许").findOne(delay_time));
         beginBtn.click();
-    } catch (error) { }
+    } catch (error) {}
 });
 requestScreenCapture(false);
 sleep(delay_time);
@@ -221,7 +221,7 @@ var answer_question_map = storage.get(answer_question_map_name);
  * @param {UiObject / string} target 控件或者是控件文本
  */
 function my_click_non_clickable(target) {
-    if (typeof (target) == 'string') {
+    if (typeof(target) == 'string') {
         text(target).waitFor();
         var tmp = text(target).findOne().bounds();
     } else {
@@ -265,10 +265,10 @@ function push_weixin_message(account, score) {
     for (var t in pushplus_token) {
         http.postJson(
             'http://www.pushplus.plus/send', {
-            token: pushplus_token[t],
-            title: '[' + account + ']今日获得' + score + '积分',
-            content: '学习强国 账号名' + account + '今日已经获得' + score + '分'
-        }
+                token: pushplus_token[t],
+                title: '[' + account + ']今日获得' + score + '积分',
+                content: '学习强国 账号名' + account + '今日已经获得' + score + '分'
+            }
         );
     }
 }
@@ -651,7 +651,7 @@ function video_answer_question(video_question) {
     video_question = video_question.slice(0, Math.max(5, punctuation_index));
     try {
         var video_result = http.get('https://www.365shenghuo.com/?s=' + encodeURI(video_question));
-    } catch (error) { }
+    } catch (error) {}
     var video_answer = video_result.body.string().match(/答案：.+</);
     if (video_answer) video_answer = video_answer[0].slice(3, video_answer[0].indexOf('<'));
     return video_answer;
@@ -666,7 +666,7 @@ function video_answer_question(video_question) {
  */
 function getSimilarity(str1, str2) {
     var sameNum = 0
-    //寻找相同字符
+        //寻找相同字符
     for (var i = 0; i < str1.length; i++) {
         for (var j = 0; j < str2.length; j++) {
             if (str1[i] === str2[j]) {
@@ -912,7 +912,7 @@ function try_web_query() {
  */
 function handling_access_exceptions() {
     // 在子线程执行的定时器，如果不用子线程，则无法获取弹出页面的控件
-    var thread_handling_access_exceptions = threads.start(function () {
+    var thread_handling_access_exceptions = threads.start(function() {
         while (true) {
             textContains("访问异常").waitFor();
             // 滑动按钮">>"位置
@@ -1106,7 +1106,7 @@ function do_battle_contest(type) {
          */
         var rawImage = captureScreen();
         var img = images.inRange(rawImage, '#000000', '#444444');
-        img = images.clip(img, pos.left, pos.top, pos.width(), device.height - pos.top);
+        img = images.clip(img, pos.left, pos.top, pos.width(), pos.height());
         var result = paddle_ocr_api(img);
         var question = result[0];
         if (question == "") {
@@ -1148,6 +1148,7 @@ if (!finish_list[6]) {
     model.click();
     sleep(utils.random_time(delay_time));
     var isPlay = textStartsWith("今日积分奖励局1").exists() || textStartsWith("今日积分奖励局2").exists();
+    console.log("四人赛第一局:%b 第二局：%b", textStartsWith("今日积分奖励局1").exists(), textStartsWith("今日积分奖励局2").exists());
     if (isPlay) {
         sleep(utils.random_time(delay_time));
         for (var i = 0; i < 2; i++) {
