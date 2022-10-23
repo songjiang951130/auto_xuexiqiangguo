@@ -113,7 +113,7 @@ threads.start(function() {
     } catch (error) {}
 });
 requestScreenCapture(false);
-sleep(delay_time);
+sleep(1000);
 
 //强制关闭其他同名脚本
 let currentEngine = engines.myEngine();
@@ -970,20 +970,20 @@ if (!finish_list[3]) {
     do_periodic_answer(5);
     my_click_clickable('返回');
 }
-log("每日答题 end")
+console.log("每日答题 end")
 
 /*
  **********挑战答题********* !finish_list[5]
  */
-log("挑战答题")
+console.log("挑战答题")
 if (!finish_list[5]) {
-    log("挑战答题start");
+    console.log("挑战答题start");
     if (!text('登录').exists()) {
         utils.back_track(2);
     };
     var q_index = app_index_version_map["challenge_question"][app_index_version]; //12 26
     var o_index = app_index_version_map["challenge_option"][app_index_version];
-    log("q_index:" + q_index + " o_index:" + o_index);
+    console.log("q_index:" + q_index + " o_index:" + o_index);
     sleep(utils.random_time(delay_time));
     entry_model(9);
     className('android.view.View').depth(q_index).waitFor();
@@ -1013,12 +1013,12 @@ if (!finish_list[5]) {
             }
             //复活后 第二次重新开局
             if (text('再来一局').exists()) {
-                log("再来一局 b");
+                console.log("再来一局 b");
                 num = 0;
                 my_click_clickable('再来一局');
                 break;
             }
-            log("挑战答题 题目等待 num:" + num);
+            console.log("挑战答题 题目等待 num:" + num);
             // 题目
             className('android.view.View').depth(q_index).waitFor();
             var question = className('android.view.View').depth(q_index).findOne().text();
@@ -1027,7 +1027,7 @@ if (!finish_list[5]) {
             // 选项文字列表
             var options_text = [];
             // 等待选项加载
-            log("挑战答题 选项等待");
+            console.log("挑战答题 选项等待");
             className('android.widget.RadioButton').depth(o_index).clickable(true).waitFor();
             // 获取所有选项控件，以RadioButton对象为基准，根据UI控件树相对位置寻找选项文字内容
             var options = className('android.widget.RadioButton').depth(o_index).find();
@@ -1048,13 +1048,13 @@ if (!finish_list[5]) {
     // 随意点击直到退出
     do {
         sleep(utils.random_time(delay_time * 2.5));
-        log("挑战完成 选第一个 start");
+        console.log("挑战完成 选第一个 start");
         var radio = className('android.widget.RadioButton').depth(o_index).findOne(3000);
         if (radio == null) {
             break;
         }
         radio.click();
-        log("挑战完成 选第一个 end");
+        console.log("挑战完成 选第一个 end");
         sleep(utils.random_time(delay_time * 2.5));
     } while (!textStartsWith('本次答对').exists());
     click('结束本局');
@@ -1064,7 +1064,7 @@ if (!finish_list[5]) {
     sleep(utils.random_time(delay_time));
     back();
 }
-log("挑战答题end");
+console.log("挑战答题end");
 
 function saveOcrError(bizName, rawImage, clip) {
     var imageDir = "./image/" + bizName + "/";
@@ -1080,7 +1080,7 @@ function saveOcrError(bizName, rawImage, clip) {
  * 四人赛先加载题目再加载答案，而且是单选题，所以可以先题目识别，找到答案，答案一加载，就点击答案
  */
 function do_battle_contest(type) {
-    log("do_battle_contest do_4_contest");
+    console.log("do_battle_contest do_4_contest");
     var q_index = app_index_version_map["four_question"][app_index_version];
     var o_index = app_index_version_map["four_option"][app_index_version];
     if (type == 2) {
@@ -1091,7 +1091,7 @@ function do_battle_contest(type) {
     while (!text('继续挑战').exists()) {
         className("android.view.View").depth(q_index).waitFor();
         var pos = className("android.view.View").depth(q_index).findOne().bounds();
-        log("do_battle_contest 选项加载");
+        console.log("do_battle_contest 选项加载");
         className('android.widget.RadioButton').depth(o_index).clickable(true).waitFor();
         /**
          * 选项虽然加载完毕，会截图到过渡页的情况 “第二题”，见image/ocr_time_error.jpg
@@ -1114,16 +1114,16 @@ function do_battle_contest(type) {
         }
         var options_text = result[1];
 
-        log("do_battle_contest 题目: " + question + " 选项:" + options_text);
+        console.log("do_battle_contest 题目: " + question + " 选项:" + options_text);
         var key = question + options_text;
         if (!options_text || options_text.length == 0) {
             var val = questionMap.get(key);
             val = val == null ? 0 : val;
             val++;
             questionMap.set(key, val);
-            saveOcrError("option4", rawImage, img);
+            // saveOcrError("option4", rawImage, img);
             if (questionMap.get(key) < 3) {
-                log("do_battle_contest 选项异常");
+                console.log("do_battle_contest 选项异常");
                 continue;
             }
         }
@@ -1134,21 +1134,21 @@ function do_battle_contest(type) {
         }
         questionMap.set(key, 1);
     }
-    log("do_battle_contest end");
+    console.log("do_battle_contest end");
 }
 
 /*
  **********四人赛********* !finish_list[6]
  */
 if (!finish_list[6]) {
-    log("四人赛");
+    console.log("四人赛");
     if (!text("四人赛").exists()) utils.back_track(2);
     swipe(500, 1700, 500, 500, utils.random_time(delay_time / 2));
     var model = text("四人赛").findOne().parent().child(4);
     model.click();
     sleep(utils.random_time(delay_time));
     var isPlay = textStartsWith("今日积分奖励局1").exists() || textStartsWith("今日积分奖励局2").exists();
-    console.log("四人赛第一局:%b 第二局：%b", textStartsWith("今日积分奖励局1").exists(), textStartsWith("今日积分奖励局2").exists());
+    console.log("四人赛第一局: %b 第二局：%b", textStartsWith("今日积分奖励局1").exists(), textStartsWith("今日积分奖励局2").exists());
     if (isPlay) {
         sleep(utils.random_time(delay_time));
         for (var i = 0; i < 2; i++) {
@@ -1167,7 +1167,7 @@ if (!finish_list[6]) {
         sleep(utils.random_time(delay_time));
         back();
     } else {
-        log("四人赛已完成跳过");
+        console.log("四人赛已完成跳过");
     }
     sleep(utils.random_time(delay_time));
     back();
@@ -1178,14 +1178,14 @@ if (!finish_list[6]) {
  !finish_list[7] && two_players_scored < 1
  */
 if (!finish_list[7] && two_players_scored < 1) {
-    log("双人对战");
+    console.log("双人对战");
     sleep(utils.random_time(delay_time));
 
     if (!text("双人对战").exists()) utils.back_track(2);
     entry_model(11);
 
     // // 点击随机匹配
-    // log("等待:" + "随机匹配");
+    // console.log("等待:" + "随机匹配");
     text("随机匹配").waitFor();
     sleep(utils.random_time(delay_time * 2));
     text("随机匹配").findOne().parent().child(0).click();
@@ -1200,7 +1200,7 @@ if (!finish_list[7] && two_players_scored < 1) {
 /*
  **********发表观点*********
  */
-log("发表观点 start")
+console.log("发表观点 start")
 if (!finish_list[9]) {
 
     var speechs = [
@@ -1233,11 +1233,11 @@ if (!finish_list[9]) {
     }
     sleep(utils.random_time(delay_time));
 
-    log("等待欢迎发表你的观点");
+    console.log("等待欢迎发表你的观点");
     text('欢迎发表你的观点').waitFor();
     sleep(utils.random_time(delay_time));
     my_click_clickable("欢迎发表你的观点");
-    log("等待欢迎发表你的观点 end");
+    console.log("等待欢迎发表你的观点 end");
     sleep(utils.random_time(delay_time));
     setText(speechs[random(0, speechs.length - 1)]);
     sleep(utils.random_time(delay_time));
@@ -1249,7 +1249,7 @@ if (!finish_list[9]) {
     sleep(utils.random_time(delay_time));
     back();
 }
-log("发表观点 end");
+console.log("发表观点 end");
 
 
 if (pushplus_token.length > 0) {
