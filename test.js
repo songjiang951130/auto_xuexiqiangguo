@@ -136,3 +136,6 @@ log("q set:" + q_set.keys());
 // m.click();
 var d = new Date();
 log(d.getFullYear() + "-" + d.getMonth() + "-" + d.getDate());
+log("device height:"+device.height)
+gesture(400, [200, 2000], [400, 100]);
+
