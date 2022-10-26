@@ -104,16 +104,19 @@ var answer_question_map_name = "answer_question_map_name";
 storage.remove(answer_question_map_name);
 
 //请求横屏截图权限
-threads.start(function() {
+threads.start(function () {
     try {
         var beginBtn;
-        if (beginBtn = classNameContains("Button").textContains("开始").findOne(delay_time));
-        else(beginBtn = classNameContains("Button").textContains("允许").findOne(delay_time));
+        if (beginBtn = classNameContains("Button").textContains("开始").findOne(1000));
+        else (beginBtn = classNameContains("Button").textContains("允许").findOne(1000));
         beginBtn.click();
-    } catch (error) {}
+    } catch (error) { 
+        console.log(error);
+    }
 });
 requestScreenCapture(false);
-sleep(1000);
+console.log("获取截图权限");
+
 
 //强制关闭其他同名脚本
 let currentEngine = engines.myEngine();
@@ -209,9 +212,9 @@ if (!storage.contains(answer_question_map_name)) {
     }
 
     storage.put(answer_question_map_name, answer_question_map);
-    log("题库 更新完成")
+    console.log("题库 更新完成")
 } else {
-    log("题库 跳过更新");
+    console.log("题库 跳过更新");
 }
 
 var answer_question_map = storage.get(answer_question_map_name);
@@ -221,7 +224,7 @@ var answer_question_map = storage.get(answer_question_map_name);
  * @param {UiObject / string} target 控件或者是控件文本
  */
 function my_click_non_clickable(target) {
-    if (typeof(target) == 'string') {
+    if (typeof (target) == 'string') {
         text(target).waitFor();
         var tmp = text(target).findOne().bounds();
     } else {
@@ -265,10 +268,10 @@ function push_weixin_message(account, score) {
     for (var t in pushplus_token) {
         http.postJson(
             'http://www.pushplus.plus/send', {
-                token: pushplus_token[t],
-                title: '[' + account + ']今日获得' + score + '积分',
-                content: '学习强国 账号名' + account + '今日已经获得' + score + '分'
-            }
+            token: pushplus_token[t],
+            title: '[' + account + ']今日获得' + score + '积分',
+            content: '学习强国 账号名' + account + '今日已经获得' + score + '分'
+        }
         );
     }
 }
@@ -298,11 +301,11 @@ function get_finish_list() {
         if (model == null) {
             app_index_version++;
             i--;
-            log("app版本:" + app_index_version);
+            console.log("app版本:" + app_index_version);
             continue;
         }
         // log("model: " + model);
-        log("task:" + (i - 4) + " " + model.child(0).text());
+        console.log("task:" + (i - 4) + " " + model.child(0).text());
         if (i == 4) {
             completed_read_count = parseInt(model.child(child_index).child(0).text());
         } else if (i == 5) {
@@ -312,7 +315,7 @@ function get_finish_list() {
         }
         finish_list.push(model.child(4).text() == '已完成');
     }
-    log("已完成情况:" + finish_list);
+    console.log("已完成情况:" + finish_list);
     return finish_list;
 }
 
@@ -328,14 +331,14 @@ var finish_list = get_finish_list();
  **********本地频道*********
  */
 if (!finish_list[10]) {
-    log("进入本地");
+    console.log("进入本地");
     //14是本地
     while (!text("本地频道").exists()) {
         swipe(400, 200, 400, 800, 500);
     }
     var c = text("本地频道").findOne().parent().child(4).click();
 
-    log("等待本地菜单:" + c);
+    console.log("等待本地菜单:" + c);
     /**
      * 重庆学习平台、重庆农家书屋等数据
      */
@@ -343,7 +346,7 @@ if (!finish_list[10]) {
     className('android.widget.LinearLayout').clickable(true).depth(tab_depth).waitFor();
     sleep(utils.random_time(delay_time));
     var c2 = className('android.widget.LinearLayout').clickable(true).depth(tab_depth).findOne().click();
-    log("等待本地菜单 点击:" + c2);
+    console.log("等待本地菜单 点击:" + c2);
 
     sleep(utils.random_time(delay_time));
     back();
@@ -363,7 +366,7 @@ var currentVolume = device.getMusicVolume();
 // 打开电台广播
 
 if (!finish_list[2]) {
-    log("打开电台广播")
+    console.log("打开电台广播")
     device.setMusicVolume(0);
     if (text("视听学习时长").exists()) {
         var model = text("视听学习时长").findOne().parent().child(4);
@@ -373,12 +376,12 @@ if (!finish_list[2]) {
     my_click_clickable('电台');
     sleep(utils.random_time(delay_time));
     my_click_clickable('听广播');
-    log("点击听广播")
+    console.log("点击听广播")
     sleep(utils.random_time(delay_time));
     if (!textStartsWith("正在收听").exists()) {
         var icon_id = app_index_version_map["icon_id"][app_index_version];
         var v = id(icon_id).findOne();
-        log("播放按钮获取成功")
+        console.log("播放按钮获取成功")
         var lay_state_icon_pos = v.bounds();
         click(lay_state_icon_pos.centerX(), lay_state_icon_pos.centerY());
         sleep(utils.random_time(delay_time));
@@ -386,9 +389,9 @@ if (!finish_list[2]) {
         click(home_bottom.centerX(), home_bottom.centerY());
     }
 }
-log("打开电台广播end");
+console.log("打开电台广播end");
 var startRead = new Date();
-log("选读文章 start");
+console.log("选读文章 start");
 if (!finish_list[4] && completed_read_count < 12) {
     utils.back_track(0);
     sleep(utils.random_time(delay_time));
@@ -404,7 +407,7 @@ if (!finish_list[4] && completed_read_count < 12) {
         swipe(800, 2000, 800, 600, 1000);
         sleep(utils.random_time(delay_time));
         var articles = className("android.widget.TextView").id("general_card_title_id").depth(article_depth).find();
-        log("找文章列表 length:", articles.length)
+        console.log("找文章列表 length:", articles.length)
 
         if (articles.length == 0) {
             toast("未找到文章，进行刷新");
@@ -420,25 +423,25 @@ if (!finish_list[4] && completed_read_count < 12) {
             if (titleSet.has(articles[i].text()) || articles[i].text().includes("朗读") || articles[i].text().includes("朗诵") || articles[i].text().includes("专题")) {
                 continue;
             }
-            log("标题+:" + articles[i].text() + " index:" + i)
+            console.log("标题+:" + articles[i].text() + " index:" + i)
             var cr = click(articles[i].text());
             //这里存在点击失败，但是进文章成功
             if (!cr && !textStartsWith("地方发布平台内容").depth(21).exists()) {
-                log("点击失败 " + articles[i].text());
+                console.log("点击失败 " + articles[i].text());
                 continue;
             }
             var use_time = 0;
-            log("阅读中");
+            console.log("阅读中");
             swipe(500, 1700, 500, 700, 500);
             sleep(Math.abs(single_total_read - use_time));
-            log("阅读完成 article length:", articles.length, " i:", i, "title:", articles[i].text());
+            console.log("阅读完成 article length:", articles.length, " i:", i, "title:", articles[i].text());
             titleSet.add(articles[i].text());
             count++;
             back();
         }
     }
 }
-log("选读文章 end" + (new Date() - startRead) / 1000 / 60);
+console.log("选读文章 end" + (new Date() - startRead) / 1000 / 60);
 
 /*
  *********************视听部分********************
@@ -464,12 +467,12 @@ if (!finish_list[2]) {
     sleep(utils.random_time(delay_time));
     device.setMusicVolume(currentVolume);
 }
-log("关闭电台广播 end");
+console.log("关闭电台广播 end");
 
 /*
  **********视听学习、听学习时长*********
  */
-log("视听学习 start:" + finish_list[1]);
+console.log("视听学习 start:" + finish_list[1]);
 if (!finish_list[1]) {
     var video_depth = app_index_version_map["video_depth"][app_index_version];
     var video_bar_depth = app_index_version_map["video_bar_depth"][app_index_version];
@@ -484,11 +487,11 @@ if (!finish_list[1]) {
     if (text("关闭").exists()) {
         click("关闭");
     }
-    log("竖")
+    console.log("竖")
     my_click_clickable('竖');
     // 等待视频加载
     device.setMusicVolume(0);
-    log("设置静音");
+    console.log("设置静音");
     sleep(utils.random_time(delay_time * 2));
     // 点击第一个视频
     var firstVideo = text("").findOne(300);
@@ -499,7 +502,7 @@ if (!finish_list[1]) {
     click(bound.centerX(), bound.centerY());
     toast("点击第一个视频");
     sleep(utils.random_time(delay_time));
-    log("completed_watch_count:" + completed_watch_count)
+    console.log("completed_watch_count:" + completed_watch_count)
     while (completed_watch_count < 6) {
         log("completed_watch_count:" + completed_watch_count);
         sleep(utils.random_time(delay_time / 2));
@@ -651,7 +654,7 @@ function video_answer_question(video_question) {
     video_question = video_question.slice(0, Math.max(5, punctuation_index));
     try {
         var video_result = http.get('https://www.365shenghuo.com/?s=' + encodeURI(video_question));
-    } catch (error) {}
+    } catch (error) { }
     var video_answer = video_result.body.string().match(/答案：.+</);
     if (video_answer) video_answer = video_answer[0].slice(3, video_answer[0].indexOf('<'));
     return video_answer;
@@ -666,7 +669,7 @@ function video_answer_question(video_question) {
  */
 function getSimilarity(str1, str2) {
     var sameNum = 0
-        //寻找相同字符
+    //寻找相同字符
     for (var i = 0; i < str1.length; i++) {
         for (var j = 0; j < str2.length; j++) {
             if (str1[i] === str2[j]) {
@@ -912,7 +915,7 @@ function try_web_query() {
  */
 function handling_access_exceptions() {
     // 在子线程执行的定时器，如果不用子线程，则无法获取弹出页面的控件
-    var thread_handling_access_exceptions = threads.start(function() {
+    var thread_handling_access_exceptions = threads.start(function () {
         while (true) {
             textContains("访问异常").waitFor();
             // 滑动按钮">>"位置
@@ -970,20 +973,20 @@ if (!finish_list[3]) {
     do_periodic_answer(5);
     my_click_clickable('返回');
 }
-log("每日答题 end")
+console.log("每日答题 end")
 
 /*
  **********挑战答题********* !finish_list[5]
  */
-log("挑战答题")
+console.log("挑战答题")
 if (!finish_list[5]) {
-    log("挑战答题start");
-    if (!text('挑战答题').exists()) {
+    console.log("挑战答题start");
+    if (!text('登录').exists()) {
         utils.back_track(2);
     };
     var q_index = app_index_version_map["challenge_question"][app_index_version]; //12 26
     var o_index = app_index_version_map["challenge_option"][app_index_version];
-    log("q_index:" + q_index + " o_index:" + o_index);
+    console.log("q_index:" + q_index + " o_index:" + o_index);
     sleep(utils.random_time(delay_time));
     entry_model(9);
     className('android.view.View').depth(q_index).waitFor();
@@ -1013,12 +1016,12 @@ if (!finish_list[5]) {
             }
             //复活后 第二次重新开局
             if (text('再来一局').exists()) {
-                log("再来一局 b");
+                console.log("再来一局 b");
                 num = 0;
                 my_click_clickable('再来一局');
                 break;
             }
-            log("挑战答题 题目等待 num:" + num);
+            console.log("挑战答题 题目等待 num:" + num);
             // 题目
             className('android.view.View').depth(q_index).waitFor();
             var question = className('android.view.View').depth(q_index).findOne().text();
@@ -1027,7 +1030,7 @@ if (!finish_list[5]) {
             // 选项文字列表
             var options_text = [];
             // 等待选项加载
-            log("挑战答题 选项等待");
+            console.log("挑战答题 选项等待");
             className('android.widget.RadioButton').depth(o_index).clickable(true).waitFor();
             // 获取所有选项控件，以RadioButton对象为基准，根据UI控件树相对位置寻找选项文字内容
             var options = className('android.widget.RadioButton').depth(o_index).find();
@@ -1048,13 +1051,13 @@ if (!finish_list[5]) {
     // 随意点击直到退出
     do {
         sleep(utils.random_time(delay_time * 2.5));
-        log("挑战完成 选第一个 start");
+        console.log("挑战完成 选第一个 start");
         var radio = className('android.widget.RadioButton').depth(o_index).findOne(3000);
         if (radio == null) {
             break;
         }
         radio.click();
-        log("挑战完成 选第一个 end");
+        console.log("挑战完成 选第一个 end");
         sleep(utils.random_time(delay_time * 2.5));
     } while (!textStartsWith('本次答对').exists());
     click('结束本局');
@@ -1064,7 +1067,7 @@ if (!finish_list[5]) {
     sleep(utils.random_time(delay_time));
     back();
 }
-log("挑战答题end");
+console.log("挑战答题end");
 
 function saveOcrError(bizName, rawImage, clip) {
     var imageDir = "./image/" + bizName + "/";
@@ -1080,7 +1083,7 @@ function saveOcrError(bizName, rawImage, clip) {
  * 四人赛先加载题目再加载答案，而且是单选题，所以可以先题目识别，找到答案，答案一加载，就点击答案
  */
 function do_battle_contest(type) {
-    log("do_battle_contest do_4_contest");
+    console.log("do_battle_contest do_4_contest");
     var q_index = app_index_version_map["four_question"][app_index_version];
     var o_index = app_index_version_map["four_option"][app_index_version];
     if (type == 2) {
@@ -1090,20 +1093,13 @@ function do_battle_contest(type) {
     var questionMap = new Map();
     while (!text('继续挑战').exists()) {
         className("android.view.View").depth(q_index).waitFor();
+        console.log("do_battle_contest 题目加载");
         var pos = className("android.view.View").depth(q_index).findOne().bounds();
-        log("do_battle_contest 选项加载");
-        className('android.widget.RadioButton').depth(o_index).clickable(true).waitFor();
-        /**
-         * 选项虽然加载完毕，会截图到过渡页的情况 “第二题”，见image/ocr_time_error.jpg
-         * 太早ocr会找不到选项，两次日志相差一秒，先设置sleep 1秒试试，甚至会出现多次ocr的情况，所以sleep2秒
-         * 
-         * 15:40:48.296/D: 题目: 1923年6月，中国共产党第三次全国代表大会在广州举行。出席大会的代表30多人，代表全国名党员。 选项:
-         * 15:40:48.296/D: 选项匹配
-         * 15:40:48.299/D: 答题 题库: 420
-         * 15:40:48.305/D: 四人赛题目加载 等答题按钮出现
-         * 15:40:48.315/D: 四人赛选项加载
-         * 15:40:49.371/D: paddle ocr result:["2.1923年6月，中国共产党第三次全","国代表大会在广州举行。出席大会的","代表30多人，代表全国","名党","员。","A.520","B.420","C.410"]
-         */
+        console.log("do_battle_contest 选项加载");
+        var options = className('android.widget.RadioButton').depth(o_index).clickable(true).findOne(3000);
+        if (options == null) {
+            break;
+        }
         var rawImage = captureScreen();
         var img = images.inRange(rawImage, '#000000', '#444444');
         img = images.clip(img, pos.left, pos.top, pos.width(), pos.height());
@@ -1114,7 +1110,7 @@ function do_battle_contest(type) {
         }
         var options_text = result[1];
 
-        log("do_battle_contest 题目: " + question + " 选项:" + options_text);
+        console.log("do_battle_contest 题目: " + question + " 选项:" + options_text);
         var key = question + options_text;
         if (!options_text || options_text.length == 0) {
             var val = questionMap.get(key);
@@ -1123,32 +1119,32 @@ function do_battle_contest(type) {
             questionMap.set(key, val);
             // saveOcrError("option4", rawImage, img);
             if (questionMap.get(key) < 3) {
-                log("do_battle_contest 选项异常");
+                console.log("do_battle_contest 选项异常");
                 continue;
             }
         }
         if (question) {
             do_contest_answer(o_index, question, options_text);
             //答完题后的休息时间
-            sleep(1300);
+            sleep(1000);
         }
         questionMap.set(key, 1);
     }
-    log("do_battle_contest end");
+    console.log("do_battle_contest end");
 }
 
 /*
  **********四人赛********* !finish_list[6]
  */
 if (!finish_list[6]) {
-    log("四人赛");
+    console.log("四人赛");
     if (!text("四人赛").exists()) utils.back_track(2);
     swipe(500, 1700, 500, 500, utils.random_time(delay_time / 2));
     var model = text("四人赛").findOne().parent().child(4);
     model.click();
     sleep(utils.random_time(delay_time));
     var isPlay = textStartsWith("今日积分奖励局1").exists() || textStartsWith("今日积分奖励局2").exists();
-    console.log("四人赛第一局:%b 第二局：%b", textStartsWith("今日积分奖励局1").exists(), textStartsWith("今日积分奖励局2").exists());
+    console.log("四人赛第一局: %b 第二局：%b", textStartsWith("今日积分奖励局1").exists(), textStartsWith("今日积分奖励局2").exists());
     if (isPlay) {
         sleep(utils.random_time(delay_time));
         for (var i = 0; i < 2; i++) {
@@ -1167,7 +1163,7 @@ if (!finish_list[6]) {
         sleep(utils.random_time(delay_time));
         back();
     } else {
-        log("四人赛已完成跳过");
+        console.log("四人赛已完成跳过");
     }
     sleep(utils.random_time(delay_time));
     back();
@@ -1178,14 +1174,14 @@ if (!finish_list[6]) {
  !finish_list[7] && two_players_scored < 1
  */
 if (!finish_list[7] && two_players_scored < 1) {
-    log("双人对战");
+    console.log("双人对战");
     sleep(utils.random_time(delay_time));
 
     if (!text("双人对战").exists()) utils.back_track(2);
     entry_model(11);
 
     // // 点击随机匹配
-    // log("等待:" + "随机匹配");
+    // console.log("等待:" + "随机匹配");
     text("随机匹配").waitFor();
     sleep(utils.random_time(delay_time * 2));
     text("随机匹配").findOne().parent().child(0).click();
@@ -1200,7 +1196,7 @@ if (!finish_list[7] && two_players_scored < 1) {
 /*
  **********发表观点*********
  */
-log("发表观点 start")
+console.log("发表观点 start")
 if (!finish_list[9]) {
 
     var speechs = [
@@ -1233,11 +1229,11 @@ if (!finish_list[9]) {
     }
     sleep(utils.random_time(delay_time));
 
-    log("等待欢迎发表你的观点");
+    console.log("等待欢迎发表你的观点");
     text('欢迎发表你的观点').waitFor();
     sleep(utils.random_time(delay_time));
     my_click_clickable("欢迎发表你的观点");
-    log("等待欢迎发表你的观点 end");
+    console.log("等待欢迎发表你的观点 end");
     sleep(utils.random_time(delay_time));
     setText(speechs[random(0, speechs.length - 1)]);
     sleep(utils.random_time(delay_time));
@@ -1249,7 +1245,7 @@ if (!finish_list[9]) {
     sleep(utils.random_time(delay_time));
     back();
 }
-log("发表观点 end");
+console.log("发表观点 end");
 
 
 if (pushplus_token.length > 0) {
