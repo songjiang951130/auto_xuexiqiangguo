@@ -110,7 +110,7 @@ threads.start(function () {
         if (beginBtn = classNameContains("Button").textContains("开始").findOne(1000));
         else (beginBtn = classNameContains("Button").textContains("允许").findOne(1000));
         beginBtn.click();
-    } catch (error) { 
+    } catch (error) {
         console.log(error);
     }
 });
@@ -507,6 +507,10 @@ if (!finish_list[1]) {
         log("completed_watch_count:" + completed_watch_count);
         sleep(utils.random_time(delay_time / 2));
         var video_time_text = className('android.widget.TextView').clickable(false).depth(video_bar_depth).findOne().text();
+        if (video_time_text == null) {
+            sleep(200);
+            continue;
+        }
         if (video_time_text.search("当前网络未非WiFi网络") != -1) {
             text("刷新重试").findOnce().click();
             sleep(200);
@@ -1029,7 +1033,6 @@ if (!finish_list[5]) {
             question = question.slice(0, question.indexOf(' '));
             // 选项文字列表
             var options_text = [];
-            // 等待选项加载
             console.log("挑战答题 选项等待");
             className('android.widget.RadioButton').depth(o_index).clickable(true).waitFor();
             // 获取所有选项控件，以RadioButton对象为基准，根据UI控件树相对位置寻找选项文字内容
@@ -1096,7 +1099,7 @@ function do_battle_contest(type) {
         console.log("do_battle_contest 题目加载");
         var pos = className("android.view.View").depth(q_index).findOne().bounds();
         console.log("do_battle_contest 选项加载");
-        var options = className('android.widget.RadioButton').depth(o_index).clickable(true).findOne(3000);
+        var options = className('android.widget.RadioButton').depth(o_index).clickable(true).findOne(6000);
         if (options == null) {
             break;
         }
