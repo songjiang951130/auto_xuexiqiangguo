@@ -104,16 +104,19 @@ var answer_question_map_name = "answer_question_map_name";
 storage.remove(answer_question_map_name);
 
 //请求横屏截图权限
-threads.start(function() {
+threads.start(function () {
     try {
         var beginBtn;
-        if (beginBtn = classNameContains("Button").textContains("开始").findOne(delay_time));
-        else(beginBtn = classNameContains("Button").textContains("允许").findOne(delay_time));
+        if (beginBtn = classNameContains("Button").textContains("开始").findOne(1000));
+        else (beginBtn = classNameContains("Button").textContains("允许").findOne(1000));
         beginBtn.click();
-    } catch (error) {}
+    } catch (error) { 
+        console.log(error);
+    }
 });
 requestScreenCapture(false);
-sleep(1000);
+console.log("获取截图权限");
+
 
 //强制关闭其他同名脚本
 let currentEngine = engines.myEngine();
@@ -221,7 +224,7 @@ var answer_question_map = storage.get(answer_question_map_name);
  * @param {UiObject / string} target 控件或者是控件文本
  */
 function my_click_non_clickable(target) {
-    if (typeof(target) == 'string') {
+    if (typeof (target) == 'string') {
         text(target).waitFor();
         var tmp = text(target).findOne().bounds();
     } else {
@@ -265,10 +268,10 @@ function push_weixin_message(account, score) {
     for (var t in pushplus_token) {
         http.postJson(
             'http://www.pushplus.plus/send', {
-                token: pushplus_token[t],
-                title: '[' + account + ']今日获得' + score + '积分',
-                content: '学习强国 账号名' + account + '今日已经获得' + score + '分'
-            }
+            token: pushplus_token[t],
+            title: '[' + account + ']今日获得' + score + '积分',
+            content: '学习强国 账号名' + account + '今日已经获得' + score + '分'
+        }
         );
     }
 }
@@ -651,7 +654,7 @@ function video_answer_question(video_question) {
     video_question = video_question.slice(0, Math.max(5, punctuation_index));
     try {
         var video_result = http.get('https://www.365shenghuo.com/?s=' + encodeURI(video_question));
-    } catch (error) {}
+    } catch (error) { }
     var video_answer = video_result.body.string().match(/答案：.+</);
     if (video_answer) video_answer = video_answer[0].slice(3, video_answer[0].indexOf('<'));
     return video_answer;
@@ -666,7 +669,7 @@ function video_answer_question(video_question) {
  */
 function getSimilarity(str1, str2) {
     var sameNum = 0
-        //寻找相同字符
+    //寻找相同字符
     for (var i = 0; i < str1.length; i++) {
         for (var j = 0; j < str2.length; j++) {
             if (str1[i] === str2[j]) {
@@ -912,7 +915,7 @@ function try_web_query() {
  */
 function handling_access_exceptions() {
     // 在子线程执行的定时器，如果不用子线程，则无法获取弹出页面的控件
-    var thread_handling_access_exceptions = threads.start(function() {
+    var thread_handling_access_exceptions = threads.start(function () {
         while (true) {
             textContains("访问异常").waitFor();
             // 滑动按钮">>"位置
@@ -1090,20 +1093,13 @@ function do_battle_contest(type) {
     var questionMap = new Map();
     while (!text('继续挑战').exists()) {
         className("android.view.View").depth(q_index).waitFor();
+        console.log("do_battle_contest 题目加载");
         var pos = className("android.view.View").depth(q_index).findOne().bounds();
         console.log("do_battle_contest 选项加载");
-        className('android.widget.RadioButton').depth(o_index).clickable(true).waitFor();
-        /**
-         * 选项虽然加载完毕，会截图到过渡页的情况 “第二题”，见image/ocr_time_error.jpg
-         * 太早ocr会找不到选项，两次日志相差一秒，先设置sleep 1秒试试，甚至会出现多次ocr的情况，所以sleep2秒
-         * 
-         * 15:40:48.296/D: 题目: 1923年6月，中国共产党第三次全国代表大会在广州举行。出席大会的代表30多人，代表全国名党员。 选项:
-         * 15:40:48.296/D: 选项匹配
-         * 15:40:48.299/D: 答题 题库: 420
-         * 15:40:48.305/D: 四人赛题目加载 等答题按钮出现
-         * 15:40:48.315/D: 四人赛选项加载
-         * 15:40:49.371/D: paddle ocr result:["2.1923年6月，中国共产党第三次全","国代表大会在广州举行。出席大会的","代表30多人，代表全国","名党","员。","A.520","B.420","C.410"]
-         */
+        var options = className('android.widget.RadioButton').depth(o_index).clickable(true).findOne(3000);
+        if (options == null) {
+            break;
+        }
         var rawImage = captureScreen();
         var img = images.inRange(rawImage, '#000000', '#444444');
         img = images.clip(img, pos.left, pos.top, pos.width(), pos.height());
@@ -1130,7 +1126,7 @@ function do_battle_contest(type) {
         if (question) {
             do_contest_answer(o_index, question, options_text);
             //答完题后的休息时间
-            sleep(1300);
+            sleep(1000);
         }
         questionMap.set(key, 1);
     }
