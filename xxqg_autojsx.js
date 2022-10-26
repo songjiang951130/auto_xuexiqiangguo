@@ -345,7 +345,7 @@ if (!finish_list[10]) {
     var tab_depth = app_index_version_map["tab_depth"][app_index_version];
     className('android.widget.LinearLayout').clickable(true).depth(tab_depth).waitFor();
     sleep(utils.random_time(delay_time));
-    var c2 = className('android.widget.LinearLayout').clickable(true).depth(tab_depth).findOne().click();
+    var c2 = className('android.widget.LinearLayout').clickable(true).depth(tab_depth).drawingOrder(1).findOne().click();
     console.log("等待本地菜单 点击:" + c2);
 
     sleep(utils.random_time(delay_time));
@@ -392,7 +392,7 @@ if (!finish_list[2]) {
 console.log("打开电台广播end");
 var startRead = new Date();
 console.log("选读文章 start");
-if (!finish_list[4] && completed_read_count < 12) {
+if (false) {
     utils.back_track(0);
     sleep(utils.random_time(delay_time));
 
@@ -473,7 +473,8 @@ console.log("关闭电台广播 end");
  **********视听学习、听学习时长*********
  */
 console.log("视听学习 start:" + finish_list[1]);
-if (!finish_list[1]) {
+completed_watch_count = 0;
+if (true) {
     var video_depth = app_index_version_map["video_depth"][app_index_version];
     var video_bar_depth = app_index_version_map["video_bar_depth"][app_index_version];
 
@@ -518,14 +519,19 @@ if (!finish_list[1]) {
         }
         // 当前视频的时间长度
         video_time_text = video_time_text.toString();
-        //&& text("刷新重试").findOnce() != null
-        // log("短视频时长:" + video_time_text);
+        log("短视频时长:" + video_time_text);
+        if (video_time_text == null) {
+            sleep(200);
+            continue;
+        }
         var current_video_time = video_time_text.match(/\/.*/).toString().slice(1);
         //"竖线后内容，有空格| 01:20"
-        log("短视频时长:" + current_video_time);
+        log("短视频时长:" + current_video_time + " " + Number(current_video_time.slice(0, 3)));
         // 如果视频超过一分钟就跳过
         if (Number(current_video_time.slice(0, 3)) >= 1) {
-            refresh(true);
+            log("视频时长超过一分钟进行跳过");
+            //下一步根据设备宽度来
+            gesture(400, [200, 2000], [400, 100]);
             sleep(utils.random_time(delay_time));
             continue;
         }
@@ -1099,7 +1105,7 @@ function do_battle_contest(type) {
         console.log("do_battle_contest 题目加载");
         var pos = className("android.view.View").depth(q_index).findOne().bounds();
         console.log("do_battle_contest 选项加载");
-        var options = className('android.widget.RadioButton').depth(o_index).clickable(true).findOne(6000);
+        var options = className('android.widget.RadioButton').depth(o_index).clickable(true).findOne(20000);
         if (options == null) {
             break;
         }
@@ -1139,7 +1145,7 @@ function do_battle_contest(type) {
 /*
  **********四人赛********* !finish_list[6]
  */
-if (!finish_list[6]) {
+if (true) {
     console.log("四人赛");
     if (!text("四人赛").exists()) utils.back_track(2);
     swipe(500, 1700, 500, 500, utils.random_time(delay_time / 2));
@@ -1148,6 +1154,7 @@ if (!finish_list[6]) {
     sleep(utils.random_time(delay_time));
     var isPlay = textStartsWith("今日积分奖励局1").exists() || textStartsWith("今日积分奖励局2").exists();
     console.log("四人赛第一局: %b 第二局：%b", textStartsWith("今日积分奖励局1").exists(), textStartsWith("今日积分奖励局2").exists());
+    isPlay = true;
     if (isPlay) {
         sleep(utils.random_time(delay_time));
         for (var i = 0; i < 2; i++) {
