@@ -326,31 +326,7 @@ utils.back_track(2);
 sleep(utils.random_time(delay_time));
 var finish_list = get_finish_list();
 
-// 返回首页
-/*
- **********本地频道*********
- */
-if (!finish_list[10]) {
-    console.log("进入本地");
-    //14是本地
-    while (!text("本地频道").exists()) {
-        swipe(400, 200, 400, 800, 500);
-    }
-    var c = text("本地频道").findOne().parent().child(4).click();
 
-    console.log("等待本地菜单:" + c);
-    /**
-     * 重庆学习平台、重庆农家书屋等数据
-     */
-    var tab_depth = app_index_version_map["tab_depth"][app_index_version];
-    className('android.widget.LinearLayout').clickable(true).depth(tab_depth).waitFor();
-    sleep(utils.random_time(delay_time));
-    var c2 = className('android.widget.LinearLayout').clickable(true).depth(tab_depth).drawingOrder(1).findOne().click();
-    console.log("等待本地菜单 点击:" + c2);
-
-    sleep(utils.random_time(delay_time));
-    back();
-}
 
 /*
  *********************阅读部分********************
@@ -390,15 +366,24 @@ if (!finish_list[2]) {
     }
 }
 console.log("打开电台广播end");
+
 var startRead = new Date();
 console.log("选读文章 start");
-if (false) {
+if (!finish_list[4] && completed_read_count < 12) {
     utils.back_track(0);
-    sleep(utils.random_time(delay_time));
-
+    sleep(200);
+    if (!finish_list[10]) {
+        var tab_depth = app_index_version_map["tab_depth"][app_index_version];
+        className('android.widget.LinearLayout').clickable(true).depth(tab_depth).waitFor();
+        sleep(utils.random_time(delay_time));
+        var c2 = className('android.widget.LinearLayout').clickable(true).depth(tab_depth).drawingOrder(1).findOne().click();
+        console.log("等待本地菜单 点击:" + c2);
+        sleep(utils.random_time(delay_time));
+        back();
+    }
     // 阅读文章次数
     var count = 0;
-    var single_total_read = 63000
+    var single_total_read = 63000;
     var titleSet = new Set();
     var article_depth = app_index_version_map["article_depth"][app_index_version];
     var need_count = (12 - completed_read_count) / 2 + 1;
@@ -407,7 +392,7 @@ if (false) {
         swipe(800, 2000, 800, 600, 1000);
         sleep(utils.random_time(delay_time));
         var articles = className("android.widget.TextView").id("general_card_title_id").depth(article_depth).find();
-        console.log("找文章列表 length:", articles.length)
+        // console.log("找文章列表 length:", articles.length)
 
         if (articles.length == 0) {
             toast("未找到文章，进行刷新");
@@ -423,18 +408,16 @@ if (false) {
             if (titleSet.has(articles[i].text()) || articles[i].text().includes("朗读") || articles[i].text().includes("朗诵") || articles[i].text().includes("专题")) {
                 continue;
             }
-            console.log("标题+:" + articles[i].text() + " index:" + i)
             var cr = click(articles[i].text());
             //这里存在点击失败，但是进文章成功
             if (!cr && !textStartsWith("地方发布平台内容").depth(21).exists()) {
-                console.log("点击失败 " + articles[i].text());
+                // console.log("点击失败 " + articles[i].text());
                 continue;
             }
             var use_time = 0;
-            console.log("阅读中");
             swipe(500, 1700, 500, 700, 500);
             sleep(Math.abs(single_total_read - use_time));
-            console.log("阅读完成 article length:", articles.length, " i:", i, "title:", articles[i].text());
+            console.log("阅读完成 count:", count, " i:", i, " title:", articles[i].text());
             titleSet.add(articles[i].text());
             count++;
             back();
@@ -473,8 +456,7 @@ console.log("关闭电台广播 end");
  **********视听学习、听学习时长*********
  */
 console.log("视听学习 start:" + finish_list[1]);
-completed_watch_count = 0;
-if (true) {
+if (!finish_list[1]) {
     var video_depth = app_index_version_map["video_depth"][app_index_version];
     var video_bar_depth = app_index_version_map["video_bar_depth"][app_index_version];
 
@@ -1145,7 +1127,7 @@ function do_battle_contest(type) {
 /*
  **********四人赛********* !finish_list[6]
  */
-if (true) {
+if (!finish_list[6]) {
     console.log("四人赛");
     if (!text("四人赛").exists()) utils.back_track(2);
     swipe(500, 1700, 500, 500, utils.random_time(delay_time / 2));
@@ -1153,8 +1135,7 @@ if (true) {
     model.click();
     sleep(utils.random_time(delay_time));
     var isPlay = textStartsWith("今日积分奖励局1").exists() || textStartsWith("今日积分奖励局2").exists();
-    console.log("四人赛第一局: %b 第二局：%b", textStartsWith("今日积分奖励局1").exists(), textStartsWith("今日积分奖励局2").exists());
-    isPlay = true;
+    console.log("四人赛第一局: %o 第二局：%o", textStartsWith("今日积分奖励局1").exists(), textStartsWith("今日积分奖励局2").exists());
     if (isPlay) {
         sleep(utils.random_time(delay_time));
         for (var i = 0; i < 2; i++) {
