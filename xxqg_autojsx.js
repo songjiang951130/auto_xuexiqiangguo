@@ -193,11 +193,6 @@ function map_get(key) {
 if (!storage.contains(answer_question_map_name)) {
     // 使用 Github 文件加速服务：https://gh-proxy.com
     var answer_question_bank = http.get("https://gh-proxy.com/https://raw.githubusercontent.com/Mondayfirst/XXQG_TiKu/main/%E9%A2%98%E5%BA%93_%E6%8E%92%E5%BA%8F%E7%89%88.json");
-    // 如果资源过期或无法访问则换成别的云盘
-    if (!(answer_question_bank.statusCode >= 200 && answer_question_bank.statusCode < 300)) {
-        // 使用腾讯云
-        var answer_question_bank = http.get("https://xxqg-tiku-1305531293.cos.ap-nanjing.myqcloud.com/%E9%A2%98%E5%BA%93_%E6%8E%92%E5%BA%8F%E7%89%88.json");
-    }
     answer_question_bank = answer_question_bank.body.string();
     answer_question_bank = JSON.parse(answer_question_bank);
 
