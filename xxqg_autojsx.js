@@ -492,13 +492,13 @@ if (!finish_list[1]) {
             sleep(200);
             continue;
         }
+        // 当前视频的时间长度
+        video_time_text = video_time_text.toString();
         if (video_time_text.search("当前网络未非WiFi网络") != -1) {
             text("刷新重试").findOnce().click();
             sleep(200);
             video_time_text = className('android.widget.TextView').clickable(false).depth(video_bar_depth).findOne().text();
         }
-        // 当前视频的时间长度
-        video_time_text = video_time_text.toString();
         log("短视频时长:" + video_time_text);
         if (video_time_text == null) {
             sleep(200);
