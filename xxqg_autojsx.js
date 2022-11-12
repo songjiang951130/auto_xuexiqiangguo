@@ -17,8 +17,8 @@ var delay_time = 500;
  * 选填，是否要使用微信消息推送功能
  * 如是 请填写pushplus的token，如何获取请见说明
  *  */
-var pushplus_token = ["dcef94e8152a455589d9080e95090c4d"];
-var pushplus_topic = ["自用"];
+var pushplus_token = [];
+var pushplus_topic = [];
 
 var app_index_version = 0;
 
@@ -262,7 +262,10 @@ function push_weixin_message(account, score) {
         return;
     }
     for (var t in pushplus_token) {
-        var topic = pushplus_topic[t];
+        var topic;
+        if (pushplus_topic.length > t) {
+            topic = pushplus_topic[t];
+        }
         http.postJson(
             'http://www.pushplus.plus/send', {
             token: pushplus_token[t],
