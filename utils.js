@@ -42,6 +42,9 @@ utils.back_track = function (back_track_flag) {
             // 去province模块
             sleep(200);
             var m = text("思想").findOne().parent().parent().child(3);
+            if (m.text() == '亮点') {
+                m = m.parent().child(4);
+            }
             m.click();
             break;
         case 1:

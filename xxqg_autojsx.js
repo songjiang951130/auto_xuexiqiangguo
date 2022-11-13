@@ -17,8 +17,13 @@ var delay_time = 500;
  * 选填，是否要使用微信消息推送功能
  * 如是 请填写pushplus的token，如何获取请见说明
  *  */
+<<<<<<< HEAD
 var pushplus_token = [];
 var pushplus_topic = [];
+=======
+var pushplus_token = ["90e87c34aa974eada2952c750b01e0f6"];
+var pushplus_topic = ["自用"];
+>>>>>>> @{-1}
 
 var app_index_version = 0;
 
@@ -586,6 +591,7 @@ function select_option(answer, depth_click_option, options_text) {
  * @param {list[string]} options_text 每个选项文本
  */
 function do_contest_answer(depth_click_option, question, options_text) {
+    var raw = question;
     question = question.slice(0, 10);
     // 如果是特殊问题需要用选项搜索答案，而不是问题
     if (special_problem.indexOf(question.slice(0, 7)) != -1) {
@@ -599,6 +605,9 @@ function do_contest_answer(depth_click_option, question, options_text) {
     // 如果本地题库没搜到，则搜网络题库
     if (answer == null) {
         var result = question_search.getAnswerText(question);
+        if (!result) {
+            result = question_search.getAnswerText(raw);
+        }
         if (result) {
             log("答题 网络搜索 :" + result);
             select_option(result, depth_click_option, options_text);
