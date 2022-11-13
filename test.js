@@ -139,3 +139,7 @@ log(d.getFullYear() + "-" + d.getMonth() + "-" + d.getDate());
 log("device height:"+device.height)
 gesture(400, [200, 2000], [400, 100]);
 
+var raw = "“昊带楚客多游，壮丽东南第一州”，这是明朝《永乐大典》编者之一的姚广孝赞美江苏的诗句";
+var search = question_search.getAnswerText(raw);
+console.log(search)
+
