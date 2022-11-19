@@ -143,3 +143,12 @@ var raw = "“昊带楚客多游，壮丽东南第一州”，这是明朝《永
 var search = question_search.getAnswerText(raw);
 console.log(search)
 
+
+var m = text("思想").findOne().parent().parent().child(4);
+console.log(m.text());
+if (m.text() == '亮点') {
+    m = m.parent().child(4);
+}
+m.click();
+console.log("currentPackage:" + currentPackage())
+

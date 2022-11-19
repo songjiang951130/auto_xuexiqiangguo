@@ -17,13 +17,9 @@ var delay_time = 500;
  * 选填，是否要使用微信消息推送功能
  * 如是 请填写pushplus的token，如何获取请见说明
  *  */
-<<<<<<< HEAD
+
 var pushplus_token = [];
 var pushplus_topic = [];
-=======
-var pushplus_token = ["90e87c34aa974eada2952c750b01e0f6"];
-var pushplus_topic = ["自用"];
->>>>>>> @{-1}
 
 var app_index_version = 0;
 
@@ -82,23 +78,10 @@ var lock_number = "";
 var start = new Date();
 
 /* **********************请填写如上信息********************** */
+console.log("解锁");
+utils.unlock(lock_number);
 
-/*判断屏幕锁定，解锁屏幕（数字密码）*/
-if (!device.isScreenOn() && lock_number) { //息屏状态将屏幕唤醒
-    device.wakeUp();
-    // 等待屏幕亮起
-    sleep(1000);
-    //向下滑动、展示输入密码页
-    swipe(500, 30, 500, 1000, 300);
-    sleep(400);
-    //输入锁屏密码
-    for (var l in lock_number) {
-        desc(lock_number[l]).findOne().click();
-        sleep(200);
-    }
-}
-
-auto.waitFor()
+auto.waitFor();
 
 // 将设备保持常亮 30分钟，应该能跑完脚本
 device.keepScreenOn(30 * 60 * 1000);
@@ -123,7 +106,6 @@ threads.start(function () {
 requestScreenCapture(false);
 console.log("获取截图权限");
 
-
 //强制关闭其他同名脚本
 let currentEngine = engines.myEngine();
 let runningEngines = engines.all();
@@ -143,7 +125,6 @@ if (runningEngines.length > 1) {
  * 在存储时，不需要存储整个question，可以仅根据选项来对应question，这样可以省去ocr题目的花费
  * 但如果遇到选项为special_problem数组中的模糊词，无法对应question，则需要存储整个问题
  */
-
 var answer_question_map = [];
 
 // 当题目为这些词时，题目较多会造成hash表上的一个index过多，此时存储其选项
@@ -384,7 +365,7 @@ if (!finish_list[4] && completed_read_count < 12) {
         sleep(utils.random_time(delay_time));
         var c2 = className('android.widget.LinearLayout').clickable(true).depth(tab_depth).drawingOrder(1).findOne().click();
         console.log("等待本地菜单 点击:" + c2);
-        sleep(utils.random_time(delay_time));
+        sleep(300);
         back();
     }
     // 阅读文章次数
@@ -397,7 +378,7 @@ if (!finish_list[4] && completed_read_count < 12) {
         console.log("开始阅读：need_count:%d count:%d", need_count, count)
         swipe(800, 2000, 800, 600, 1000);
         sleep(utils.random_time(delay_time));
-        var articles = className("android.widget.TextView").id("general_card_title_id").depth(article_depth).find();
+        var articles = className("android.widget.TextView").id("general_card_title_id").depth(article_depth).drawingOrder(2).find();
         // console.log("找文章列表 length:", articles.length)
 
         if (articles.length == 0) {
@@ -411,7 +392,10 @@ if (!finish_list[4] && completed_read_count < 12) {
             if (count >= need_count) {
                 break;
             }
-            if (titleSet.has(articles[i].text()) || articles[i].text().includes("朗读") || articles[i].text().includes("朗诵") || articles[i].text().includes("专题")) {
+            if (titleSet.has(articles[i].text()) || articles[i].text().includes("朗读") 
+                || articles[i].text().includes("朗诵") || articles[i].text().includes("专题")
+                || articles[i].text().includes("近平")
+                ) {
                 continue;
             }
             var cr = click(articles[i].text());
