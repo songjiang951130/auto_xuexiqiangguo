@@ -391,10 +391,10 @@ if (!finish_list[4] && completed_read_count < 12) {
             if (count >= need_count) {
                 break;
             }
-            if (titleSet.has(articles[i].text()) || articles[i].text().includes("朗读") 
+            if (titleSet.has(articles[i].text()) || articles[i].text().includes("朗读")
                 || articles[i].text().includes("朗诵") || articles[i].text().includes("专题")
                 || articles[i].text().includes("近平")
-                ) {
+            ) {
                 continue;
             }
             var cr = click(articles[i].text());
@@ -612,7 +612,7 @@ function do_contest_answer(depth_click_option, question, options_text) {
 /*
  ********************答题部分********************
  */
-
+var blank_storge = storages.create("auto_xuexiqiangguo:blank");
 // 填空题
 function fill_in_blank(answer) {
     // 获取每个空
@@ -626,6 +626,18 @@ function fill_in_blank(answer) {
         // 需要缓冲
         sleep(500);
     }
+}
+
+function findBlankAnswer(tipsText, questionSlice) {
+    for (var i in questionSlice) {
+        var q = questionSlice[i].text();
+        tipsText = tipsText.replace(q, "");
+        console.log("填空题解析res:" + tipsText);
+        if (q.includes("出题")) {
+            break;
+        }
+    }
+    return tipsText;
 }
 
 /**
@@ -828,6 +840,7 @@ function do_periodic_answer(number) {
                 // 打开查看提示的时间
                 sleep(1000);
                 var tipsModel = text("提示").findOne().parent().parent().child(1).child(0);
+                var tipsText = tipsModel.text();
                 var pos = tipsModel.bounds();
                 var sc = captureScreen();
                 // var imageC = images.clip(sc, pos.left, pos.top, pos.width(), device.height - pos.top);
@@ -846,13 +859,15 @@ function do_periodic_answer(number) {
                 if (textContains('多选题').exists() || textContains('单选题').exists()) {
                     multiple_choice(answer);
                 } else {
+                    if (!answer) {
+                        var questionSlice = className('android.view.View').depth(24).find();
+                        findBlankAnswer(tipsText, questionSlice);
+                    }
                     fill_in_blank(answer);
                 }
             }
 
             sleep(400);
-
-            // 不是专项答题时
             click('确定');
             sleep(utils.random_time(delay_time));
             // 如果错误（ocr识别有误）则重来

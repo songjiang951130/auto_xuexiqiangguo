@@ -136,7 +136,7 @@ log("q set:" + q_set.keys());
 // m.click();
 var d = new Date();
 log(d.getFullYear() + "-" + d.getMonth() + "-" + d.getDate());
-log("device height:"+device.height)
+log("device height:" + device.height)
 gesture(400, [200, 2000], [400, 100]);
 
 var raw = "“昊带楚客多游，壮丽东南第一州”，这是明朝《永乐大典》编者之一的姚广孝赞美江苏的诗句";
@@ -144,11 +144,25 @@ var search = question_search.getAnswerText(raw);
 console.log(search)
 
 
-var m = text("思想").findOne().parent().parent().child(4);
-console.log(m.text());
-if (m.text() == '亮点') {
-    m = m.parent().child(4);
+function findBlankAnswer(tipsText, questionSlice) {
+    for (var i in questionSlice) {
+        var q = questionSlice[i].text();
+        tipsText = tipsText.replace(q, "");
+        console.log("填空题解析res:" + tipsText);
+        if (q.includes("出题")) {
+            break;
+        }
+    }
+    return tipsText;
 }
-m.click();
-console.log("currentPackage:" + currentPackage())
+
+click("查看提示");
+var tipsModel = text("提示").findOne().parent().parent().child(1).child(0);
+var tipsText = tipsModel.text();
+console.log("tipsText:" + tipsText);
+back();
+
+var questionSlice = className('android.view.View').depth(24).find();
+
+findBlankAnswer(tipsText, questionSlice);
 
