@@ -41,7 +41,7 @@ utils.back_track = function (back_track_flag) {
             click(home_bottom.centerX(), home_bottom.centerY());
             // 去province模块
             sleep(200);
-            var m = text("思想").findOne().parent().parent().child(3);
+            var m = text("思想").findOne().parent().parent().child(4);
             if (m.text() == '亮点') {
                 m = m.parent().child(4);
             }
@@ -58,6 +58,36 @@ utils.back_track = function (back_track_flag) {
             id("comm_head_xuexi_score").findOne().click();
             text('登录').waitFor();
             break;
+    }
+}
+
+utils.unlock = function (lock_number) {
+    if (!lock_number) {
+        return;
+    }
+
+    if (!device.isScreenOn()) {
+        //息屏状态将屏幕唤醒
+        device.wakeUp();
+    }
+    //如果有包启动就
+    if (!currentPackage()) {
+        console.log("跳过解锁");
+        return;
+    }
+    console.log("开始输入密码");
+    // 等待屏幕亮起
+    sleep(1000);
+    //向下滑动、展示输入密码页
+    swipe(500, 30, 500, 1000, 300);
+    sleep(400);
+    //输入锁屏密码
+    for (var l in lock_number) {
+        var mo = desc(lock_number[l]).findOnce(200)
+        if (mo != null) {
+            mo.click();
+        }
+        sleep(200);
     }
 }
 module.exports = utils;
