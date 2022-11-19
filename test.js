@@ -145,13 +145,25 @@ console.log(search)
 
 
 function findBlankAnswer(tipsText, questionSlice) {
+    var questionString = [];
     for (var i in questionSlice) {
+        if (typeof questionSlice[i] == "function" || !questionSlice[i]) {
+            continue;
+        }
+        if (questionSlice[i] == "class com.stardust.automator.UiObjectCollection") {
+            continue;
+        }
         var q = questionSlice[i].text();
-        tipsText = tipsText.replace(q, "");
-        console.log("填空题解析res:" + tipsText);
-        if (q.includes("出题")) {
+        if (q.includes("")) {
             break;
         }
+        console.log("填空题解析q :" + q + " i:" + i);
+        // tipsText = tipsText.replace(q, "");
+        // console.log("填空题解析res:" + tipsText);
+        if (q.includes("")) {
+            break;
+        }
+
     }
     return tipsText;
 }
@@ -162,7 +174,7 @@ var tipsText = tipsModel.text();
 console.log("tipsText:" + tipsText);
 back();
 
-var questionSlice = className('android.view.View').depth(24).find();
+var questionSlice = className('android.view.View').depth(24).drawingOrder(0).find();
 
 findBlankAnswer(tipsText, questionSlice);
 
