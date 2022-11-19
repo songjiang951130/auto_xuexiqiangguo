@@ -73,7 +73,7 @@ var app_index_version_map = {
     ]
 }
 
-var lock_number = "";
+var lock_number = "303178";
 var start = new Date();
 
 /* **********************请填写如上信息********************** */
@@ -630,6 +630,16 @@ function fill_in_blank(answer) {
 
 function findBlankAnswer(tipsText, questionSlice) {
     for (var i in questionSlice) {
+        if (typeof questionSlice[i] == "function" || !questionSlice[i]) {
+            continue;
+        }
+        if (questionSlice[i] == "class com.stardust.automator.UiObjectCollection") {
+            continue;
+        }
+        var q = questionSlice[i].text();
+        if (q.includes("")) {
+            break;
+        }
         var q = questionSlice[i].text();
         tipsText = tipsText.replace(q, "");
         console.log("填空题解析res:" + tipsText);
