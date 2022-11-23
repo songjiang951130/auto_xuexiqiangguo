@@ -73,7 +73,7 @@ var app_index_version_map = {
     ]
 }
 
-var lock_number = "303178";
+var lock_number = "";
 var start = new Date();
 
 /* **********************请填写如上信息********************** */
@@ -361,10 +361,8 @@ if (!finish_list[4] && completed_read_count < 12) {
     if (!finish_list[10]) {
         var tab_depth = app_index_version_map["tab_depth"][app_index_version];
         className('android.widget.LinearLayout').clickable(true).depth(tab_depth).waitFor();
-        sleep(utils.random_time(delay_time));
-        var c2 = className('android.widget.LinearLayout').clickable(true).depth(tab_depth).drawingOrder(1).findOne().click();
-        console.log("等待本地菜单 点击:" + c2);
-        sleep(300);
+        className('android.widget.LinearLayout').clickable(true).depth(tab_depth).drawingOrder(1).findOne().click();
+        sleep(500);
         back();
     }
     // 阅读文章次数
@@ -475,7 +473,7 @@ if (!finish_list[1]) {
     toast("点击第一个视频");
     sleep(utils.random_time(delay_time));
     console.log("completed_watch_count:" + completed_watch_count)
-    while (completed_watch_count < 6) {
+    while (completed_watch_count <= 6) {
         log("completed_watch_count:" + completed_watch_count);
         sleep(utils.random_time(delay_time / 2));
         var video_time_text = className('android.widget.TextView').clickable(false).depth(video_bar_depth).findOne().text();
@@ -485,13 +483,13 @@ if (!finish_list[1]) {
         }
         // 当前视频的时间长度
         video_time_text = video_time_text.toString();
-        if (video_time_text.search("当前网络未非WiFi网络") != -1) {
+        if (video_time_text.search("当前网络未非WiFi网络") != -1 || video_time_text.search("当前为未非WiFi网络") != -1) {
             text("刷新重试").findOnce().click();
             sleep(200);
             video_time_text = className('android.widget.TextView').clickable(false).depth(video_bar_depth).findOne().text();
         }
         log("短视频时长:" + video_time_text);
-        if (video_time_text == null) {
+        if (video_time_text == null || video_time_text == '') {
             sleep(200);
             continue;
         }
@@ -506,7 +504,7 @@ if (!finish_list[1]) {
             sleep(utils.random_time(delay_time));
             continue;
         }
-        sleep(Number(current_video_time.slice(4)) * 1000 + 1000);
+        sleep(Number(current_video_time.slice(4)) * 1000 + 3000);
         completed_watch_count++;
     }
     back();
@@ -871,7 +869,7 @@ function do_periodic_answer(number) {
                 } else {
                     if (!answer) {
                         var questionSlice = className('android.view.View').depth(24).find();
-                        findBlankAnswer(tipsText, questionSlice);
+                        answer = findBlankAnswer(tipsText, questionSlice);
                     }
                     fill_in_blank(answer);
                 }
@@ -1100,6 +1098,7 @@ function do_battle_contest(type) {
     }
 
     var questionMap = new Map();
+    var ocrFailTime = 0;
     while (!text('继续挑战').exists()) {
         className("android.view.View").depth(q_index).waitFor();
         console.log("do_battle_contest 题目加载");
@@ -1115,6 +1114,14 @@ function do_battle_contest(type) {
         var result = paddle_ocr_api(img);
         var question = result[0];
         if (question == "") {
+            ocrFailTime++;
+            if (ocrFailTime >= 4) {
+                var b = className('android.widget.RadioButton').depth(o_index).clickable(true).findOnce();
+                if (b != null) {
+                    b.click();
+                    ocrFailTime = 0;
+                }
+            }
             continue;
         }
         var options_text = result[1];
@@ -1136,46 +1143,15 @@ function do_battle_contest(type) {
             do_contest_answer(o_index, question, options_text);
             //答完题后的休息时间
             sleep(1000);
+        } else {
+            var b = className('android.widget.RadioButton').depth(o_index).clickable(true).findOnce();
+            if (b != null) {
+                b.click();
+            }
         }
         questionMap.set(key, 1);
     }
     console.log("do_battle_contest end");
-}
-
-/*
- **********四人赛********* !finish_list[6]
- */
-if (!finish_list[6]) {
-    console.log("四人赛");
-    if (!text("四人赛").exists()) utils.back_track(2);
-    swipe(500, 1700, 500, 500, utils.random_time(delay_time / 2));
-    var model = text("四人赛").findOne().parent().child(4);
-    model.click();
-    sleep(utils.random_time(delay_time));
-    var isPlay = textStartsWith("今日积分奖励局1").exists() || textStartsWith("今日积分奖励局2").exists();
-    console.log("四人赛第一局: %o 第二局：%o", textStartsWith("今日积分奖励局1").exists(), textStartsWith("今日积分奖励局2").exists());
-    if (isPlay) {
-        sleep(utils.random_time(delay_time));
-        for (var i = 0; i < 2; i++) {
-            sleep(utils.random_time(delay_time));
-            my_click_clickable("开始比赛");
-            do_battle_contest(4);
-            if (text("非积分奖励局").exists()) {
-                break;
-            }
-            if (i == 0) {
-                sleep(utils.random_time(delay_time * 2));
-                my_click_clickable("继续挑战");
-                sleep(utils.random_time(delay_time));
-            }
-        }
-        sleep(utils.random_time(delay_time));
-        back();
-    } else {
-        console.log("四人赛已完成跳过");
-    }
-    sleep(utils.random_time(delay_time));
-    back();
 }
 
 /*
@@ -1203,18 +1179,61 @@ if (!finish_list[7] && two_players_scored < 1) {
 }
 
 /*
+ **********四人赛********* !finish_list[6]
+ */
+if (!finish_list[6]) {
+    console.log("四人赛");
+    if (!text("四人赛").exists()) utils.back_track(2);
+    swipe(500, 1700, 500, 500, utils.random_time(delay_time / 2));
+    var model = text("四人赛").findOne().parent().child(4);
+    model.click();
+    sleep(utils.random_time(delay_time));
+    /*
+    * 有个奇怪的bug，不识别下面的，导致不能答题
+    */
+    var b1 = className("android.view.View").depth(23).textStartsWith("今日积分奖励局1").exists();
+    var b2 = className("android.view.View").depth(23).textStartsWith("今日积分奖励局2").exists();
+    var isPlay = b1 || b2;
+    console.log("四人赛第一局: %o 第二局：%o", b1, b2);
+    if (isPlay) {
+        sleep(utils.random_time(delay_time));
+        for (var i = 0; i < 2; i++) {
+            sleep(utils.random_time(delay_time));
+            my_click_clickable("开始比赛");
+            do_battle_contest(4);
+            if (text("非积分奖励局").exists()) {
+                break;
+            }
+            if (i == 0) {
+                sleep(utils.random_time(delay_time * 2));
+                my_click_clickable("继续挑战");
+                sleep(utils.random_time(delay_time));
+            }
+        }
+        sleep(utils.random_time(delay_time));
+        back();
+    } else {
+        console.log("四人赛已完成跳过");
+    }
+    sleep(utils.random_time(delay_time));
+    back();
+}
+
+/*
  **********发表观点*********
  */
 console.log("发表观点 start")
-if (!finish_list[9]) {
-
+var userName = "";
+//!finish_list[9]
+if (true) {
+    toastLog("评论获取用户名称");
     var speechs = [
         "好好学习，天天向上",
-        // "大国领袖，高瞻远瞩",
+        "大国领袖，高瞻远瞩",
         "请党放心，强国有我",
-        // "坚持信念，砥砺奋进",
-        // "团结一致，共建美好",
-        // "为人民谋幸福"
+        "坚持信念，砥砺奋进",
+        "团结一致，共建美好",
+        "为人民谋幸福"
     ];
 
     sleep(utils.random_time(delay_time));
@@ -1229,7 +1248,7 @@ if (!finish_list[9]) {
     var artcle = null;
     var c = false;
     while (!c) {
-        swipe(500, 600, 500, 300, 600);
+        swipe(500, 600, 500, 300, 300);
         artcle = id("general_card_title_id").findOnce();
         if (artcle == null || artcle.parent() == null || artcle.parent().parent() == null) {
             continue;
@@ -1248,6 +1267,7 @@ if (!finish_list[9]) {
     sleep(utils.random_time(delay_time));
     my_click_clickable('发布');
     sleep(utils.random_time(delay_time * 2));
+    userName = className("android.widget.TextView").text("我").findOne().parent().child(0).text();
     my_click_clickable('删除');
     sleep(utils.random_time(delay_time));
     my_click_clickable('确认');
@@ -1256,17 +1276,14 @@ if (!finish_list[9]) {
 }
 console.log("发表观点 end");
 
-
 if (pushplus_token.length > 0) {
-    utils.back_track(1);
+    utils.back_track(2);
     // 获取今日得分
     var score = textStartsWith('今日已累积').findOne().text();
     score = score.match(/\d+/);
     sleep(utils.random_time(delay_time));
     back();
-    // 获取账号名
-    var account = id('my_display_name').findOne().text();
-    push_weixin_message(account, score);
+    push_weixin_message(userName, score);
 }
 
 device.cancelKeepingAwake();

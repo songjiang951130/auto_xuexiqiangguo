@@ -143,38 +143,35 @@ var raw = "“昊带楚客多游，壮丽东南第一州”，这是明朝《永
 var search = question_search.getAnswerText(raw);
 console.log(search)
 
+var lock_number = "303178";
+device.wakeUpIfNeeded();
 
-function findBlankAnswer(tipsText, questionSlice) {
-    var questionString = [];
-    for (var i in questionSlice) {
-        if (typeof questionSlice[i] == "function" || !questionSlice[i]) {
-            continue;
-        }
-        if (questionSlice[i] == "class com.stardust.automator.UiObjectCollection") {
-            continue;
-        }
-        var q = questionSlice[i].text();
-        if (q.includes("")) {
-            break;
-        }
-        console.log("填空题解析q :" + q + " i:" + i);
-        // tipsText = tipsText.replace(q, "");
-        // console.log("填空题解析res:" + tipsText);
-        if (q.includes("")) {
-            break;
-        }
+console.log("开始输入密码");
+// 等待屏幕亮起
+sleep(1000);
+//向下滑动、展示输入密码页
+swipe(500, 30, 500, 1000, 300);
+sleep(400);
 
-    }
-    return tipsText;
-}
+//输入锁屏密码
+// for (var l in lock_number) {
+//     console.log("开始输入密码中");
+//     // lock_number[l].paste();
+//     for (let index = 0; index < 30; index++) {
+//         var m = className('android.view.View').depth(index).find();
+//         for(var mi in m){
+//             try {
+//                 console.log("mi text:" + mi.text());
+//                 m[mi].click();
+//                 setClip(lock_number[l]);
+//                 console.log("密码:" + lock_number[l]);
+//                 m[mi].paste();
+//                 sleep(200);
+//             } catch (error) {
+//                 console.log(error) 
+//             }
+            
+//         }
+//     }
 
-click("查看提示");
-var tipsModel = text("提示").findOne().parent().parent().child(1).child(0);
-var tipsText = tipsModel.text();
-console.log("tipsText:" + tipsText);
-back();
-
-var questionSlice = className('android.view.View').depth(24).drawingOrder(0).find();
-
-findBlankAnswer(tipsText, questionSlice);
-
+// }

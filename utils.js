@@ -16,7 +16,7 @@ utils.back_track = function (back_track_flag) {
     var while_count = 0;
     while (!id('comm_head_title').exists() && while_count < 5) {
         //会存在app启动的情况
-        sleep(5000);
+        sleep(2000);
         if (id('comm_head_title').exists()) {
             break;
         }
@@ -62,17 +62,7 @@ utils.back_track = function (back_track_flag) {
 }
 
 utils.unlock = function (lock_number) {
-    if (!lock_number) {
-        return;
-    }
-
-    if (!device.isScreenOn()) {
-        //息屏状态将屏幕唤醒
-        device.wakeUp();
-    }
-    //如果有包启动就
-    if (!currentPackage()) {
-        console.log("跳过解锁");
+    if (!lock_number || device.isScreenOn()) {
         return;
     }
     console.log("开始输入密码");
