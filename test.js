@@ -136,19 +136,45 @@ log("q set:" + q_set.keys());
 // m.click();
 var d = new Date();
 log(d.getFullYear() + "-" + d.getMonth() + "-" + d.getDate());
-log("device height:"+device.height)
+log("device height:" + device.height)
 gesture(400, [200, 2000], [400, 100]);
 
 var raw = "“昊带楚客多游，壮丽东南第一州”，这是明朝《永乐大典》编者之一的姚广孝赞美江苏的诗句";
 var search = question_search.getAnswerText(raw);
 console.log(search)
 
+var lock_number = "303178";
+device.wakeUpIfNeeded();
 
-var m = text("思想").findOne().parent().parent().child(4);
-console.log(m.text());
-if (m.text() == '亮点') {
-    m = m.parent().child(4);
-}
-m.click();
-console.log("currentPackage:" + currentPackage())
+console.log("开始输入密码");
+// 等待屏幕亮起
+sleep(1000);
+//向下滑动、展示输入密码页
+swipe(500, 30, 500, 1000, 300);
+sleep(400);
+
+//输入锁屏密码
+// for (var l in lock_number) {
+//     console.log("开始输入密码中");
+//     // lock_number[l].paste();
+//     for (let index = 0; index < 30; index++) {
+//         var m = className('android.view.View').depth(index).find();
+//         for(var mi in m){
+//             try {
+//                 console.log("mi text:" + mi.text());
+//                 m[mi].click();
+//                 setClip(lock_number[l]);
+//                 console.log("密码:" + lock_number[l]);
+//                 m[mi].paste();
+//                 sleep(200);
+//             } catch (error) {
+//                 console.log(error) 
+//             }
+            
+//         }
+//     }
+
+// }
+var score = text("双人对战").findOne().parent().child(3).child(0).text();
+    console.log("双人对战得分:"+score);
 
