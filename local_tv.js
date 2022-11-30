@@ -5,7 +5,7 @@ localTV.doTask = function () {
     var score = text(taskName).findOne().parent().child(3).child(0).text();
     console.log(taskName+" score:"+score);
     if(score > 0){
-        retrn;
+        return;
     }
     text(taskName).findOne().parent().child(4).click();
     var tab_depth = 26;
