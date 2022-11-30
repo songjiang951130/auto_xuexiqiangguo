@@ -175,3 +175,6 @@ sleep(400);
 //     }
 
 // }
+var score = text("双人对战").findOne().parent().child(3).child(0).text();
+    console.log("双人对战得分:"+score);
+

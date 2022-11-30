@@ -1,4 +1,3 @@
-var delay_time = 500;
 var task_parent = 11;
 
 var utils = {};

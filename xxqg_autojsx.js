@@ -1,6 +1,7 @@
 /** 代码模块化 */
 var question_search = require('question_search.js');
 var utils = require('utils.js');
+var local_tv = require('local_tv.js');
 var my_log = require('log.js');
 my_log.config();
 
@@ -272,8 +273,6 @@ function push_weixin_message(account, score) {
 var completed_read_count;
 // 已观看视频次数
 var completed_watch_count;
-// 双人对战已得分
-var two_players_scored;
 /**
  * 
  * @returns 
@@ -296,9 +295,7 @@ function get_finish_list() {
             completed_read_count = parseInt(model.child(child_index).child(0).text());
         } else if (i == 5) {
             completed_watch_count = parseInt(model.child(child_index).child(0).text());
-        } else if (i == 11) {
-            two_players_scored = parseInt(model.child(child_index).child(0).text());
-        }
+        } 
         finish_list.push(model.child(4).text() == '已完成');
     }
     console.log("已完成情况:" + finish_list);
@@ -358,13 +355,7 @@ console.log("选读文章 start");
 if (!finish_list[4] && completed_read_count < 12) {
     utils.back_track(0);
     sleep(200);
-    if (!finish_list[10]) {
-        var tab_depth = app_index_version_map["tab_depth"][app_index_version];
-        className('android.widget.LinearLayout').clickable(true).depth(tab_depth).waitFor();
-        className('android.widget.LinearLayout').clickable(true).depth(tab_depth).drawingOrder(1).findOne().click();
-        sleep(500);
-        back();
-    }
+    local_tv.doTask();
     // 阅读文章次数
     var count = 0;
     var single_total_read = 63000;
@@ -412,6 +403,10 @@ if (!finish_list[4] && completed_read_count < 12) {
     }
 }
 console.log("选读文章 end" + (new Date() - startRead) / 1000 / 60);
+
+
+
+local_tv.doTask();
 
 /*
  *********************视听部分********************
@@ -1115,11 +1110,12 @@ function do_battle_contest(type) {
         var question = result[0];
         if (question == "") {
             ocrFailTime++;
-            if (ocrFailTime >= 4) {
+            if (ocrFailTime >= 3) {
                 var b = className('android.widget.RadioButton').depth(o_index).clickable(true).findOnce();
                 if (b != null) {
                     b.click();
                     ocrFailTime = 0;
+                    sleep(2000);
                 }
             }
             continue;
@@ -1158,25 +1154,33 @@ function do_battle_contest(type) {
  **********双人对战*********
  !finish_list[7] && two_players_scored < 1
  */
-if (!finish_list[7] && two_players_scored < 1) {
+function battleTwo(){
     console.log("双人对战");
     sleep(utils.random_time(delay_time));
 
-    if (!text("双人对战").exists()) utils.back_track(2);
-    entry_model(11);
-
-    // // 点击随机匹配
-    // console.log("等待:" + "随机匹配");
+    if (!text("双人对战").exists()){
+        utils.back_track(2);
+    }
+    var score = text("双人对战").findOne().parent().child(3).child(0).text();
+    console.log("双人对战得分:"+score);
+    if(score > 0){
+        console.log("双人对战已做答");
+        return ;
+    }
+    text("双人对战").findOne().parent().child(4).click();
     text("随机匹配").waitFor();
-    sleep(utils.random_time(delay_time * 2));
+    sleep(200);
     text("随机匹配").findOne().parent().child(0).click();
     do_battle_contest(2);
-    sleep(utils.random_time(delay_time));
+    sleep(200);
     back();
-    sleep(utils.random_time(delay_time));
+    sleep(200);
     back();
-    my_click_clickable("退出");
+    if(text("随机匹配").exists()){
+        back();
+    }
 }
+battleTwo();
 
 /*
  **********四人赛********* !finish_list[6]
@@ -1228,7 +1232,6 @@ console.log("发表观点 start")
 var userName = "";
 //!finish_list[9]
 if (true) {
-    toastLog("评论获取用户名称");
     var speechs = [
         "好好学习，天天向上",
         "大国领袖，高瞻远瞩",
@@ -1242,7 +1245,10 @@ if (true) {
     if (!text('发表观点').exists()) {
         utils.back_track(2);
     }
-    entry_model(14);
+    toastLog("评论获取用户名称");
+    var model = text("发表观点").findOne().parent().child(4);
+    model.click();
+
     // 随意找一篇文章
     sleep(utils.random_time(delay_time * 2));
     className("android.widget.TextView").text("文化").findOne().parent().click();
