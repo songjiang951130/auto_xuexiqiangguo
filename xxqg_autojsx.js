@@ -1183,7 +1183,9 @@ if (!finish_list[7] && two_players_scored < 1) {
  */
 if (!finish_list[6]) {
     console.log("四人赛");
-    if (!text("四人赛").exists()) utils.back_track(2);
+    if (!text("四人赛").exists()){
+        utils.back_track(2);
+    } 
     swipe(500, 1700, 500, 500, utils.random_time(delay_time / 2));
     var model = text("四人赛").findOne().parent().child(4);
     model.click();
@@ -1240,7 +1242,7 @@ if (true) {
     if (!text('发表观点').exists()) {
         utils.back_track(2);
     }
-    entry_model(13);
+    entry_model(14);
     // 随意找一篇文章
     sleep(utils.random_time(delay_time * 2));
     className("android.widget.TextView").text("文化").findOne().parent().click();
