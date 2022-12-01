@@ -78,7 +78,6 @@ var lock_number = "";
 var start = new Date();
 
 /* **********************请填写如上信息********************** */
-console.log("解锁");
 utils.unlock(lock_number);
 
 auto.waitFor();
@@ -94,14 +93,10 @@ storage.remove(answer_question_map_name);
 
 //请求横屏截图权限
 threads.start(function () {
-    try {
-        var beginBtn;
-        if (beginBtn = classNameContains("Button").textContains("开始").findOne(1000));
-        else (beginBtn = classNameContains("Button").textContains("允许").findOne(1000));
-        beginBtn.click();
-    } catch (error) {
-        console.log(error);
-    }
+    var beginBtn;
+    if (beginBtn = classNameContains("Button").textContains("开始").findOne(1000));
+    else (beginBtn = classNameContains("Button").textContains("允许").findOne(1000));
+    beginBtn.click();
 });
 requestScreenCapture(false);
 console.log("获取截图权限");

@@ -61,9 +61,11 @@ utils.back_track = function (back_track_flag) {
 }
 
 utils.unlock = function (lock_number) {
-    if (!lock_number || device.isScreenOn()) {
+    console.log("解锁");
+    if (!lock_number) {
         return;
     }
+    device.wakeUpIfNeeded();
     console.log("开始输入密码");
     // 等待屏幕亮起
     sleep(1000);
@@ -72,10 +74,13 @@ utils.unlock = function (lock_number) {
     sleep(400);
     //输入锁屏密码
     for (var l in lock_number) {
-        var mo = desc(lock_number[l]).findOnce(200)
-        if (mo != null) {
-            mo.click();
-        }
+        var c = lock_number[l]
+        // console.log("password:"+lock_number[l]);
+        // if(text(lock_number[l]).exists()){
+        //     console.log("password:"+textContains(lock_number[l]).findOne().text()+ " exists");
+        // }
+        var ract = text(c).findOne().bounds();
+        click(ract.centerX(), ract.centerY())
         sleep(200);
     }
 }
