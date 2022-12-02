@@ -66,12 +66,14 @@ utils.unlock = function (lock_number) {
         return;
     }
     device.wakeUpIfNeeded();
-    console.log("开始输入密码");
     // 等待屏幕亮起
     sleep(1000);
     //向下滑动、展示输入密码页
     swipe(500, 30, 500, 1000, 300);
     sleep(400);
+    if(!text("输入密码").exists()){
+        return;
+    }
     //输入锁屏密码
     for (var l in lock_number) {
         var c = lock_number[l]
