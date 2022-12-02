@@ -79,7 +79,6 @@ var lock_number = "";
 var start = new Date();
 
 /* **********************请填写如上信息********************** */
-console.log("解锁");
 utils.unlock(lock_number);
 
 auto.waitFor();
@@ -95,14 +94,10 @@ storage.remove(answer_question_map_name);
 
 //请求横屏截图权限
 threads.start(function () {
-    try {
-        var beginBtn;
-        if (beginBtn = classNameContains("Button").textContains("开始").findOne(1000));
-        else (beginBtn = classNameContains("Button").textContains("允许").findOne(1000));
-        beginBtn.click();
-    } catch (error) {
-        console.log(error);
-    }
+    var beginBtn;
+    if (beginBtn = classNameContains("Button").textContains("开始").findOne(1000));
+    else (beginBtn = classNameContains("Button").textContains("允许").findOne(1000));
+    beginBtn.click();
 });
 requestScreenCapture(false);
 console.log("获取截图权限");
@@ -356,7 +351,6 @@ console.log("选读文章 start");
 if (!finish_list[4] && completed_read_count < 12) {
     utils.back_track(0);
     sleep(200);
-    local_tv.doTask();
     // 阅读文章次数
     var count = 0;
     var single_total_read = 63000;
@@ -406,7 +400,7 @@ if (!finish_list[4] && completed_read_count < 12) {
 console.log("选读文章 end" + (new Date() - startRead) / 1000 / 60);
 
 
-
+utils.back_track(2);
 local_tv.doTask();
 
 /*
@@ -722,7 +716,10 @@ function is_select_all_choice() {
     var question = (className('android.view.View').depth(daily_question_depth).findOnce(1).text().length > 2) ?
         className('android.view.View').depth(daily_question_depth).findOnce(1).text() :
         className('android.view.View').depth(daily_question_depth).findOnce(3).text();
-    return options.length / 2 == (question.match(/\s+/g) || []).length;
+    var isMultChoice =  options.length / 2 == (question.match(/\s+/g) || []).length;
+    console.log("多选题判断全选:"+isMultChoice);
+    console.log("多选题文本:"+question);
+    return isMultChoice;
 }
 
 /**
@@ -813,7 +810,7 @@ function do_periodic_answer(number) {
             sleep(utils.random_time(delay_time));
 
             // 判断是否是全选，这样就不用ocr
-            if (textContains('多选题').exists() && is_select_all_choice()) {
+            if (text('多选题').exists() && is_select_all_choice()) {
                 // options数组：下标为i基数时对应着ABCD，下标为偶数时对应着选项i-1(ABCD)的数值
                 var options = className('android.view.View').depth(26).find();
                 for (var i = 1; i < options.length; i += 2) {

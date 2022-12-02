@@ -146,12 +146,7 @@ console.log(search)
 var lock_number = "303178";
 device.wakeUpIfNeeded();
 
-console.log("开始输入密码");
-// 等待屏幕亮起
-sleep(1000);
-//向下滑动、展示输入密码页
-swipe(500, 30, 500, 1000, 300);
-sleep(400);
+
 
 //输入锁屏密码
 // for (var l in lock_number) {
@@ -175,6 +170,8 @@ sleep(400);
 //     }
 
 // }
-var score = text("双人对战").findOne().parent().child(3).child(0).text();
-    console.log("双人对战得分:"+score);
+
+
+    var t = className('android.view.View').depth(23).findOnce(1).text();
+    console.log("multChoice:"+t);
 
