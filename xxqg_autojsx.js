@@ -290,7 +290,7 @@ function get_finish_list() {
             completed_read_count = parseInt(model.child(child_index).child(0).text());
         } else if (i == 5) {
             completed_watch_count = parseInt(model.child(child_index).child(0).text());
-        } 
+        }
         finish_list.push(model.child(4).text() == '已完成');
     }
     console.log("已完成情况:" + finish_list);
@@ -715,9 +715,9 @@ function is_select_all_choice() {
     var question = (className('android.view.View').depth(daily_question_depth).findOnce(1).text().length > 2) ?
         className('android.view.View').depth(daily_question_depth).findOnce(1).text() :
         className('android.view.View').depth(daily_question_depth).findOnce(3).text();
-    var isMultChoice =  options.length / 2 == (question.match(/\s+/g) || []).length;
-    console.log("多选题判断全选:"+isMultChoice);
-    console.log("多选题文本:"+question);
+    var isMultChoice = options.length / 2 == (question.match(/\s+/g) || []).length;
+    console.log("多选题判断全选:" + isMultChoice);
+    console.log("多选题文本:" + question);
     return isMultChoice;
 }
 
@@ -1151,18 +1151,18 @@ function do_battle_contest(type) {
  **********双人对战*********
  !finish_list[7] && two_players_scored < 1
  */
-function battleTwo(){
+function battleTwo() {
     console.log("双人对战");
     sleep(utils.random_time(delay_time));
 
-    if (!text("双人对战").exists()){
+    if (!text("双人对战").exists()) {
         utils.back_track(2);
     }
     var score = text("双人对战").findOne().parent().child(3).child(0).text();
-    console.log("双人对战得分:"+score);
-    if(score > 0){
+    console.log("双人对战得分:" + score);
+    if (score > 0) {
         console.log("双人对战已做答");
-        return ;
+        return;
     }
     text("双人对战").findOne().parent().child(4).click();
     text("随机匹配").waitFor();
@@ -1173,54 +1173,51 @@ function battleTwo(){
     back();
     sleep(200);
     back();
-    if(text("随机匹配").exists()){
+    if (text("随机匹配").exists()) {
         back();
     }
 }
 battleTwo();
 
-/*
- **********四人赛********* !finish_list[6]
- */
-if (!finish_list[6]) {
+function battleFour() {
     console.log("四人赛");
-    if (!text("四人赛").exists()){
+    if (!text("四人赛").exists()) {
         utils.back_track(2);
-    } 
+    }
+    var taskName = "四人赛";
+    console.log(taskName);
+    var score = text(taskName).findOne().parent().child(3).child(0).text();
+    console.log(taskName + " score:" + score);
+    if (score >= 4) {
+        return;
+    }
+    var playTimes = 1;
+    if (score == 0) {
+        playTimes = 2;
+    }
+
     swipe(500, 1700, 500, 500, utils.random_time(delay_time / 2));
     var model = text("四人赛").findOne().parent().child(4);
     model.click();
     sleep(utils.random_time(delay_time));
-    /*
-    * 有个奇怪的bug，不识别下面的，导致不能答题
-    */
-    var b1 = className("android.view.View").depth(23).textStartsWith("今日积分奖励局1").exists();
-    var b2 = className("android.view.View").depth(23).textStartsWith("今日积分奖励局2").exists();
-    var isPlay = b1 || b2;
-    console.log("四人赛第一局: %o 第二局：%o", b1, b2);
-    if (isPlay) {
+    for (var i = 0; i <= playTimes; i++) {
         sleep(utils.random_time(delay_time));
-        for (var i = 0; i < 2; i++) {
-            sleep(utils.random_time(delay_time));
-            my_click_clickable("开始比赛");
-            do_battle_contest(4);
-            if (text("非积分奖励局").exists()) {
-                break;
-            }
-            if (i == 0) {
-                sleep(utils.random_time(delay_time * 2));
-                my_click_clickable("继续挑战");
-                sleep(utils.random_time(delay_time));
-            }
+        my_click_clickable("开始比赛");
+        do_battle_contest(4);
+        if (text("非积分奖励局").exists()) {
+            break;
         }
-        sleep(utils.random_time(delay_time));
-        back();
-    } else {
-        console.log("四人赛已完成跳过");
+        if (i == 0) {
+            sleep(utils.random_time(delay_time * 2));
+            my_click_clickable("继续挑战");
+            sleep(utils.random_time(delay_time));
+        }
     }
     sleep(utils.random_time(delay_time));
     back();
 }
+battleFour();
+
 
 /*
  **********发表观点*********
