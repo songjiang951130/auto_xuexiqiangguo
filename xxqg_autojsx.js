@@ -800,10 +800,6 @@ function do_periodic_answer(number) {
         var answer = "";
         var num = 0;
         for (num; num < number; num++) {
-            if (text("登录").exists()) {
-                entry_model(7);
-                num = 0;
-            }
             // 下滑到底防止题目过长，选项没有读取到
             swipe(500, 1700, 500, 500, utils.random_time(delay_time / 2));
             sleep(utils.random_time(delay_time));
@@ -962,17 +958,26 @@ handling_access_exceptions();
 var restart_flag = 0;
 
 log("每日答题 start")
-if (!finish_list[3]) {
-    sleep(utils.random_time(delay_time));
-    if (!text('积分规则').exists()) {
+function dauily() {
+    if (!text("每日答题").exists()) {
         utils.back_track(2);
     }
-    entry_model(7);
+    var taskName = "每日答题";
+    console.log(taskName);
+    var score = text(taskName).findOne().parent().child(3).child(0).text();
+    console.log(taskName + " score:" + score);
+    if (score >= 5) {
+        return;
+    }
+
+    var model = text(taskName).findOne().parent().child(4);
+    model.click();
     // 等待题目加载
     text('查看提示').waitFor();
     do_periodic_answer(5);
     my_click_clickable('返回');
 }
+dauily();
 console.log("每日答题 end")
 
 /*
@@ -1185,7 +1190,6 @@ function battleFour() {
         utils.back_track(2);
     }
     var taskName = "四人赛";
-    console.log(taskName);
     var score = text(taskName).findOne().parent().child(3).child(0).text();
     console.log(taskName + " score:" + score);
     if (score >= 4) {
@@ -1205,14 +1209,15 @@ function battleFour() {
         my_click_clickable("开始比赛");
         do_battle_contest(4);
         if (text("非积分奖励局").exists()) {
+            back();
             break;
         }
-        if (i == 0) {
-            sleep(utils.random_time(delay_time * 2));
-            my_click_clickable("继续挑战");
-            sleep(utils.random_time(delay_time));
-        }
     }
+    console.log("继续挑战start");
+    if (text("继续挑战").exists()) {
+        back();
+    }
+    console.log("继续挑战end");
     sleep(utils.random_time(delay_time));
     back();
 }
@@ -1222,10 +1227,18 @@ battleFour();
 /*
  **********发表观点*********
  */
+var users = storages.create("user");
+
 console.log("发表观点 start")
-var userName = "";
-//!finish_list[9]
-if (true) {
+var userName = users.get("user");;
+function sendOpinion() {
+    var taskName = "发表观点";
+    console.log(taskName);
+    var score = text(taskName).findOne().parent().child(3).child(0).text();
+    console.log(taskName + " score:" + score);
+    if (score > 0) {
+        return;
+    }
     var speechs = [
         "好好学习，天天向上",
         "大国领袖，高瞻远瞩",
@@ -1270,12 +1283,14 @@ if (true) {
     my_click_clickable('发布');
     sleep(utils.random_time(delay_time * 2));
     userName = className("android.widget.TextView").text("我").findOne().parent().child(0).text();
+    users.put("user", userName);
     my_click_clickable('删除');
     sleep(utils.random_time(delay_time));
     my_click_clickable('确认');
     sleep(utils.random_time(delay_time));
     back();
 }
+sendOpinion();
 console.log("发表观点 end");
 
 if (pushplus_token.length > 0) {
