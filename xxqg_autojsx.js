@@ -555,7 +555,6 @@ function select_option(answer, depth_click_option, options_text) {
 }
 
 /**
- * 答题（挑战答题、四人赛与双人对战）
  * @param {int} depth_click_option 点击选项控件的深度，用于点击选项
  * @param {string} question 问题
  * @param {list[string]} options_text 每个选项文本
@@ -1083,9 +1082,7 @@ function saveOcrError(bizName, rawImage, clip) {
     images.save(clip, imageDir + "fail" + t + "_clip.jpg");
 }
 
-/**
- * 四人赛先加载题目再加载答案，而且是单选题，所以可以先题目识别，找到答案，答案一加载，就点击答案
- */
+
 function do_battle_contest(type) {
     console.log("do_battle_contest do_4_contest");
     var q_index = app_index_version_map["four_question"][app_index_version];
@@ -1204,9 +1201,13 @@ function battleFour() {
     var model = text("四人赛").findOne().parent().child(4);
     model.click();
     sleep(utils.random_time(delay_time));
-    for (var i = 0; i <= playTimes; i++) {
+    for (var i = 0; i < playTimes; i++) {
         sleep(utils.random_time(delay_time));
-        my_click_clickable("开始比赛");
+        if (i == 0) {
+            my_click_clickable("开始比赛");
+        } else {
+            my_click_clickable("继续挑战");
+        }
         do_battle_contest(4);
         if (text("非积分奖励局").exists()) {
             back();
