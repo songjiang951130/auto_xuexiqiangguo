@@ -1231,7 +1231,6 @@ battleFour();
 var users = storages.create("user");
 
 console.log("发表观点 start")
-var userName = users.get("user");;
 function sendOpinion() {
     var taskName = "发表观点";
     console.log(taskName);
@@ -1283,7 +1282,7 @@ function sendOpinion() {
     sleep(utils.random_time(delay_time));
     my_click_clickable('发布');
     sleep(utils.random_time(delay_time * 2));
-    userName = className("android.widget.TextView").text("我").findOne().parent().child(0).text();
+    var userName = className("android.widget.TextView").text("我").findOne().parent().child(0).text();
     users.put("user", userName);
     my_click_clickable('删除');
     sleep(utils.random_time(delay_time));
@@ -1301,6 +1300,7 @@ if (pushplus_token.length > 0) {
     score = score.match(/\d+/);
     sleep(utils.random_time(delay_time));
     back();
+    var userName = users.get("user");
     push_weixin_message(userName, score);
 }
 
