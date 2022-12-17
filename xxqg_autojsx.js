@@ -799,6 +799,10 @@ function do_periodic_answer(number) {
         var answer = "";
         var num = 0;
         for (num; num < number; num++) {
+            if (text("登录").exists()) {
+                entry_model(7);
+                num = 0;
+            }
             // 下滑到底防止题目过长，选项没有读取到
             swipe(500, 1700, 500, 500, utils.random_time(delay_time / 2));
             sleep(utils.random_time(delay_time));
