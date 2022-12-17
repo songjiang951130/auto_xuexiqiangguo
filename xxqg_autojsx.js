@@ -1114,7 +1114,8 @@ function do_battle_contest(type) {
         if (question == "") {
             ocrFailTime++;
             if (ocrFailTime >= 3) {
-                var b = className('android.widget.RadioButton').depth(o_index).clickable(true).findOnce();
+                var random = Math.round(Math.random());
+                var b = className('android.widget.RadioButton').depth(o_index).clickable(true).findOnce(random);
                 if (b != null) {
                     b.click();
                     ocrFailTime = 0;
