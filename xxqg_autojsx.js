@@ -960,7 +960,6 @@ handling_access_exceptions();
  */
 var restart_flag = 0;
 
-log("每日答题 start")
 function dauily() {
     if (!text("每日答题").exists()) {
         utils.back_track(2);
@@ -980,6 +979,7 @@ function dauily() {
     do_periodic_answer(5);
     my_click_clickable('返回');
 }
+log("每日答题 start");
 dauily();
 console.log("每日答题 end")
 
@@ -1194,19 +1194,15 @@ function battleFour() {
     var taskName = "四人赛";
     var score = text(taskName).findOne().parent().child(3).child(0).text();
     console.log(taskName + " score:" + score);
-    if (score >= 4) {
+    if (className("android.view.View").text("今日积分奖励局3/2").exists()) {
         return;
-    }
-    var playTimes = 1;
-    if (score == 0) {
-        playTimes = 2;
     }
 
     swipe(500, 1700, 500, 500, utils.random_time(delay_time / 2));
     var model = text("四人赛").findOne().parent().child(4);
     model.click();
     sleep(utils.random_time(delay_time));
-    for (var i = 0; i < playTimes; i++) {
+    for (var i = 0; i < 2; i++) {
         sleep(utils.random_time(delay_time));
         if (i == 0) {
             my_click_clickable("开始比赛");
@@ -1214,10 +1210,6 @@ function battleFour() {
             my_click_clickable("继续挑战");
         }
         do_battle_contest(4);
-        if (text("非积分奖励局").exists()) {
-            back();
-            break;
-        }
     }
     console.log("继续挑战start");
     if (text("继续挑战").exists()) {
