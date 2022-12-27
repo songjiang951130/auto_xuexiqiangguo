@@ -17,6 +17,7 @@ var delay_time = 500;
 /**
  * 选填，是否要使用微信消息推送功能
  * 如是 请填写pushplus的token，如何获取请见说明
+ * topic 分组消息，可以进行组员消息推送
  *  */
 var pushplus_token = [];
 var pushplus_topic = [];
@@ -258,53 +259,11 @@ function push_weixin_message(account, score) {
     }
 }
 
-/**
- * 注意各个版本位置不同需要分辨
- * 获取各模块完成情况的列表、以及全局变量
- * 先获取有哪些模块还没有完成，并生成一个列表，其中第一个是我要选读文章模块，以此类推
- * 再获取阅读模块和视听模块已完成的时间和次数
- */
-// 已阅读文章次数
-var completed_read_count;
-// 已观看视频次数
-var completed_watch_count;
-/**
- * 
- * @returns 
- */
-function get_finish_list() {
-    var child_index = 3;
-    var finish_list = [];
-    for (var i = 4; i < 16; i++) {
-        var task_parent = app_index_version_map["task_parent"][app_index_version];
-        var model = className('android.view.View').depth(task_parent).findOnce(i);
-        if (model == null) {
-            app_index_version++;
-            i--;
-            console.log("app版本:" + app_index_version);
-            continue;
-        }
-        // log("model: " + model);
-        console.log("task:" + (i - 4) + " " + model.child(0).text());
-        if (i == 4) {
-            completed_read_count = parseInt(model.child(child_index).child(0).text());
-        } else if (i == 5) {
-            completed_watch_count = parseInt(model.child(child_index).child(0).text());
-        }
-        finish_list.push(model.child(4).text() == '已完成');
-    }
-    console.log("已完成情况:" + finish_list);
-    return finish_list;
-}
-
 /*
  *********************准备部分********************
  */
 utils.back_track(2);
 sleep(utils.random_time(delay_time));
-var finish_list = get_finish_list();
-
-
 
 /*
  *********************阅读部分********************
@@ -318,14 +277,19 @@ media.pauseMusic();
  */
 var currentVolume = device.getMusicVolume();
 // 打开电台广播
-
-if (!finish_list[2]) {
-    console.log("打开电台广播")
+function listenFM() {
+    var taskName = '视听学习时长';
+    var score = text(taskName).findOne().parent().child(3).child(0).text();
+    console.log(taskName + " score:" + score);
+    if (score >= 6) {
+        return;
+    }
     device.setMusicVolume(0);
-    if (text("视听学习时长").exists()) {
-        var model = text("视听学习时长").findOne().parent().child(4);
+    if (text(taskName).exists()) {
+        var model = text(taskName).findOne().parent().child(4);
         model.click();
     }
+
     sleep(utils.random_time(delay_time));
     my_click_clickable('电台');
     sleep(utils.random_time(delay_time));
@@ -343,11 +307,38 @@ if (!finish_list[2]) {
         click(home_bottom.centerX(), home_bottom.centerY());
     }
 }
-console.log("打开电台广播end");
 
-var startRead = new Date();
-console.log("选读文章 start");
-if (!finish_list[4] && completed_read_count < 12) {
+function closeFM() {
+    var taskName = '视听学习时长';
+    if (text(taskName).exists()) {
+        var model = text(taskName).findOne().parent().child(4);
+        model.click();
+    }
+    sleep(utils.random_time(delay_time));
+    my_click_clickable('电台');
+    sleep(utils.random_time(delay_time));
+    my_click_clickable('听广播');
+    sleep(utils.random_time(delay_time));
+    if (!textStartsWith("最近收听").exists() && !textStartsWith("推荐收听").exists()) {
+        // 换成通过text寻找控件
+        textStartsWith("正在收听").waitFor();
+        if (textStartsWith("正在收听").findOne().parent().child(1).child(0) != null) {
+            textStartsWith("正在收听").findOne().parent().child(1).child(0).click();
+        } else {
+            id("v_playing").findOne().click();
+        }
+    }
+}
+
+function readArtcle() {
+    utils.back_track(2);
+    var taskName = '我要选读文章';
+    var completed_read_count = text(taskName).findOne().parent().child(3).child(0).text();
+    console.log(taskName + " score:" + completed_read_count);
+    if (completed_read_count >= 12) {
+        return;
+    }
+
     utils.back_track(0);
     sleep(200);
     // 阅读文章次数
@@ -396,49 +387,23 @@ if (!finish_list[4] && completed_read_count < 12) {
         }
     }
 }
-console.log("选读文章 end" + (new Date() - startRead) / 1000 / 60);
-
-
-utils.back_track(2);
-local_tv.doTask();
-
-/*
- *********************视听部分********************
- */
-
-// 关闭电台广播
-if (!finish_list[2]) {
-    device.setMusicVolume(0);
-    sleep(utils.random_time(delay_time));
-    my_click_clickable('电台');
-    sleep(utils.random_time(delay_time));
-    my_click_clickable('听广播');
-    sleep(utils.random_time(delay_time));
-    if (!textStartsWith("最近收听").exists() && !textStartsWith("推荐收听").exists()) {
-        // 换成通过text寻找控件
-        textStartsWith("正在收听").waitFor();
-        if (textStartsWith("正在收听").findOne().parent().child(1).child(0) != null) {
-            textStartsWith("正在收听").findOne().parent().child(1).child(0).click();
-        } else {
-            id("v_playing").findOne().click();
-        }
-    }
-    sleep(utils.random_time(delay_time));
-    device.setMusicVolume(currentVolume);
-}
-console.log("关闭电台广播 end");
 
 /*
  **********视听学习、听学习时长*********
  */
-console.log("视听学习 start:" + finish_list[1]);
-if (!finish_list[1]) {
-    var video_depth = app_index_version_map["video_depth"][app_index_version];
-    var video_bar_depth = app_index_version_map["video_bar_depth"][app_index_version];
-
+function videoListenStudy() {
+    var taskName = "视听学习"
     if (!text('视听学习').exists()) {
         utils.back_track(2);
     }
+    // 已观看视频次数
+    var score = text(taskName).findOne().parent().child(3).child(0).text();
+    console.log(taskName + " score:" + score);
+    if (score >= 6) {
+        return;
+    }
+    var video_depth = app_index_version_map["video_depth"][app_index_version];
+    var video_bar_depth = app_index_version_map["video_bar_depth"][app_index_version];
     entry_model(5);
     sleep(utils.random_time(delay_time * 2));
     my_click_clickable('百灵');
@@ -461,9 +426,9 @@ if (!finish_list[1]) {
     click(bound.centerX(), bound.centerY());
     toast("点击第一个视频");
     sleep(utils.random_time(delay_time));
-    console.log("completed_watch_count:" + completed_watch_count)
-    while (completed_watch_count <= 6) {
-        log("completed_watch_count:" + completed_watch_count);
+    console.log("completed_watch_count:" + score)
+    while (score <= 6) {
+        log("completed_watch_count:" + score);
         sleep(utils.random_time(delay_time / 2));
         var video_time_text = className('android.widget.TextView').clickable(false).depth(video_bar_depth).findOne().text();
         if (video_time_text == null) {
@@ -494,13 +459,31 @@ if (!finish_list[1]) {
             continue;
         }
         sleep(Number(current_video_time.slice(4)) * 1000 + 3000);
-        completed_watch_count++;
+        score++;
     }
     back();
     sleep(1000);
     device.setMusicVolume(currentVolume);
 }
-log("视听学习 end");
+
+console.log("打开电台广播");
+listenFM();
+console.log("打开电台广播 end");
+
+var startRead = new Date();
+console.log("选读文章 start");
+readArtcle();
+console.log("选读文章 end" + (new Date() - startRead) / 1000 / 60);
+
+utils.back_track(2);
+local_tv.doTask();
+
+closeFM();
+console.log("关闭电台广播 end");
+
+console.log("视听学习 start");
+videoListenStudy();
+console.log("视听学习 end");
 
 /*
  *********************竞赛部分********************
@@ -986,17 +969,23 @@ console.log("每日答题 end")
 /*
  **********挑战答题********* !finish_list[5]
  */
-console.log("挑战答题")
-if (!finish_list[5]) {
-    console.log("挑战答题start");
+function challenge() {
     if (!text('登录').exists()) {
         utils.back_track(2);
     };
+    var taskName = '挑战答题';
+    var score = text(taskName).findOne().parent().child(3).child(0).text();
+    console.log(taskName + " score:" + score);
+    if (score >= 5) {
+        return;
+    }
+
     var q_index = app_index_version_map["challenge_question"][app_index_version]; //12 26
     var o_index = app_index_version_map["challenge_option"][app_index_version];
     console.log("q_index:" + q_index + " o_index:" + o_index);
     sleep(utils.random_time(delay_time));
-    entry_model(9);
+    var model = text(taskName).findOne().parent().child(4);
+    model.click();
     className('android.view.View').depth(q_index).waitFor();
     //由于可以复活，所以5分满分加复活一次，就是6次
     var times = 6;
@@ -1074,6 +1063,8 @@ if (!finish_list[5]) {
     sleep(utils.random_time(delay_time));
     back();
 }
+console.log("挑战答题");
+challenge();
 console.log("挑战答题end");
 
 function saveOcrError(bizName, rawImage, clip) {
