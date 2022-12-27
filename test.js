@@ -139,39 +139,40 @@ log(d.getFullYear() + "-" + d.getMonth() + "-" + d.getDate());
 log("device height:" + device.height)
 gesture(400, [200, 2000], [400, 100]);
 
-var raw = "“昊带楚客多游，壮丽东南第一州”，这是明朝《永乐大典》编者之一的姚广孝赞美江苏的诗句";
+var raw = "vvv这是明朝《cc永乐大典》ccc编者之一的姚广孝赞美江苏的诗句cccc";
 var search = question_search.getAnswerText(raw);
 console.log(search)
 
-var lock_number = "303178";
-device.wakeUpIfNeeded();
+function search2(question) {
+    var url = "https://www.hysgn.com/e/search/index.php";
 
+    var keyboard = question
+    var show = "title";
+    var tempid = 1;
+    var tbname = "news";
+    var Submit = "搜索"
 
+    var r2 = http.post(url, {
+        "keyboard": keyboard,
+        "show": show,
+        "tempid": tempid,
+        "tbname": tbname,
+        "Submit": Submit
+    });
+    var body = r2.body.string();
+    // console.log("body:" + r2.body);
+    // var html = document.createElement('html');
+    // html.innerHTML = body;
+    // var bList = el.getElementsByTagName( 'b' );
+    // console.log("b List:" + bList);
+    var result = body.match(/f00.*<\/b/);
+    result = result.toString().replace('f00\">', "");
+    result = result.toString().replace('</b', "");
+    result = result.toString().replace(/[A-z]、/, "");
+    console.log("r:" + result);
 
-//输入锁屏密码
-// for (var l in lock_number) {
-//     console.log("开始输入密码中");
-//     // lock_number[l].paste();
-//     for (let index = 0; index < 30; index++) {
-//         var m = className('android.view.View').depth(index).find();
-//         for(var mi in m){
-//             try {
-//                 console.log("mi text:" + mi.text());
-//                 m[mi].click();
-//                 setClip(lock_number[l]);
-//                 console.log("密码:" + lock_number[l]);
-//                 m[mi].paste();
-//                 sleep(200);
-//             } catch (error) {
-//                 console.log(error) 
-//             }
-            
-//         }
-//     }
+}
+var q = "马克思";
+search2(q);
 
-// }
-
-
-    var t = className('android.view.View').depth(23).findOnce(1).text();
-    console.log("multChoice:"+t);
 
