@@ -1098,6 +1098,9 @@ function do_battle_contest(type) {
     var questionMap = new Map();
     var ocrFailTime = 0;
     while (!text('继续挑战').exists()) {
+        if (text("开始比赛").exists()) {
+            click("开始比赛");
+        }
         className("android.view.View").depth(q_index).waitFor();
         console.log("do_battle_contest 题目加载");
         var pos = className("android.view.View").depth(q_index).findOne().bounds();
@@ -1208,6 +1211,7 @@ function battleFour() {
             my_click_clickable("开始比赛");
         } else {
             my_click_clickable("继续挑战");
+            sleep(200);
         }
         do_battle_contest(4);
     }
