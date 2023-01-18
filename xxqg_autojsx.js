@@ -280,8 +280,10 @@ media.pauseMusic();
 var currentVolume = device.getMusicVolume();
 // 打开电台广播
 function listenFM() {
-    utils.back_track(2);
     var taskName = '视听学习时长';
+    if (!text(taskName).exists()) {
+        utils.back_track(2);
+    }
     var score = text(taskName).findOne().parent().child(3).child(0).text();
     console.log(taskName + " score:" + score);
     if (score >= 6) {
@@ -311,6 +313,9 @@ function listenFM() {
 
 function closeFM() {
     var taskName = '视听学习时长';
+    if (!text(taskName).exists()) {
+        utils.back_track(2);
+    }
     if (text(taskName).exists()) {
         var model = text(taskName).findOne().parent().child(4);
         model.click();
@@ -970,7 +975,7 @@ function challenge() {
     }
     var model = text(taskName).findOne().parent().child(4);
     model.click();
-    click("时事政治");
+    text("时事政治").findOne().click();
 
     var q_index = app_index_version_map["challenge_question"][app_index_version]; //12 26
     var o_index = app_index_version_map["challenge_option"][app_index_version];
@@ -1127,12 +1132,7 @@ function do_battle_contest(type) {
     console.log("do_battle_contest end");
 }
 
-/*
- **********双人对战*********
- !finish_list[7] && two_players_scored < 1
- */
 function battleTwo() {
-    console.log("双人对战");
     sleep(utils.random_time(delay_time));
 
     if (!text("双人对战").exists()) {
@@ -1153,10 +1153,7 @@ function battleTwo() {
     back();
     sleep(200);
     back();
-    if (text("随机匹配").exists()) {
-        back();
-        click("退出");
-    }
+    text("退出").click();
 }
 
 
