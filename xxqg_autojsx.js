@@ -1155,6 +1155,7 @@ function battleTwo() {
     back();
     if (text("随机匹配").exists()) {
         back();
+        click("退出");
     }
 }
 
