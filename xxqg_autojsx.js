@@ -23,6 +23,7 @@ var pushplus_token = [];
 var pushplus_topic = [];
 var lock_number = "";
 
+var users = storages.create("user");
 var app_index_version = 0;
 
 var app_index_version_map = {
@@ -953,9 +954,6 @@ function dauily() {
     do_periodic_answer(5);
     my_click_clickable('返回');
 }
-log("每日答题 start");
-dauily();
-console.log("每日答题 end")
 
 /*
  **********挑战答题********* !finish_list[5]
@@ -970,13 +968,15 @@ function challenge() {
     if (score >= 5) {
         return;
     }
+    var model = text(taskName).findOne().parent().child(4);
+    model.click();
+    click("时事政治");
 
     var q_index = app_index_version_map["challenge_question"][app_index_version]; //12 26
     var o_index = app_index_version_map["challenge_option"][app_index_version];
     console.log("q_index:" + q_index + " o_index:" + o_index);
     sleep(utils.random_time(delay_time));
-    var model = text(taskName).findOne().parent().child(4);
-    model.click();
+
     className('android.view.View').depth(q_index).waitFor();
     //由于可以复活，所以5分满分加复活一次，就是6次
     var times = 6;
@@ -1054,19 +1054,7 @@ function challenge() {
     sleep(utils.random_time(delay_time));
     back();
 }
-console.log("挑战答题");
-challenge();
-console.log("挑战答题end");
 
-function saveOcrError(bizName, rawImage, clip) {
-    var imageDir = "./image/" + bizName + "/";
-    if (!files.exists(imageDir)) {
-        files.createWithDirs(imageDir);
-    }
-    var t = new Date().toLocaleTimeString().toString().split(" ")[0].replace(/:/g, "-");
-    images.save(rawImage, imageDir + "fail" + t + "_raw.jpg");
-    images.save(clip, imageDir + "fail" + t + "_clip.jpg");
-}
 
 
 function do_battle_contest(type) {
@@ -1169,7 +1157,7 @@ function battleTwo() {
         back();
     }
 }
-battleTwo();
+
 
 function battleFour() {
     console.log("四人赛");
@@ -1205,15 +1193,12 @@ function battleFour() {
     sleep(utils.random_time(delay_time));
     back();
 }
-battleFour();
+
 
 
 /*
  **********发表观点*********
  */
-var users = storages.create("user");
-
-console.log("发表观点 start")
 function sendOpinion() {
     var taskName = "发表观点";
     console.log(taskName);
@@ -1273,6 +1258,16 @@ function sendOpinion() {
     sleep(utils.random_time(delay_time));
     back();
 }
+
+log("每日答题 start");
+dauily();
+console.log("每日答题 end");
+console.log("挑战答题");
+challenge();
+console.log("挑战答题end");
+battleTwo();
+battleFour();
+console.log("发表观点 start");
 sendOpinion();
 console.log("发表观点 end");
 
