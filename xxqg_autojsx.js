@@ -22,6 +22,7 @@ var delay_time = 500;
 
 var pushplus_token = [];
 var pushplus_topic = [];
+var lock_number = "";
 
 var app_index_version = 0;
 
@@ -76,7 +77,7 @@ var app_index_version_map = {
     ]
 }
 
-var lock_number = "";
+
 var start = new Date();
 
 /* **********************请填写如上信息********************** */
@@ -279,6 +280,7 @@ media.pauseMusic();
 var currentVolume = device.getMusicVolume();
 // 打开电台广播
 function listenFM() {
+    utils.back_track(2);
     var taskName = '视听学习时长';
     var score = text(taskName).findOne().parent().child(3).child(0).text();
     console.log(taskName + " score:" + score);
@@ -286,10 +288,8 @@ function listenFM() {
         return;
     }
     device.setMusicVolume(0);
-    if (text(taskName).exists()) {
-        var model = text(taskName).findOne().parent().child(4);
-        model.click();
-    }
+    var model = text(taskName).findOne().parent().child(4);
+    model.click();
 
     sleep(utils.random_time(delay_time));
     my_click_clickable('电台');
@@ -403,9 +403,11 @@ function videoListenStudy() {
     if (score >= 6) {
         return;
     }
+    var model = text(taskName).findOne().parent().child(4);
+    model.click();
     var video_depth = app_index_version_map["video_depth"][app_index_version];
     var video_bar_depth = app_index_version_map["video_bar_depth"][app_index_version];
-    entry_model(5);
+
     sleep(utils.random_time(delay_time * 2));
     my_click_clickable('百灵');
     sleep(utils.random_time(delay_time));
@@ -422,6 +424,8 @@ function videoListenStudy() {
     var firstVideo = text("").findOne(300);
     if (firstVideo == null) {
         firstVideo = className('android.widget.FrameLayout').clickable(true).depth(video_depth).findOne();
+    } else {
+        log("查找首个视频失败");
     }
     var bound = firstVideo.bounds();
     click(bound.centerX(), bound.centerY());
@@ -704,21 +708,6 @@ function is_select_all_choice() {
     return isMultChoice;
 }
 
-/**
- * 点击对应的去答题或去看看
- * @param {int} number 7对应为每日答题模块，以此类推
- */
-function entry_model(number) {
-    var task_parent = app_index_version_map["task_parent"][app_index_version];
-    var model = className('android.view.View').depth(task_parent).findOnce(number);
-    model.child(4).click();
-}
-
-function entry_text_model(model_text) {
-    var model = text(model_text).parent();
-    model.child(4).click();
-}
-
 function paddle_ocr_api(img) {
     /**
      * @see http://doc.autoxjs.com/#/AI
@@ -784,7 +773,9 @@ function do_periodic_answer(number) {
         var num = 0;
         for (num; num < number; num++) {
             if (text("登录").exists()) {
-                entry_model(7);
+                var taskName = "每日答题";
+                var model = text(taskName).findOne().parent().child(4);
+                model.click();
                 num = 0;
             }
             // 下滑到底防止题目过长，选项没有读取到
