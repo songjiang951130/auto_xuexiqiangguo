@@ -477,25 +477,6 @@ function videoListenStudy() {
     device.setMusicVolume(currentVolume);
 }
 
-console.log("打开电台广播");
-listenFM();
-console.log("打开电台广播 end");
-
-var startRead = new Date();
-console.log("选读文章 start");
-readArtcle();
-console.log("选读文章 end" + (new Date() - startRead) / 1000 / 60);
-
-utils.back_track(2);
-local_tv.doTask();
-
-closeFM();
-console.log("关闭电台广播 end");
-
-console.log("视听学习 start");
-videoListenStudy();
-console.log("视听学习 end");
-
 /*
  *********************竞赛部分********************
  */
@@ -1154,6 +1135,7 @@ function battleTwo() {
     back();
     sleep(200);
     back();
+    className("android.view.View").text("").findOne().click();
     text("退出").click();
 }
 
@@ -1258,6 +1240,42 @@ function sendOpinion() {
     back();
 }
 
+function pushMessage() {
+    if (pushplus_token.length <= 0) {
+        return;
+    }
+
+    utils.back_track(2);
+    // 获取今日得分
+    var score = textStartsWith('今日已累积').findOne().text();
+    score = score.match(/\d+/);
+    sleep(utils.random_time(delay_time));
+    back();
+    var userName = users.get("user");
+    push_weixin_message(userName, score);
+}
+
+
+
+console.log("打开电台广播");
+listenFM();
+console.log("打开电台广播 end");
+
+var startRead = new Date();
+console.log("选读文章 start");
+readArtcle();
+console.log("选读文章 end" + (new Date() - startRead) / 1000 / 60);
+
+utils.back_track(2);
+local_tv.doTask();
+
+closeFM();
+console.log("关闭电台广播 end");
+
+console.log("视听学习 start");
+videoListenStudy();
+console.log("视听学习 end");
+
 log("每日答题 start");
 dauily();
 console.log("每日答题 end");
@@ -1270,16 +1288,8 @@ console.log("发表观点 start");
 sendOpinion();
 console.log("发表观点 end");
 
-if (pushplus_token.length > 0) {
-    utils.back_track(2);
-    // 获取今日得分
-    var score = textStartsWith('今日已累积').findOne().text();
-    score = score.match(/\d+/);
-    sleep(utils.random_time(delay_time));
-    back();
-    var userName = users.get("user");
-    push_weixin_message(userName, score);
-}
+pushMessage();
+
 
 device.cancelKeepingAwake();
 
