@@ -1132,11 +1132,14 @@ function battleTwo() {
     text("随机匹配").findOne().parent().child(0).click();
     do_battle_contest(2);
     sleep(200);
-    back();
+    if(text("继续挑战").exists()){
+        className("android.view.View").text("").findOne().click();
+    }
     sleep(200);
-    back();
-    className("android.view.View").text("").findOne().click();
-    text("退出").click();
+    if(text("开始对战").exists()){
+        className("android.view.View").text("").findOne().click();
+        text("退出").click();
+    }
 }
 
 
