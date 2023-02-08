@@ -317,6 +317,11 @@ function closeFM() {
     if (!text(taskName).exists()) {
         utils.back_track(2);
     }
+    var score = text(taskName).findOne().parent().child(3).child(0).text();
+    console.log(taskName + " score:" + score);
+    if (score >= 6) {
+        return;
+    }
     if (text(taskName).exists()) {
         var model = text(taskName).findOne().parent().child(4);
         model.click();
