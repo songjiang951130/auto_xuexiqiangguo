@@ -69,7 +69,7 @@ utils.unlock = function (lock_number) {
     // 等待屏幕亮起
     sleep(1000);
     //向下滑动、展示输入密码页
-    swipe(500, 30, 500, 1000, 300);
+    swipe(500, 1000, 500, 300, 300);
     sleep(400);
     if(!text("输入密码").exists()){
         return;
