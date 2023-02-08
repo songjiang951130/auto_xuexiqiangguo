@@ -957,7 +957,9 @@ function challenge() {
     }
     var model = text(taskName).findOne().parent().child(4);
     model.click();
+    sleep(200);
     text("时事政治").findOne().click();
+    sleep(200);
 
     var q_index = app_index_version_map["challenge_question"][app_index_version]; //12 26
     var o_index = app_index_version_map["challenge_option"][app_index_version];
@@ -1132,11 +1134,11 @@ function battleTwo() {
     text("随机匹配").findOne().parent().child(0).click();
     do_battle_contest(2);
     sleep(200);
-    if(text("继续挑战").exists()){
+    if (text("继续挑战").exists()) {
         className("android.view.View").text("").findOne().click();
     }
     sleep(200);
-    if(text("开始对战").exists()){
+    if (text("开始对战").exists()) {
         className("android.view.View").text("").findOne().click();
         text("退出").click();
     }
@@ -1151,7 +1153,9 @@ function battleFour() {
     var taskName = "四人赛";
     var score = text(taskName).findOne().parent().child(3).child(0).text();
     console.log(taskName + " score:" + score);
-    if (className("android.view.View").text("今日积分奖励局3/2").exists()) {
+    var b1 = className("android.view.View").text("今日积分奖励局1/2").exists();
+    var b2 = className("android.view.View").text("今日积分奖励局2/2").exists();
+    if (!b1 && !b2) {
         return;
     }
 

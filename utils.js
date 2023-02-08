@@ -15,7 +15,7 @@ utils.back_track = function (back_track_flag) {
     var while_count = 0;
     while (!id('comm_head_title').exists() && while_count < 5) {
         //会存在app启动的情况
-        sleep(2000);
+        sleep(3000);
         if (id('comm_head_title').exists()) {
             break;
         }
