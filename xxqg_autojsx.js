@@ -343,8 +343,10 @@ function closeFM() {
 }
 
 function readArtcle() {
-    utils.back_track(2);
     var taskName = '我要选读文章';
+    if(!text(taskName).exists()){
+        utils.back_track(2);
+    }
     var completed_read_count = text(taskName).findOne().parent().child(3).child(0).text();
     console.log(taskName + " score:" + completed_read_count);
     if (completed_read_count >= 12) {
@@ -1158,15 +1160,19 @@ function battleFour() {
     var taskName = "四人赛";
     var score = text(taskName).findOne().parent().child(3).child(0).text();
     console.log(taskName + " score:" + score);
-    var b1 = className("android.view.View").text("今日积分奖励局1/2").exists();
-    var b2 = className("android.view.View").text("今日积分奖励局2/2").exists();
-    if (!b1 && !b2) {
-        return;
-    }
-
     swipe(500, 1700, 500, 500, utils.random_time(delay_time / 2));
     var model = text("四人赛").findOne().parent().child(4);
     model.click();
+    sleep(3000);
+    var b1 = text("今日积分奖励局1/2").exists();
+    var b2 = text("今日积分奖励局2/2").exists();
+    log("b1:%b b2:{}", b1, b2)
+    if (!(b1 || b2)) {
+        console.log(taskName + " 已完成");
+        back();
+        return;
+    }
+
     sleep(utils.random_time(delay_time));
     for (var i = 0; i < 2; i++) {
         sleep(utils.random_time(delay_time));
