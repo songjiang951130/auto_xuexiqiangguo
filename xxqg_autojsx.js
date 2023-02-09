@@ -778,9 +778,12 @@ function do_periodic_answer(number) {
 
             // 判断是否是全选，这样就不用ocr
             if (text('多选题').exists() && is_select_all_choice()) {
+                sleep(300);
                 // options数组：下标为i基数时对应着ABCD，下标为偶数时对应着选项i-1(ABCD)的数值
                 var options = className('android.view.View').depth(26).find();
+                log("options length:" + options.length);
                 for (var i = 1; i < options.length; i += 2) {
+                    log("options text:"+options[i].text());
                     my_click_non_clickable(options[i].text());
                 }
 
