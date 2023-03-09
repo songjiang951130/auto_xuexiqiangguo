@@ -174,31 +174,35 @@ function map_get(key) {
 var storage = storages.create('data');
 // 更新题库为
 var answer_question_map_name = "answer_question_map_name";
-storage.remove(answer_question_map_name);
-if (!storage.contains(answer_question_map_name)) {
+function updateQuestionKit() {
+    console.log("题库 updating")
     // 使用 Github 文件加速服务：https://gh-proxy.com
-    var answer_question_bank = http.get("https://gh-proxy.com/https://raw.githubusercontent.com/Mondayfirst/XXQG_TiKu/main/%E9%A2%98%E5%BA%93_%E6%8E%92%E5%BA%8F%E7%89%88.json");
-    answer_question_bank = answer_question_bank.body.string();
-    answer_question_bank = JSON.parse(answer_question_bank);
-
-    for (var question in answer_question_bank) {
-        var answer = answer_question_bank[question];
-        if (special_problem.indexOf(question.slice(0, 7)) != -1) question = question.slice(question.indexOf('|') + 1);
-        else {
-            question = question.slice(0, question.indexOf('|'));
-            question = question.slice(0, question.indexOf(' '));
-            question = question.slice(0, 10);
+    http.get("https://ghproxy.com/https://raw.githubusercontent.com/Mondayfirst/XXQG_TiKu/main/%E9%A2%98%E5%BA%93_%E6%8E%92%E5%BA%8F%E7%89%88.json", {}, function (res, err) {
+        if (err) {
+            console.log("题库 下载失败")
+            console.error(err);
+            return;
         }
-        map_set(question, answer);
-    }
+        var answer_question_bank = res.body.string();
+        answer_question_bank = JSON.parse(answer_question_bank);
 
-    storage.put(answer_question_map_name, answer_question_map);
-    console.log("题库 更新完成")
-} else {
-    console.log("题库 跳过更新");
+        for (var question in answer_question_bank) {
+            var answer = answer_question_bank[question];
+            if (special_problem.indexOf(question.slice(0, 7)) != -1) question = question.slice(question.indexOf('|') + 1);
+            else {
+                question = question.slice(0, question.indexOf('|'));
+                question = question.slice(0, question.indexOf(' '));
+                question = question.slice(0, 10);
+            }
+            map_set(question, answer);
+        }
+        console.log("题库 移除旧题库");
+        storage.remove(answer_question_map_name);
+        storage.put(answer_question_map_name, answer_question_map);
+        console.log("题库 更新完成");
+    });
 }
-
-var answer_question_map = storage.get(answer_question_map_name);
+updateQuestionKit();
 
 /**
  * 模拟点击不可以点击元素
@@ -344,7 +348,7 @@ function closeFM() {
 
 function readArtcle() {
     var taskName = '我要选读文章';
-    if(!text(taskName).exists()){
+    if (!text(taskName).exists()) {
         utils.back_track(2);
     }
     var completed_read_count = text(taskName).findOne().parent().child(3).child(0).text();
@@ -360,7 +364,7 @@ function readArtcle() {
     var single_total_read = 63000;
     var titleSet = new Set();
     var article_depth = app_index_version_map["article_depth"][app_index_version];
-    var need_count = (12 - completed_read_count) / 2 + 1;
+    var need_count = (12 - completed_read_count) / 2;
     while (count < need_count) {
         console.log("开始阅读：need_count:%d count:%d", need_count, count)
         swipe(800, 2000, 800, 600, 1000);
@@ -445,10 +449,21 @@ function videoListenStudy() {
     toast("点击第一个视频");
     sleep(utils.random_time(delay_time));
     console.log("completed_watch_count:" + score)
-    while (score <= 6) {
+    while (score < 6) {
         log("completed_watch_count:" + score);
         sleep(utils.random_time(delay_time / 2));
+        // 当前视频的时间长度
         var video_time_text = className('android.widget.TextView').clickable(false).depth(video_bar_depth).findOne().text();
+        if (video_time_text == null) {
+            sleep(200);
+            continue;
+        }
+        video_time_text = video_time_text.toString();
+        if (video_time_text.search("当前网络未非WiFi网络") != -1 || video_time_text.search("当前为未非WiFi网络") != -1) {
+            text("刷新重试").findOnce().click();
+            sleep(200);
+            video_time_text = className('android.widget.TextView').clickable(false).depth(video_bar_depth).findOne().text();
+        }
         if (video_time_text == null) {
             sleep(200);
             continue;
@@ -580,7 +595,6 @@ function do_contest_answer(depth_click_option, question, options_text) {
 /*
  ********************答题部分********************
  */
-var blank_storge = storages.create("auto_xuexiqiangguo:blank");
 // 填空题
 function fill_in_blank(answer) {
     // 获取每个空
@@ -783,7 +797,7 @@ function do_periodic_answer(number) {
                 var options = className('android.view.View').depth(26).find();
                 log("options length:" + options.length);
                 for (var i = 1; i < options.length; i += 2) {
-                    log("options text:"+options[i].text());
+                    log("options text:" + options[i].text());
                     my_click_non_clickable(options[i].text());
                 }
 
@@ -1298,6 +1312,7 @@ videoListenStudy();
 console.log("视听学习 end");
 
 log("每日答题 start");
+updateQuestionKit();
 dauily();
 console.log("每日答题 end");
 console.log("挑战答题");
