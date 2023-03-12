@@ -8,11 +8,11 @@ localTV.doTask = function () {
         return;
     }
     text(taskName).findOne().parent().child(4).click();
-    var tab_depth = 26;
-    className('android.widget.LinearLayout').clickable(true).depth(tab_depth).waitFor();
-    className('android.widget.LinearLayout').clickable(true).depth(tab_depth).drawingOrder(1).findOne().click();
     sleep(500);
+    var tab_depth = 27;
+    var c = textEndsWith("学习平台").depth(tab_depth).findOne().bounds();
+    click(c.centerX(), c.centerY());
+    sleep(200);
     back();
 }
-
 module.exports = localTV;
