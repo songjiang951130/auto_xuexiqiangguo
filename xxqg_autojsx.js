@@ -1290,7 +1290,9 @@ function pushMessage() {
     push_weixin_message(userName, score);
 }
 
-
+console.log("挑战答题");
+challenge();
+console.log("挑战答题end");
 
 console.log("打开电台广播");
 listenFM();
@@ -1315,9 +1317,7 @@ log("每日答题 start");
 updateQuestionKit();
 dauily();
 console.log("每日答题 end");
-console.log("挑战答题");
-challenge();
-console.log("挑战答题end");
+
 battleTwo();
 battleFour();
 console.log("发表观点 start");
