@@ -1293,6 +1293,13 @@ function pushMessage() {
 console.log("挑战答题");
 challenge();
 console.log("挑战答题end");
+log("每日答题 start");
+updateQuestionKit();
+dauily();
+console.log("每日答题 end");
+
+battleTwo();
+battleFour();
 
 console.log("打开电台广播");
 listenFM();
@@ -1313,13 +1320,6 @@ console.log("视听学习 start");
 videoListenStudy();
 console.log("视听学习 end");
 
-log("每日答题 start");
-updateQuestionKit();
-dauily();
-console.log("每日答题 end");
-
-battleTwo();
-battleFour();
 console.log("发表观点 start");
 sendOpinion();
 console.log("发表观点 end");
