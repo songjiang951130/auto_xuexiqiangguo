@@ -202,7 +202,7 @@ function updateQuestionKit() {
         console.log("题库 更新完成");
     });
 }
-updateQuestionKit();
+
 
 /**
  * 模拟点击不可以点击元素
@@ -406,6 +406,10 @@ function readArtcle() {
     }
 }
 
+function doReadArtcle(){
+
+}
+
 /*
  **********视听学习、听学习时长*********
  */
@@ -431,7 +435,7 @@ function videoListenStudy() {
     if (text("关闭").exists()) {
         click("关闭");
     }
-    console.log("竖")
+    console.log("竖");
     my_click_clickable('竖');
     // 等待视频加载
     device.setMusicVolume(0);
@@ -1100,8 +1104,7 @@ function do_battle_contest(type) {
         if (question == "") {
             ocrFailTime++;
             if (ocrFailTime >= 3) {
-                var random = Math.round(Math.random());
-                var b = className('android.widget.RadioButton').depth(o_index).clickable(true).findOnce(random);
+                var b = className('android.widget.RadioButton').depth(o_index).clickable(true).findOnce(0);
                 if (b != null) {
                     b.click();
                     ocrFailTime = 0;
@@ -1217,6 +1220,9 @@ function battleFour() {
  */
 function sendOpinion() {
     var taskName = "发表观点";
+    if (!text(taskName).exists()) {
+        utils.back_track(2);
+    }
     console.log(taskName);
     var score = text(taskName).findOne().parent().child(3).child(0).text();
     console.log(taskName + " score:" + score);
@@ -1290,11 +1296,11 @@ function pushMessage() {
     push_weixin_message(userName, score);
 }
 
+updateQuestionKit();
 console.log("挑战答题");
 challenge();
 console.log("挑战答题end");
 log("每日答题 start");
-updateQuestionKit();
 dauily();
 console.log("每日答题 end");
 
@@ -1307,6 +1313,8 @@ console.log("打开电台广播 end");
 
 var startRead = new Date();
 console.log("选读文章 start");
+readArtcle();
+//经常会失败，所以多读一次
 readArtcle();
 console.log("选读文章 end" + (new Date() - startRead) / 1000 / 60);
 
