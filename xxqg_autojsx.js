@@ -455,19 +455,14 @@ function videoListenStudy() {
     console.log("completed_watch_count:" + score)
     while (score < 6) {
         log("completed_watch_count:" + score);
-        sleep(utils.random_time(delay_time / 2));
+        sleep(300);
+        var continueLook = text("继续播放").findOnce();
+        if(continueLook != null){
+            continueLook.click();
+            sleep(200);
+        }
         // 当前视频的时间长度
         var video_time_text = className('android.widget.TextView').clickable(false).depth(video_bar_depth).findOne().text();
-        if (video_time_text == null) {
-            sleep(200);
-            continue;
-        }
-        video_time_text = video_time_text.toString();
-        if (video_time_text.search("当前网络未非WiFi网络") != -1 || video_time_text.search("当前为未非WiFi网络") != -1) {
-            text("刷新重试").findOnce().click();
-            sleep(200);
-            video_time_text = className('android.widget.TextView').clickable(false).depth(video_bar_depth).findOne().text();
-        }
         if (video_time_text == null) {
             sleep(200);
             continue;
