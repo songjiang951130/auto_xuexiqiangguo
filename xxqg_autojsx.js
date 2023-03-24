@@ -954,7 +954,7 @@ function dauily() {
 }
 
 /*
- **********挑战答题********* !finish_list[5]
+ **********挑战答题********* 
  */
 function challenge() {
     if (!text('登录').exists()) {

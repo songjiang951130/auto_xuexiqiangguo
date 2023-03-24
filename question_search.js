@@ -56,13 +56,12 @@ question_search.getAnswerText = function (question) {
     result = r1.body.string().match(/答案：.*</);
     // log("searh question:" + question + " r1:" + result);
     if (result == null) {
-        log("url:" + 'http://www.syiban.com/search/index/init.html?modelid=1&q=' + encodeURI(question.slice(0, 10)));
-        return search2(question);
-    } else {
-        var result = result[0].slice(5, result[0].indexOf('<'));
-        result = result.replace(/、/, "");
-        // log('searh res: ' + result);
-        return result;
+        log("url error:" + 'http://www.syiban.com/search/index/init.html?modelid=1&q=' + encodeURI(question.slice(0, 10)));
+        return null;
     }
+    var result = result[0].slice(5, result[0].indexOf('<'));
+    result = result.replace(/、/, "");
+    // log('searh res: ' + result);
+    return result;
 }
 module.exports = question_search;
