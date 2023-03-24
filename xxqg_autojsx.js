@@ -406,10 +406,6 @@ function readArtcle() {
     }
 }
 
-function doReadArtcle(){
-
-}
-
 /*
  **********视听学习、听学习时长*********
  */
@@ -457,7 +453,7 @@ function videoListenStudy() {
         log("completed_watch_count:" + score);
         sleep(300);
         var continueLook = text("继续播放").findOnce();
-        if(continueLook != null){
+        if (continueLook != null) {
             continueLook.click();
             sleep(200);
         }
@@ -623,11 +619,11 @@ function findBlankAnswer(tipsText, questionSlice) {
         }
         var q = questionSlice[i].text();
         tipsText = tipsText.replace(q, "");
-        console.log("填空题解析res:" + tipsText);
         if (q.includes("出题")) {
             break;
         }
     }
+    console.log("填空题解析res:" + tipsText);
     return tipsText;
 }
 
@@ -637,15 +633,12 @@ function findBlankAnswer(tipsText, questionSlice) {
  * @returns {string} video_answer 答案
  */
 function video_answer_question(video_question) {
+    console.log("视频题文案：" + video_question)
     // 找到中文标点符号
     var punctuation_index = video_question.search(/[\u3002|\uff1f|\uff01|\uff0c|\u3001|\uff1b|\uff1a|\u201c|\u201d|\u2018|\u2019|\uff08|\uff09|\u300a|\u300b|\u3008|\u3009|\u3010|\u3011|\u300e|\u300f|\u300c|\u300d|\ufe43|\ufe44|\u3014|\u3015|\u2026|\u2014|\uff5e|\ufe4f|\uffe5]/);
     video_question = video_question.slice(0, Math.max(5, punctuation_index));
-    try {
-        var video_result = http.get('https://www.365shenghuo.com/?s=' + encodeURI(video_question));
-    } catch (error) { }
-    var video_answer = video_result.body.string().match(/答案：.+</);
-    if (video_answer) video_answer = video_answer[0].slice(3, video_answer[0].indexOf('<'));
-    return video_answer;
+    console.log("视频题文案：" + video_question)
+    return false;
 }
 
 /**
@@ -857,7 +850,7 @@ function do_periodic_answer(number) {
             // 如果错误（ocr识别有误）则重来
             if (text('下一题').exists() || text('完成').exists()) {
                 // 如果视频题错误，则每周答题就不需要重新答
-                if (restart_flag == 1 && className("android.widget.Image").exists()) {
+                if (className("android.widget.Image").exists()) {
                     if (text('下一题').exists()) click('下一题');
                     else click('完成');
                 } else {
@@ -939,11 +932,6 @@ function handling_access_exceptions() {
 处理访问异常，滑动验证
 */
 handling_access_exceptions();
-
-/*
- **********每日答题*********
- */
-var restart_flag = 0;
 
 function dauily() {
     if (!text("每日答题").exists()) {

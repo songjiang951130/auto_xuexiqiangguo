@@ -42,7 +42,7 @@ question_search.getAnswerText = function (question) {
     //qustion 选取文本最多的
     question = question.replace(/\d\./, "");
     question = question.replace(",", "，");
-    var q_list = question.split("，");
+    var q_list = question.split(/[,”.]/);
     question = "";
     q_list.forEach(element => {
         var blank_list = element.split("         ");
